@@ -1,12 +1,17 @@
 #include <time.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <unistd.h> //Para usar sleep()
 
 typedef struct nodo {
 	int dato;
 	struct nodo *sig;
 }NODO;
 
+/*Recibe un apuntador al primer caracter de una cadena, la modifica y genera un
+  codigo de forma ABC-123 donde las letras y numeros son aleatorias en base a la 
+  semilla generada por el tiempo
+*/
 void  uid ( char *uid) {
     int min = 65, max = 90, i = 0;
     srand(time(NULL));
@@ -19,6 +24,7 @@ void  uid ( char *uid) {
         uid[i] = rand() % ('9' - '1' + 1) + '1';
     }
 }
+
 void imprimeLista(NODO *ap){
 	while(ap!=NULL) {
 		printf("\nDato: %d", ap->dato);
