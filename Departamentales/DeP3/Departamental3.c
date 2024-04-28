@@ -1,20 +1,30 @@
 #include <time.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <unistd.h> //Para usar sleep()
 
 typedef struct nodo {
-	int dato;
+    char uid[8]; //ABC-789\0
+	int urgencia, operaciones;
 	struct nodo *sig;
 }NODO;
 
 /*Recibe un apuntador al primer caracter de una cadena, la modifica y genera un
   codigo de forma ABC-123 donde las letras y numeros son aleatorias en base a la 
-  semilla generada por el tiempo
+  semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
+  de caracteres de forma &uid[0].
 */
 void  uid ( char *uid) {
     int min = 65, max = 90, i = 0;
-    srand(time(NULL));
+    printf("\nRegistrando en la lista");
+    for(int i = 0; i < 10; i++) 
+    {
+        usleep(100000); //Pausa por 100000 microsegundos
+        printf(".");
+    } //pausa de un segundo
+
+    srand(time(NULL));//se genera la semilla
     for(i; i < 3; i++) {
         uid[i] = rand() % (max - min + 1) + min; 
     }
@@ -27,25 +37,28 @@ void  uid ( char *uid) {
 
 void imprimeLista(NODO *ap){
 	while(ap!=NULL) {
-		printf("\nDato: %d", ap->dato);
+		printf("\nUrgencia: %d | Operaciones: %d | UID: %s", ap->urgencia, ap->operaciones, ap->uid);
 		ap=ap->sig;
 	}
 	printf("\nFin\n\n");
 } 
-NODO *creaNodo (int dato) {
+NODO *creaNodo (int urgencia, int operaciones) {
 	NODO *nuevo;
 	nuevo=(NODO *)malloc(sizeof(NODO));
 	if (nuevo != NULL) {
-		nuevo->dato=dato;
+		nuevo->urgencia=urgencia;
+        nuevo->operaciones=operaciones;
+        //nuevo->uid = (char *)malloc(sizeof(char) * 8);
+        uid(&nuevo->uid[0]);
 		nuevo->sig=NULL;
 	}
 	return nuevo;
 }
 
-NODO *insertaFinal(NODO *ap, int d) {
+NODO *insertaFinal(NODO *ap, int urgencia, int operaciones) {
 	NODO *aux, *nuevo;
 	
-	nuevo=creaNodo(d);
+	nuevo=creaNodo(urgencia,operaciones);
 	if (nuevo == NULL) return ap;
 	if (ap==NULL) {
 		ap=nuevo;
@@ -60,15 +73,15 @@ NODO *insertaFinal(NODO *ap, int d) {
 	return ap;
 }
 
-NODO *insertaAlInicio(NODO *ap, int d) {
+NODO *insertaAlInicio(NODO *ap, int urgencia, int operaciones) {
 	NODO *aux, *nuevo;
 	
-	nuevo=creaNodo(d);
+	nuevo=creaNodo(urgencia, operaciones);
 	if (nuevo == NULL) return ap;
-	aux=ap;
-	ap=nuevo;
-	nuevo->sig=aux;
-	return ap;
+	aux=ap; //raiz
+	ap=nuevo; //nuevo
+	nuevo->sig=aux; //nuevo apunta a raiz
+	return ap; //se actualiza la raiz
 }
 
 int cuentaNodos(NODO *ap){
@@ -85,6 +98,12 @@ int cuentaNodos(NODO *ap){
 int main() {
 	NODO *raiz, *raiz1;
 
-	printf("\n Primera lista");
+	printf("\nPrimera lista");
 	raiz=NULL;
+    raiz=insertaAlInicio(raiz, 1,3);
+    raiz=insertaAlInicio(raiz, 1,2);
+    raiz=insertaAlInicio(raiz, 2,1);
+    raiz=insertaAlInicio(raiz, 3,2);
+    raiz=insertaAlInicio(raiz, 4,2);
+    imprimeLista(raiz);
 }
