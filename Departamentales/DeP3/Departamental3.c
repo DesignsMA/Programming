@@ -84,6 +84,42 @@ NODO *insertaAlInicio(NODO *ap, int urgencia, int operaciones) {
 	return ap; //se actualiza la raiz
 }
 
+NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
+	NODO *aux, *anterior, *nuevo;
+	
+	nuevo=creaNodo(urgencia,operaciones);
+	if (nuevo == NULL) return ap;
+	if (ap==NULL) {
+		ap=nuevo;
+	}
+	else {
+		anterior=ap; // se asigna a un auxiliar la raiz
+		if (anterior->sig == NULL && (nuevo->urgencia < anterior->urgencia))
+		{
+			nuevo->sig = anterior;
+			ap = nuevo;
+		}
+		else if (anterior->sig == NULL && (nuevo->urgencia > anterior->urgencia))
+			anterior->sig = nuevo;
+		else if (anterior->sig == NULL && (nuevo->urgencia == anterior->urgencia))
+			anterior->sig = nuevo;
+		else
+		{ //se recorre la lista
+			aux=ap;
+			while(aux != NULL) {
+				anterior = aux;
+				aux=anterior->sig; //se recorre al siguiente nodo
+				if ( aux->urgencia > nuevo->urgencia && (anterior->urgencia != aux->urgencia))
+				{
+					
+				}
+			}	
+			aux->sig=nuevo; //el ultimo apunta a nuevo que apunta a null
+		}
+	}
+	return ap;
+}
+
 int cuentaNodos(NODO *ap){
 	int c;
 	
