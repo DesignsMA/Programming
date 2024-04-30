@@ -85,7 +85,8 @@ NODO *insertaAlInicio(NODO *ap, int urgencia, int operaciones) {
 }
 
 NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
-	NODO *aux, *anterior, *nuevo;
+	NODO *aux, *anterior, *nuevo, *pos1, *pos2;
+    int distancia;
 	
 	nuevo=creaNodo(urgencia,operaciones);
 	if (nuevo == NULL) return ap;
@@ -93,30 +94,49 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
 		ap=nuevo;
 	}
 	else {
-		anterior=ap; // se asigna a un auxiliar la raiz
-		if (anterior->sig == NULL && (nuevo->urgencia < anterior->urgencia))
-		{
-			nuevo->sig = anterior;
-			ap = nuevo;
-		}
-		else if (anterior->sig == NULL && (nuevo->urgencia > anterior->urgencia))
-			anterior->sig = nuevo;
-		else if (anterior->sig == NULL && (nuevo->urgencia == anterior->urgencia))
-			anterior->sig = nuevo;
-		else
-		{ //se recorre la lista
-			aux=ap;
-			while(aux != NULL) {
-				anterior = aux;
-				aux=anterior->sig; //se recorre al siguiente nodo
-				if ( aux->urgencia > nuevo->urgencia && (anterior->urgencia != aux->urgencia))
+			distancia = nuevo->urgencia;
+			while(aux != NULL) 
+            {
+				anterior = ap;
+                aux=anterior->sig; //se recorre al siguiente nodo
+				if (aux == NULL)
 				{
-					
+					if (anterior->urgencia > nuevo->urgencia)
+					{
+						nuevo->sig = anterior;
+						anterior->sig = NULL;
+						ap = nuevo;
+												
+					}
+					else if ( anterior->urgencia <= nuevo->urgencia )
+					{
+						anterior->sig = nuevo;
+					}	
 				}
-			}	
-			aux->sig=nuevo; //el ultimo apunta a nuevo que apunta a null
+				else if (anterior->urgencia != aux->urgencia) 
+                {
+                    if ( aux->urgencia - nuevo->urgencia < distancia )
+                        {
+                            distancia = aux->urgencia - nuevo->urgencia;
+                            pos1 = anterior;
+                            pos2 = aux;
+                        }
+                }
+                
+			}
+			//se inserta el nuevo nodo en la lista
+            if (  distancia >=0 && aux != NULL )
+            {
+                pos1->sig = nuevo;
+                nuevo->sig = pos2;
+            }
+            else if (distancia < 0 && aux != NULL)
+            {
+                pos2->sig = nuevo;
+            }
+        	
 		}
-	}
+	
 	return ap;
 }
 
@@ -136,10 +156,13 @@ int main() {
 
 	printf("\nPrimera lista");
 	raiz=NULL;
-    raiz=insertaAlInicio(raiz, 1,3);
-    raiz=insertaAlInicio(raiz, 1,2);
-    raiz=insertaAlInicio(raiz, 2,1);
-    raiz=insertaAlInicio(raiz, 3,2);
-    raiz=insertaAlInicio(raiz, 4,2);
+    raiz=insertaUrgencia(raiz, 3,3);
+	imprimeLista(raiz);
+    raiz=insertaUrgencia(raiz, 1,2);
+	imprimeLista(raiz);
+    raiz=insertaUrgencia(raiz, 2,1);
+	imprimeLista(raiz);
+    raiz=insertaUrgencia(raiz, 3,2);
+    raiz=insertaUrgencia(raiz, 4,2);
     imprimeLista(raiz);
 }
