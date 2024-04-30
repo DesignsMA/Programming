@@ -8,7 +8,6 @@ c) Imprimir el Mínimo*/
 #include <stdio.h>
 int main(){
     int n, i, prom, aux, suma, min, max;
-    prom=0, suma=0, aux=0, max=0, min=0;
     printf("\nDeme el valor de n: \n");
     scanf("%d", &n);
     if( n>=1 && n<=20 ){
