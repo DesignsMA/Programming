@@ -1,91 +1,69 @@
-#include <time.h>
+#include <time.h> //generar semilla en base a tiempo
 #include <stdio.h>
-#include <stdlib.h>
 #include <malloc.h>
-#include <unistd.h> //Para usar sleep()
-
-typedef struct nodo {
-    char uid[8]; //ABC-789\0
+#include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID)
+typedef struct NODO {
+	char uid[8]; //ABC-789\0
 	int urgencia, operaciones;
-	struct nodo *sig;
+	struct NODO *sig;
 }NODO;
 
+void systemCLS() {
+    #ifdef _WIN32 //Si es windows
+        system("cls"); //ejecuta comando (no necesita libreria)
+    #else //Si no, usar clear (linux y mac)
+        system("clear"); //ejecuta comando (no necesita libreria)
+    #endif
+}
+
+void imprimeLista(NODO *ap){
+    printf("\n------------------------------------------------------\n");
+	while(ap!=NULL) {
+		printf("\nUrgencia: %d | Operaciones: %d | UID: %s", ap->urgencia, ap->operaciones, ap->uid);
+		ap=ap->sig;
+	}
+	printf("\n------------------------------------------------------\n");
+} 
+
 /*Recibe un apuntador al primer caracter de una cadena, la modifica y genera un
-  codigo de forma ABC-123 donde las letras y numeros son aleatorias en base a la 
-  semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
-  de caracteres de forma &uid[0].
+codigo de forma ABC-123 donde las letras y numeros son aleatorias en base a la 
+semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
+de caracteres de forma &uid[0].
 */
 void  uid ( char *uid) {
     int min = 65, max = 90, i = 0;
     printf("\nRegistrando en la lista");
     for(int i = 0; i < 10; i++) 
     {
-        usleep(100000); //Pausa por 100000 microsegundos
+        usleep(100000); //Pausa por 100000 microsegundos, 0.1 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
         printf(".");
-    } //pausa de un segundo
-
+    } //pausa de un segundo (10 *0.1 = 1)
+    
     srand(time(NULL));//se genera la semilla
     for(i; i < 3; i++) 
-	{
         uid[i] = rand() % (max - min + 1) + min; 
-    }
+
     uid[i] = '-';
     i++;
-    for(i; i < 7; i++)
-	{
-        uid[i] = rand() % ('9' - '1' + 1) + '1';
-    }
-}
 
-void imprimeLista(NODO *ap){
-	while(ap!=NULL) {
-		printf("\nUrgencia: %d | Operaciones: %d | UID: %s", ap->urgencia, ap->operaciones, ap->uid);
-		ap=ap->sig;
-	}
-	printf("\nFin\n\n");
-} 
+    for(i; i < 7; i++)
+        uid[i] = rand() % ('9' - '1' + 1) + '1';
+    
+}
+	
 NODO *creaNodo (int urgencia, int operaciones) {
 	NODO *nuevo;
 	nuevo=(NODO *)malloc(sizeof(NODO));
+    /*TENEMOS QUE LEER URGENCIA Y OPERACIONES EN EL MENU, ASI PODEMOS VOLVER A METER EL NODO SI AUN TIENE OPERACIONES*/
 	if (nuevo != NULL) {
 		nuevo->urgencia=urgencia;
         nuevo->operaciones=operaciones;
-        //nuevo->uid = (char *)malloc(sizeof(char) * 8);
-        uid(&nuevo->uid[0]);
+        uid(&nuevo->uid[0]); //se envia el apuntador al primer caracter
 		nuevo->sig=NULL;
 	}
 	return nuevo;
 }
-
-NODO *insertaFinal(NODO *ap, int urgencia, int operaciones) {
-	NODO *aux, *nuevo;
 	
-	nuevo=creaNodo(urgencia,operaciones);
-	if (nuevo == NULL) return ap;
-	if (ap==NULL) {
-		ap=nuevo;
-	}
-	else {
-		aux=ap;
-		while(aux->sig != NULL) {
-			aux=aux->sig;
-		}	
-		aux->sig=nuevo;
-	}
-	return ap;
-}
-
-NODO *insertaAlInicio(NODO *ap, int urgencia, int operaciones) {
-	NODO *aux, *nuevo;
-	
-	nuevo=creaNodo(urgencia, operaciones);
-	if (nuevo == NULL) return ap;
-	aux=ap; //raiz
-	ap=nuevo; //nuevo
-	nuevo->sig=aux; //nuevo apunta a raiz
-	return ap; //se actualiza la raiz
-}
-
 NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
 	NODO *aux, *nuevo;	
 	nuevo=creaNodo(urgencia,operaciones);
@@ -127,7 +105,7 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
 						return ap;
 					}
 				}
-				else /*Si no significa que no encontro ninguna cola correspondiente, es decir es menos urgente que todos los anteriores
+				else /*Si no, significa que no encontro ninguna cola correspondiente, es decir es menos urgente que todos los anteriores
 					   , lo coloca al final*/
 				{
 					aux->sig = nuevo;
@@ -140,31 +118,87 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
 	return ap;
 }
 
-int cuentaNodos(NODO *ap){
-	int c;
-	
-	c=0;
-	while (ap!=NULL) {
-		ap=ap->sig;
-		c++;
+void leerDatos(NODO *raiz) {
+	int urgencia = 0, operaciones = 0;
+    /*A menor valor, mayor urgencia*/
+	while(urgencia<1 || urgencia>4)
+    {
+		printf("Seleccione su nivel de urgencia:\n1. Mucha\n2. Algo\n3. Poca\n4. Ninguna\nOpcion: ");
+		fflush(stdin);
+		scanf("%d", &urgencia);
+		systemCLS();
 	}
-	return c;
+    /*Se permiten mas de 3 operaciones, cuando tiene mas de 3 se resta y se vuelve a formar con misma urgencia y operaciones-3*/
+	while(operaciones<1)
+    {
+		printf("Operaciones a realizar (Minimo 1), solo se atienden 3 a la vez, te volveras a formar si existen pendientes: ");
+		fflush(stdin);
+		scanf("%d", &operaciones);
+		systemCLS();
+	}
+    /*TENEMOS QUE LEER URGENCIA Y OPERACIONES EN EL MENU, ASI PODEMOS VOLVER A METER EL NODO SI AUN TIENE OPERACIONES*/
+    insertaUrgencia(raiz,urgencia,operaciones);
 }
-	
+
+NODO *eliminarNodo(NODO *raiz) { //Solo borra un nodo (el primero) y actualiza la lista
+	NODO *aux;
+	if(raiz == NULL)
+    {
+		printf("\nNo hay clientes en la fila\n");
+		sleep(1); //pausa de un segundo
+		return raiz;
+	} 
+    else
+    {
+		aux = raiz; //se guarda la raiz
+		raiz = raiz->sig; // raiz pasa a ser el siguiente
+		free(aux);
+        printf("\nCliente atendido\n");
+		sleep(1);
+	}
+	return raiz;
+}
+
+void atenderCliente(NODO *raiz) {
+    int urgencia, operaciones; //Para hacer logs y verificaciones
+    if (raiz != NULL)
+    {
+        operaciones = raiz->operaciones;
+        urgencia = raiz->urgencia;
+        if ( operaciones-3 > 0 ) insertaUrgencia(raiz, urgencia, operaciones - 3); //Volver a formar si tiene operaciones pendientes
+        /*Instrucciones para guardar logs y eliminar el nodo*/
+        raiz = eliminarNodo(raiz);
+    }
+    return raiz;
+}
+
 int main() {
 	NODO *raiz;
-
-	printf("\nPrimera lista");
+    char opcion;
 	raiz=NULL;
-    raiz=insertaUrgencia(raiz, 2,3);
-	imprimeLista(raiz);
-    raiz=insertaUrgencia(raiz, 4,2);
-	imprimeLista(raiz);
-    raiz=insertaUrgencia(raiz, 3,1);
-	imprimeLista(raiz);
-    raiz=insertaUrgencia(raiz, 1,2);
-	imprimeLista(raiz);
-    raiz=insertaUrgencia(raiz, 4,2);
-	raiz=insertaUrgencia(raiz, 1,2);
-    imprimeLista(raiz);
+
+    do //Ejecutar instruccion primero
+    { //Instruccion compuesta
+        imprimeLista(raiz);
+		printf("\tMenu\n1. Nuevo cliente\n2. Atender cliente\n3. Salir");
+        fflush(stdin);
+        opcion = getchar();
+        systemCLS(); //Funcion personalizada, funciona en todos los OS
+		switch(opcion){
+		case '1':
+			leerDatos(raiz);
+			break;
+			
+		case '2':
+			raiz=eliminarNodo(raiz);
+			break;
+			
+		case '3':
+			return 0;
+		default: //Si no se elige una opcion valida, volver a iterar
+			break;
+		}
+		systemCLS(); //Funcion personalizada, funciona en todos los OS
+
+    } while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
 }
