@@ -1,5 +1,6 @@
 #include <time.h> //generar semilla en base a tiempo
 #include <stdio.h>
+#include <stdlib.h> // funciones rand
 #include <malloc.h>
 #include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID)
 typedef struct NODO {
@@ -22,7 +23,7 @@ void imprimeLista(NODO *ap){
 		printf("\nUrgencia: %d | Operaciones: %d | UID: %s", ap->urgencia, ap->operaciones, ap->uid);
 		ap=ap->sig;
 	}
-	printf("\n------------------------------------------------------\n");
+	printf("\n------------------------------------------------------\n\n");
 } 
 
 /*Recibe un apuntador al primer caracter de una cadena, la modifica y genera un
@@ -118,7 +119,7 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
 	return ap;
 }
 
-void leerDatos(NODO *raiz) {
+NODO *leerDatos(NODO *raiz) {
 	int urgencia = 0, operaciones = 0;
     /*A menor valor, mayor urgencia*/
 	while(urgencia<1 || urgencia>4)
@@ -137,7 +138,8 @@ void leerDatos(NODO *raiz) {
 		systemCLS();
 	}
     /*TENEMOS QUE LEER URGENCIA Y OPERACIONES EN EL MENU, ASI PODEMOS VOLVER A METER EL NODO SI AUN TIENE OPERACIONES*/
-    insertaUrgencia(raiz,urgencia,operaciones);
+    raiz = insertaUrgencia(raiz,urgencia,operaciones);
+	return raiz;
 }
 
 NODO *eliminarNodo(NODO *raiz) { //Solo borra un nodo (el primero) y actualiza la lista
@@ -159,7 +161,7 @@ NODO *eliminarNodo(NODO *raiz) { //Solo borra un nodo (el primero) y actualiza l
 	return raiz;
 }
 
-void atenderCliente(NODO *raiz) {
+NODO *atenderCliente(NODO *raiz) {
     int urgencia, operaciones; //Para hacer logs y verificaciones
     if (raiz != NULL)
     {
@@ -180,25 +182,24 @@ int main() {
     do //Ejecutar instruccion primero
     { //Instruccion compuesta
         imprimeLista(raiz);
-		printf("\tMenu\n1. Nuevo cliente\n2. Atender cliente\n3. Salir");
+		printf("\t\tMenu\n1. Nuevo cliente\t2. Atender cliente\n3. Salir\t Opcion: ");
         fflush(stdin);
         opcion = getchar();
         systemCLS(); //Funcion personalizada, funciona en todos los OS
 		switch(opcion){
 		case '1':
-			leerDatos(raiz);
+			raiz = leerDatos(raiz);
 			break;
 			
 		case '2':
-			raiz=eliminarNodo(raiz);
+			raiz= atenderCliente(raiz);
 			break;
-			
-		case '3':
-			return 0;
 		default: //Si no se elige una opcion valida, volver a iterar
 			break;
 		}
 		systemCLS(); //Funcion personalizada, funciona en todos los OS
 
     } while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
+
+	return 0;
 }
