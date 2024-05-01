@@ -18,7 +18,7 @@ void systemCLS() {
 }
 
 void imprimeLista(NODO *ap){
-    printf("\n------------------------------------------------------\n");
+    printf("\n------------------------------------------------------");
 	while(ap!=NULL) {
 		printf("\nUrgencia: %d | Operaciones: %d | UID: %s", ap->urgencia, ap->operaciones, ap->uid);
 		ap=ap->sig;
@@ -169,8 +169,8 @@ NODO *atenderCliente(NODO *raiz) {
         urgencia = raiz->urgencia;
         if ( operaciones-3 > 0 ) insertaUrgencia(raiz, urgencia, operaciones - 3); //Volver a formar si tiene operaciones pendientes
         /*Instrucciones para guardar logs y eliminar el nodo*/
-        raiz = eliminarNodo(raiz);
-    }
+	}
+	raiz = eliminarNodo(raiz);
     return raiz;
 }
 
@@ -182,7 +182,7 @@ int main() {
     do //Ejecutar instruccion primero
     { //Instruccion compuesta
         imprimeLista(raiz);
-		printf("\t\tMenu\n1. Nuevo cliente\t2. Atender cliente\n3. Salir\t Opcion: ");
+		printf("\t\t  Menu\n1. Nuevo cliente\t2. Atender cliente\n3. Salir\nOpcion: ");
         fflush(stdin);
         opcion = getchar();
         systemCLS(); //Funcion personalizada, funciona en todos los OS
