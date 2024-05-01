@@ -169,8 +169,8 @@ NODO *atenderCliente(NODO *raiz) {
         urgencia = raiz->urgencia;
         if ( operaciones-3 > 0 ) 
 		{
-			insertaUrgencia(raiz, urgencia, operaciones - 3); //Volver a formar si tiene operaciones pendientes
 			printf("\nVolviendo a formar\n");
+			insertaUrgencia(raiz, urgencia, operaciones - 3); //Volver a formar si tiene operaciones pendientes
 			usleep(500000); //espera 0.5 segundos
 			systemCLS();
 		}
