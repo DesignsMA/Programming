@@ -25,12 +25,14 @@ void  uid ( char *uid) {
     } //pausa de un segundo
 
     srand(time(NULL));//se genera la semilla
-    for(i; i < 3; i++) {
+    for(i; i < 3; i++) 
+	{
         uid[i] = rand() % (max - min + 1) + min; 
     }
     uid[i] = '-';
     i++;
-    for(i; i < 7; i++) {
+    for(i; i < 7; i++)
+	{
         uid[i] = rand() % ('9' - '1' + 1) + '1';
     }
 }
@@ -85,9 +87,7 @@ NODO *insertaAlInicio(NODO *ap, int urgencia, int operaciones) {
 }
 
 NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
-	NODO *aux, *nuevo, *pos1, *pos2;
-    int distancia;
-	
+	NODO *aux, *nuevo;	
 	nuevo=creaNodo(urgencia,operaciones);
 	if (nuevo == NULL) return ap;
 	if (ap==NULL) {
@@ -152,7 +152,7 @@ int cuentaNodos(NODO *ap){
 }
 	
 int main() {
-	NODO *raiz, *raiz1;
+	NODO *raiz;
 
 	printf("\nPrimera lista");
 	raiz=NULL;
