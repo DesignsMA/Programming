@@ -85,7 +85,7 @@ NODO *insertaAlInicio(NODO *ap, int urgencia, int operaciones) {
 }
 
 NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
-	NODO *aux, *anterior, *nuevo, *pos1, *pos2;
+	NODO *aux, *nuevo, *pos1, *pos2;
     int distancia;
 	
 	nuevo=creaNodo(urgencia,operaciones);
@@ -94,49 +94,49 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
 		ap=nuevo;
 	}
 	else {
-			distancia = nuevo->urgencia;
+			aux = ap;
+
+			/*Verifica por primera vez si la raiz (primer elemento) es mayor o menor, los ordena de manera correspondiente,
+			como tambien puede ocurrir si al ultimo colocamos un elemento mas urgente debemos hacer esos cambios (se elimino la
+			dependencia de que aux->sig sea NULL)*/
+			if (aux->urgencia > nuevo->urgencia &&( aux == ap))
+			{
+				nuevo->sig = aux;
+				ap = nuevo;
+				return ap;				
+			}
+			/*Si la raiz es menor o igual al nuevo nodo, que la raiz apunte al nuevo nodo (a la derecha)
+			 SOLO DEBEMOS REALIZAR ESTOS CAMBIOS CUANDO SOLO HAY UN NODO, los otros casos parecidos se manejan
+			 en el while*/
+			else if ( aux->urgencia <= nuevo->urgencia &&( aux == ap) && aux->sig == NULL)
+			{
+				aux->sig = nuevo;
+				return ap;
+			}	
+
+			/*Mientras no se haya llegado al final de la lista*/
 			while(aux != NULL) 
             {
-				anterior = ap;
-                aux=anterior->sig; //se recorre al siguiente nodo
-				if (aux == NULL)
+				if (aux->sig != NULL) /*Solo si no se han alcanzado los ultimos dos nodos */ 
 				{
-					if (anterior->urgencia > nuevo->urgencia)
+					/*Busca por lugares de la forma ( menor o igual a nuevo (X) mayor a nuevo ) en X se inserta el nodo*/
+					if ( aux->urgencia <= nuevo->urgencia && ( aux->sig->urgencia > nuevo->urgencia ))
 					{
-						nuevo->sig = anterior;
-						anterior->sig = NULL;
-						ap = nuevo;
-												
+						nuevo->sig = aux->sig;
+						aux->sig = nuevo;
+						return ap;
 					}
-					else if ( anterior->urgencia <= nuevo->urgencia )
-					{
-						anterior->sig = nuevo;
-					}	
 				}
-				else if (anterior->urgencia != aux->urgencia) 
-                {
-                    if ( aux->urgencia - nuevo->urgencia < distancia )
-                        {
-                            distancia = aux->urgencia - nuevo->urgencia;
-                            pos1 = anterior;
-                            pos2 = aux;
-                        }
-                }
-                
+				else /*Si no significa que no encontro ninguna cola correspondiente, es decir es menos urgente que todos los anteriores
+					   , lo coloca al final*/
+				{
+					aux->sig = nuevo;
+					nuevo->sig = NULL;
+					return ap;
+				}
+				aux=aux->sig; //se recorre al siguiente nodo
 			}
-			//se inserta el nuevo nodo en la lista
-            if (  distancia >=0 && aux != NULL )
-            {
-                pos1->sig = nuevo;
-                nuevo->sig = pos2;
-            }
-            else if (distancia < 0 && aux != NULL)
-            {
-                pos2->sig = nuevo;
-            }
-        	
 		}
-	
 	return ap;
 }
 
@@ -156,13 +156,15 @@ int main() {
 
 	printf("\nPrimera lista");
 	raiz=NULL;
-    raiz=insertaUrgencia(raiz, 3,3);
+    raiz=insertaUrgencia(raiz, 2,3);
+	imprimeLista(raiz);
+    raiz=insertaUrgencia(raiz, 4,2);
+	imprimeLista(raiz);
+    raiz=insertaUrgencia(raiz, 3,1);
 	imprimeLista(raiz);
     raiz=insertaUrgencia(raiz, 1,2);
 	imprimeLista(raiz);
-    raiz=insertaUrgencia(raiz, 2,1);
-	imprimeLista(raiz);
-    raiz=insertaUrgencia(raiz, 3,2);
     raiz=insertaUrgencia(raiz, 4,2);
+	raiz=insertaUrgencia(raiz, 1,2);
     imprimeLista(raiz);
 }
