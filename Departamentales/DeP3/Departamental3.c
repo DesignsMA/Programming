@@ -167,7 +167,14 @@ NODO *atenderCliente(NODO *raiz) {
     {
         operaciones = raiz->operaciones;
         urgencia = raiz->urgencia;
-        if ( operaciones-3 > 0 ) insertaUrgencia(raiz, urgencia, operaciones - 3); //Volver a formar si tiene operaciones pendientes
+        if ( operaciones-3 > 0 ) 
+		{
+			insertaUrgencia(raiz, urgencia, operaciones - 3); //Volver a formar si tiene operaciones pendientes
+			printf("\nVolviendo a formar\n");
+			usleep(50000); //espera 0.5 segundos
+			systemCLS();
+		}
+		
         /*Instrucciones para guardar logs y eliminar el nodo*/
 	}
 	raiz = eliminarNodo(raiz);
@@ -198,7 +205,6 @@ int main() {
 			break;
 		}
 		systemCLS(); //Funcion personalizada, funciona en todos los OS
-
     } while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
 
 	return 0;
