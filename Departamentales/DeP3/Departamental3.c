@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h> // funciones rand
 #include <malloc.h>
-#include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID)
+#include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID, WINDOWS)
 typedef struct NODO {
 	char uid[8]; //ABC-789\0
 	int urgencia, operaciones;
