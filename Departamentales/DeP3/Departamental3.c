@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h> // funciones rand
 #include <malloc.h>
+#include <string.h>
 #include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID, WINDOWS)
 typedef struct NODO {
 	char uid[8]; //ABC-789\0
@@ -10,11 +11,10 @@ typedef struct NODO {
 }NODO;
 
 void systemCLS() {
-    #ifdef _WIN32 //Si es windows
+    if( _WIN32) //Si es windows
         system("cls"); //ejecuta comando (no necesita libreria)
-    #else //Si no, usar clear (linux y mac)
+    else //Si no, usar clear (linux y mac)
         system("clear"); //ejecuta comando (no necesita libreria)
-    #endif
 }
 
 void imprimeLista(NODO *ap){
@@ -31,7 +31,7 @@ codigo de forma ABC-123 donde las letras y numeros son aleatorias en base a la
 semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
 de caracteres de forma &uid[0].
 */
-void  uid ( char *uid) {
+void  uidGen(char *uid) {
     int min = 65, max = 90, i = 0;
     printf("\nRegistrando en la lista");
     for(int i = 0; i < 10; i++) 
@@ -52,21 +52,21 @@ void  uid ( char *uid) {
     
 }
 	
-NODO *creaNodo (int urgencia, int operaciones) {
+NODO *creaNodo (int urgencia, int operaciones, char uid[8]) {
 	NODO *nuevo;
 	nuevo=(NODO *)malloc(sizeof(NODO));
 	if (nuevo != NULL) {
 		nuevo->urgencia=urgencia;
         nuevo->operaciones=operaciones;
-        uid(&nuevo->uid[0]); //se envia el apuntador al primer caracter
+		strcpy(nuevo->uid, uid);
 		nuevo->sig=NULL;
 	}
 	return nuevo;
 }
 	
-NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
+NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones, char uid[8]) {
 	NODO *aux, *nuevo;	
-	nuevo=creaNodo(urgencia,operaciones);
+	nuevo=creaNodo(urgencia,operaciones, uid);
 	if (nuevo == NULL) return ap;
 	if (ap==NULL) {
 		ap=nuevo;
@@ -120,6 +120,7 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones) {
 
 NODO *leerDatos(NODO *raiz) {
 	int urgencia = 0, operaciones = 0;
+	char uid[8];
     /*A menor valor, mayor urgencia*/
 	while(urgencia<1 || urgencia>4)
     {
@@ -136,7 +137,8 @@ NODO *leerDatos(NODO *raiz) {
 		scanf("%d", &operaciones);
 		systemCLS();
 	}
-    raiz = insertaUrgencia(raiz,urgencia,operaciones);
+	uidGen(&uid[0]); //se envia el apuntador al primer caracter
+    raiz = insertaUrgencia(raiz,urgencia,operaciones, uid);
 	return raiz;
 }
 
@@ -161,21 +163,24 @@ NODO *eliminarNodo(NODO *raiz) { //Solo borra un nodo (el primero) y actualiza l
 
 NODO *atenderCliente(NODO *raiz) {
     int urgencia, operaciones; //Para hacer logs y verificaciones
+	char uid[8];
     if (raiz != NULL)
     {
-        operaciones = raiz->operaciones;
+        operaciones = raiz->operaciones; //guardamos los datos para despues hacer logs
         urgencia = raiz->urgencia;
-        if ( operaciones-3 > 0 ) 
+		strcpy(uid, raiz->uid); //guardar uid
+        if ( operaciones-3 > 0 ) //Si las operaciones exceden las 3
 		{
 			printf("\nVolviendo a formar\n");
-			insertaUrgencia(raiz, urgencia, operaciones - 3); //Volver a formar si tiene operaciones pendientes
+			raiz = eliminarNodo(raiz);
+			raiz = insertaUrgencia(raiz, urgencia, operaciones - 3, uid); //Volver a formar si tiene operaciones pendientes
 			usleep(500000); //espera 0.5 segundos
 			systemCLS();
 		}
-		
+		else raiz = eliminarNodo(raiz);
         /*Instrucciones para guardar logs*/
 	}
-	raiz = eliminarNodo(raiz);
+	
     return raiz;
 }
 
@@ -187,7 +192,7 @@ int main() {
     do //Ejecutar instruccion primero
     { //Instruccion compuesta
         imprimeLista(raiz);
-		printf("\t\t  Menu\n1. Nuevo cliente\t2. Atender cliente\n3. Salir\nOpcion: ");
+		printf("\tMenu\n1. Nuevo cliente\n2. Atender cliente\n3. Salir\nOpcion: ");
         fflush(stdin);
         opcion = getchar();
         systemCLS(); //Funcion personalizada, funciona en todos los OS
@@ -204,6 +209,10 @@ int main() {
 		}
 		systemCLS(); //Funcion personalizada, funciona en todos los OS
     } while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
+
+	while (raiz!=NULL)
+		eliminarNodo(raiz);
+	
 
 	return 0;
 }
