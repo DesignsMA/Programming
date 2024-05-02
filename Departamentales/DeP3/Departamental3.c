@@ -40,7 +40,7 @@ void  uid ( char *uid) {
         printf(".");
     } //pausa de un segundo (10 *0.1 = 1)
     
-    srand(time(NULL));//se genera la semilla
+    srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
     for(i; i < 3; i++) 
         uid[i] = rand() % (max - min + 1) + min; 
 
@@ -55,7 +55,6 @@ void  uid ( char *uid) {
 NODO *creaNodo (int urgencia, int operaciones) {
 	NODO *nuevo;
 	nuevo=(NODO *)malloc(sizeof(NODO));
-    /*TENEMOS QUE LEER URGENCIA Y OPERACIONES EN EL MENU, ASI PODEMOS VOLVER A METER EL NODO SI AUN TIENE OPERACIONES*/
 	if (nuevo != NULL) {
 		nuevo->urgencia=urgencia;
         nuevo->operaciones=operaciones;
@@ -137,7 +136,6 @@ NODO *leerDatos(NODO *raiz) {
 		scanf("%d", &operaciones);
 		systemCLS();
 	}
-    /*TENEMOS QUE LEER URGENCIA Y OPERACIONES EN EL MENU, ASI PODEMOS VOLVER A METER EL NODO SI AUN TIENE OPERACIONES*/
     raiz = insertaUrgencia(raiz,urgencia,operaciones);
 	return raiz;
 }
@@ -175,7 +173,7 @@ NODO *atenderCliente(NODO *raiz) {
 			systemCLS();
 		}
 		
-        /*Instrucciones para guardar logs y eliminar el nodo*/
+        /*Instrucciones para guardar logs*/
 	}
 	raiz = eliminarNodo(raiz);
     return raiz;
