@@ -11,10 +11,11 @@ typedef struct NODO {
 }NODO;
 
 void systemCLS() {
-    if( _WIN32) //Si es windows
+    #if defined( _WIN32) //Si es windows
         system("cls"); //ejecuta comando (no necesita libreria)
-    else //Si no, usar clear (linux y mac)
+    #else //Si no, usar clear (linux y mac)
         system("clear"); //ejecuta comando (no necesita libreria)
+	#endif
 }
 
 void imprimeLista(NODO *ap){
@@ -32,7 +33,7 @@ semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
 de caracteres de forma &uid[0].
 */
 void  uidGen(char *uid) {
-    int min = 65, max = 90, i = 0;
+    int min = 65, max = 90, i = 0;//limites para generar letras entre A-Z
     printf("\nRegistrando en la lista");
     for(int i = 0; i < 10; i++) 
     {
@@ -48,8 +49,8 @@ void  uidGen(char *uid) {
     i++;
 
     for(i; i < 7; i++)
-        uid[i] = rand() % ('9' - '1' + 1) + '1';
-    
+        uid[i] = rand() % ('9' - '1' + 1) + '1';//Limites para generar digitos entre 1-9
+    uid[i] = '\0';
 }
 	
 NODO *creaNodo (int urgencia, int operaciones, char uid[8]) {
@@ -118,6 +119,7 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones, char uid[8]) {
 	return ap;
 }
 
+/*Funcion que lee los datos de un cliente, con esos datos manda a introducir en la lista y la actualiza*/
 NODO *leerDatos(NODO *raiz) {
 	int urgencia = 0, operaciones = 0;
 	char uid[8];
@@ -130,7 +132,7 @@ NODO *leerDatos(NODO *raiz) {
 		systemCLS();
 	}
     /*Se permiten mas de 3 operaciones, cuando tiene mas de 3 se resta y se vuelve a formar con misma urgencia y operaciones-3*/
-	while(operaciones<1)
+	while(operaciones<1 )
     {
 		printf("Operaciones a realizar (Minimo 1), solo se atienden 3 a la vez, te volveras a formar si existen pendientes: ");
 		fflush(stdin);
@@ -142,25 +144,18 @@ NODO *leerDatos(NODO *raiz) {
 	return raiz;
 }
 
-NODO *eliminarNodo(NODO *raiz) { //Solo borra un nodo (el primero) y actualiza la lista
+/*Funcion que tal cual dice su nombre, solo borra un nodo y actualiza la lista
+ (el primer nodo en la lista)*/
+NODO *eliminarNodo(NODO *raiz) {
 	NODO *aux;
-	if(raiz == NULL)
-    {
-		printf("\nNo hay clientes en la fila\n");
-		sleep(1); //pausa de un segundo
-		return raiz;
-	} 
-    else
-    {
-		aux = raiz; //se guarda la raiz
-		raiz = raiz->sig; // raiz pasa a ser el siguiente
-		free(aux);
-        printf("\nCliente atendido\n");
-		sleep(1);
-	}
+	aux = raiz; //se guarda la raiz
+	raiz = raiz->sig; // raiz pasa a ser el siguiente
+	free(aux);
 	return raiz;
 }
 
+/*Funcion para realizar las operaciones al atender un cliente, (guarda datos y manda a eliminar el nodo)
+  Si el cliente tiene operaciones pendientes lo vuelve a formar*/
 NODO *atenderCliente(NODO *raiz) {
     int urgencia, operaciones; //Para hacer logs y verificaciones
 	char uid[8];
@@ -172,16 +167,62 @@ NODO *atenderCliente(NODO *raiz) {
         if ( operaciones-3 > 0 ) //Si las operaciones exceden las 3
 		{
 			printf("\nVolviendo a formar\n");
+
 			raiz = eliminarNodo(raiz);
 			raiz = insertaUrgencia(raiz, urgencia, operaciones - 3, uid); //Volver a formar si tiene operaciones pendientes
-			usleep(500000); //espera 0.5 segundos
-			systemCLS();
 		}
 		else raiz = eliminarNodo(raiz);
         /*Instrucciones para guardar logs*/
-	}
-	
+		printf("\nCliente atendido\n");
+		usleep(500000); //espera 0.5 segundos
+		systemCLS();
+
+
+	} else if(raiz == NULL)
+    {
+		printf("\nNo hay clientes en la fila\n");
+		sleep(1); //pausa de un segundo
+	} 
     return raiz;
+}
+
+void guardarSesion(NODO *raiz) {
+	FILE *sesion;
+	sesion = fopen("lastSession.bin", "wb"); //Abrir archivo en modo escritura
+	//fwrite( puntero a la variable (bloque de memoria) a escribir, tamanio de cada elemento a ser escrito (bytes), numero de elementos, apuntador al archivo)
+	if (sesion == NULL) printf("Error abriendo el archivo");
+	else
+		while (raiz != NULL)
+		{
+			fwrite(&raiz->uid, sizeof(char)*8, 1, sesion);
+			fwrite(&raiz->urgencia, sizeof(raiz->urgencia), 1, sesion);
+			fwrite(&raiz->operaciones, sizeof(raiz->operaciones), 1, sesion);
+			raiz = raiz -> sig;
+		}
+	fclose(sesion);
+}
+
+NODO *raiz restablecerSesion(NODO *raiz) {
+	FILE *sesion;
+	int urgencia, operaciones; //Lugares donde se almacenan los  bloques de memoria recuperados de un bin
+	char uidPasado[8] = "ABC-000", uids[8];
+	sesion = fopen("lastSession.bin", "rb"); //Abrir archivo en modo lectura
+	if (sesion == NULL) printf("Error abriendo el archivo");
+	else
+	do
+	{
+		if ( strcmp(uidPasado, uids) == 0 ) break;
+		strcpy(uidPasado, uids);
+		fread(&uids, sizeof(char)*8, 1, sesion);
+		fread(&urgencia, sizeof(urgencia), 1, sesion);
+		fread(&operaciones, sizeof(operaciones), 1, sesion);
+		raiz = insertaUrgencia(raiz, urgencia)
+
+		
+		
+	} while (1);
+	fclose(sesion);
+	return raiz;
 }
 
 int main() {
@@ -209,9 +250,9 @@ int main() {
 		}
 		systemCLS(); //Funcion personalizada, funciona en todos los OS
     } while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
-
+	guardarSesion(raiz);
 	while (raiz!=NULL)
-		eliminarNodo(raiz);
+		raiz = eliminarNodo(raiz);
 	
 
 	return 0;
