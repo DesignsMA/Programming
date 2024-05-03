@@ -205,7 +205,7 @@ void guardarSesion(NODO *raiz) {
 NODO *raiz restablecerSesion(NODO *raiz) {
 	FILE *sesion;
 	int urgencia, operaciones; //Lugares donde se almacenan los  bloques de memoria recuperados de un bin
-	char uidPasado[8] = "ABC-000", uids[8];
+	char uidPasado[8], uids[8] = "ABC-000";
 	sesion = fopen("lastSession.bin", "rb"); //Abrir archivo en modo lectura
 	if (sesion == NULL) printf("Error abriendo el archivo");
 	else
@@ -216,10 +216,7 @@ NODO *raiz restablecerSesion(NODO *raiz) {
 		fread(&uids, sizeof(char)*8, 1, sesion);
 		fread(&urgencia, sizeof(urgencia), 1, sesion);
 		fread(&operaciones, sizeof(operaciones), 1, sesion);
-		raiz = insertaUrgencia(raiz, urgencia)
-
-		
-		
+		raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
 	} while (1);
 	fclose(sesion);
 	return raiz;
