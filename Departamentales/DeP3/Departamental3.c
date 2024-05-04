@@ -37,10 +37,9 @@ void  uidGen(char *uid) {
     printf("\nRegistrando en la lista");
     for(int i = 0; i < 10; i++) 
     {
-        usleep(100000); //Pausa por 100000 microsegundos, 0.1 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
+        usleep(3333); //Pausa por 100000 microsegundos, 0.1 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
         printf(".");
     } //pausa de un segundo (10 *0.1 = 1)
-    
     srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
     for(i; i < 3; i++) 
         uid[i] = rand() % (max - min + 1) + min; 
@@ -74,7 +73,6 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones, char uid[8]) {
 	}
 	else {
 			aux = ap;
-
 			/*Verifica por primera vez si la raiz (primer elemento) es mayor o menor, los ordena de manera correspondiente,
 			como tambien puede ocurrir si al ultimo colocamos un elemento mas urgente debemos hacer esos cambios (se elimino la
 			dependencia de que aux->sig sea NULL)*/
@@ -92,7 +90,6 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones, char uid[8]) {
 				aux->sig = nuevo;
 				return ap;
 			}	
-
 			/*Mientras no se haya llegado al final de la lista*/
 			while(aux != NULL) 
             {
@@ -118,7 +115,6 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones, char uid[8]) {
 		}
 	return ap;
 }
-
 /*Funcion que lee los datos de un cliente, con esos datos manda a introducir en la lista y la actualiza*/
 NODO *leerDatos(NODO *raiz) {
 	int urgencia = 0, operaciones = 0;
@@ -143,7 +139,6 @@ NODO *leerDatos(NODO *raiz) {
     raiz = insertaUrgencia(raiz,urgencia,operaciones, uid);
 	return raiz;
 }
-
 /*Funcion que tal cual dice su nombre, solo borra un nodo y actualiza la lista
  (el primer nodo en la lista)*/
 NODO *eliminarNodo(NODO *raiz) {
@@ -153,7 +148,6 @@ NODO *eliminarNodo(NODO *raiz) {
 	free(aux);
 	return raiz;
 }
-
 /*Funcion para realizar las operaciones al atender un cliente, (guarda datos y manda a eliminar el nodo)
   Si el cliente tiene operaciones pendientes lo vuelve a formar*/
 NODO *atenderCliente(NODO *raiz) {
@@ -204,23 +198,19 @@ void guardarSesion(NODO *raiz) {
 
 NODO *restablecerSesion(NODO *raiz) {
 	FILE *sesion;
-	int urgencia, operaciones; //Lugares donde se almacenan los  bloques de memoria recuperados de un bin
-	char uidPasado[8], uids[8] = "ABC-000";
-	sesion = fopen("lastSession.bin", "rb"); //Abrir archivo en modo lectura
-	fseek(sesion, 0, SEEK_END);
-    
-    
-	if (sesion == NULL || ftell(sesion) == 0) return raiz; 
+	int urgencia = 0, operaciones; //Lugares donde se almacenan los  bloques de memoria recuperados de un bin
+	char uids[8];
+	sesion = fopen("lastSession.bin", "rb"); //Abrir archivo en modo lectura    
+	if (sesion == NULL) return raiz; 
 	else {
-		rewind(sesion);
 		do
 		{
-			strcpy(uidPasado, uids);
-			fread(&urgencia, sizeof(urgencia), 1, sesion);
+			fread(&urgencia, sizeof(urgencia), 1, sesion); //No actualizara el bloque de memoria si no lee nada
 			fread(&operaciones, sizeof(operaciones), 1, sesion);
 			fread(&uids, sizeof(char)*8, 1, sesion);
-			if ( strcmp(uidPasado, uids) == 0 ) break;
+			if ( urgencia == 0 ) break;
 			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
+			urgencia = 0;
 			
 		} while (1);
 	}
