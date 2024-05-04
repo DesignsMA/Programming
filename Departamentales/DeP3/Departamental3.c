@@ -194,9 +194,9 @@ void guardarSesion(NODO *raiz) {
 	else
 		while (raiz != NULL)
 		{
-			fwrite(&raiz->uid, sizeof(char)*8, 1, sesion);
 			fwrite(&raiz->urgencia, sizeof(raiz->urgencia), 1, sesion);
 			fwrite(&raiz->operaciones, sizeof(raiz->operaciones), 1, sesion);
+			fwrite(&raiz->uid, sizeof(char)*8, 1, sesion);
 			raiz = raiz -> sig;
 		}
 	fclose(sesion);
@@ -216,9 +216,9 @@ NODO *restablecerSesion(NODO *raiz) {
 		do
 		{
 			strcpy(uidPasado, uids);
-			fread(&uids, sizeof(char)*8, 1, sesion);
 			fread(&urgencia, sizeof(urgencia), 1, sesion);
 			fread(&operaciones, sizeof(operaciones), 1, sesion);
+			fread(&uids, sizeof(char)*8, 1, sesion);
 			if ( strcmp(uidPasado, uids) == 0 ) break;
 			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
 			
