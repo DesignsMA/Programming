@@ -202,22 +202,28 @@ void guardarSesion(NODO *raiz) {
 	fclose(sesion);
 }
 
-NODO *raiz restablecerSesion(NODO *raiz) {
+NODO *restablecerSesion(NODO *raiz) {
 	FILE *sesion;
 	int urgencia, operaciones; //Lugares donde se almacenan los  bloques de memoria recuperados de un bin
 	char uidPasado[8], uids[8] = "ABC-000";
 	sesion = fopen("lastSession.bin", "rb"); //Abrir archivo en modo lectura
-	if (sesion == NULL) printf("Error abriendo el archivo");
-	else
-	do
-	{
-		if ( strcmp(uidPasado, uids) == 0 ) break;
-		strcpy(uidPasado, uids);
-		fread(&uids, sizeof(char)*8, 1, sesion);
-		fread(&urgencia, sizeof(urgencia), 1, sesion);
-		fread(&operaciones, sizeof(operaciones), 1, sesion);
-		raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
-	} while (1);
+	fseek(sesion, 0, SEEK_END);
+    
+    
+	if (sesion == NULL || ftell(sesion) == 0) return raiz; 
+	else {
+		rewind(sesion);
+		do
+		{
+			strcpy(uidPasado, uids);
+			fread(&uids, sizeof(char)*8, 1, sesion);
+			fread(&urgencia, sizeof(urgencia), 1, sesion);
+			fread(&operaciones, sizeof(operaciones), 1, sesion);
+			if ( strcmp(uidPasado, uids) == 0 ) break;
+			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
+			
+		} while (1);
+	}
 	fclose(sesion);
 	return raiz;
 }
@@ -226,6 +232,8 @@ int main() {
 	NODO *raiz;
     char opcion;
 	raiz=NULL;
+	
+	raiz = restablecerSesion(raiz);
 
     do //Ejecutar instruccion primero
     { //Instruccion compuesta
@@ -247,6 +255,7 @@ int main() {
 		}
 		systemCLS(); //Funcion personalizada, funciona en todos los OS
     } while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
+
 	guardarSesion(raiz);
 	while (raiz!=NULL)
 		raiz = eliminarNodo(raiz);
