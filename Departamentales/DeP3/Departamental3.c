@@ -120,9 +120,9 @@ NODO *leerDatos(NODO *raiz) {
 	int urgencia = 0, operaciones = 0;
 	char uid[8];
     /*A menor valor, mayor urgencia*/
-	while(urgencia<1 || urgencia>4)
+	while(urgencia<1)
     {
-		printf("Seleccione su nivel de urgencia:\n1. Mucha\n2. Algo\n3. Poca\n4. Ninguna\nOpcion: ");
+		printf("Seleccione su nivel de urgencia:\n1. Mucha\n2. Algo\n3. Poca\n4 para arriba ninguna\nOpcion: ");
 		fflush(stdin);
 		scanf("%d", &urgencia);
 		systemCLS();
@@ -182,10 +182,17 @@ NODO *atenderCliente(NODO *raiz) {
 
 void guardarSesion(NODO *raiz) {
 	FILE *sesion;
+	struct tm *tmp ; //structura con datos del  tiempo (separados)
+	time_t t; //variable donde el tiempo se almacena en entero
+	time(&t); //obtenemos el tiempo actual
+	tmp = localtime(&t); //transformamos a tiempo local y almacenamos separado en tmp
+
 	sesion = fopen("lastSession.bin", "wb"); //Abrir archivo en modo escritura
-	//fwrite( puntero a la variable (bloque de memoria) a escribir, tamanio de cada elemento a ser escrito (bytes), numero de elementos, apuntador al archivo)
+	//clientesdiamesañohoraminutos 18
+	mktime(s)
 	if (sesion == NULL) printf("Error abriendo el archivo");
 	else
+	{
 		while (raiz != NULL)
 		{
 			fwrite(&raiz->urgencia, sizeof(raiz->urgencia), 1, sesion);
@@ -193,6 +200,7 @@ void guardarSesion(NODO *raiz) {
 			fwrite(&raiz->uid, sizeof(char)*8, 1, sesion);
 			raiz = raiz -> sig;
 		}
+	}
 	fclose(sesion);
 }
 
@@ -202,7 +210,8 @@ NODO *restablecerSesion(NODO *raiz) {
 	char uids[8];
 	sesion = fopen("lastSession.bin", "rb"); //Abrir archivo en modo lectura    
 	if (sesion == NULL) return raiz; 
-	else {
+	else 
+	{
 		do
 		{
 			fread(&urgencia, sizeof(urgencia), 1, sesion); //No actualizara el bloque de memoria si no lee nada
@@ -211,7 +220,6 @@ NODO *restablecerSesion(NODO *raiz) {
 			if ( urgencia == 0 ) break;
 			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
 			urgencia = 0;
-			
 		} while (1);
 	}
 	fclose(sesion);
