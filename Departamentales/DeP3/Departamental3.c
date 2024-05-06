@@ -4,6 +4,9 @@
 #include <malloc.h> 
 #include <string.h>
 #include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID, WINDOWS)
+
+
+
 typedef struct NODO {
 	char uid[8]; //ABC-789\0
 	int urgencia, operaciones;
@@ -14,9 +17,11 @@ typedef struct SALIDA //Estructura de salida
 {
 	char id[11];
 }SALIDA;
+
 /*https://www.upgrad.com/tutorials/software-engineering/c-tutorial/macros-in-c/*/
 /*Las directivas precedidas por # pertenecen al conjunto de intrucciones de preprocesador, se ejecutan
 antes de la compilacion de un programa,*/
+
 void systemCLS() {
     #if defined( _WIN32) //Antes de la compilacion verifica si la constante WIN32 esta definida en el sistema
         system("cls"); //sino ejecutara esta seccion de codigo (no necesita libreria)
@@ -38,26 +43,25 @@ void imprimeLista(NODO *ap){
 /*Recibe un apuntador al primer caracter de una cadena, la modifica y genera un
 codigo de forma ABC-123 donde las letras y numeros son aleatorias en base a la 
 semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
-de caracteres de forma &uid[0].
-*/
+de caracteres de forma &uid[0]. */
+
 void  uidGen(char *uid) {
-    int min = 65, max = 90, i = 0;//limites para generar letras entre A-Z
+    int min = 65, max = 90, i;//limites para generar letras entre A-Z
     printf("\nRegistrando en la lista");
-    for(int i = 0; i < 10; i++) 
+    for(i=0; i < 10; i++) 
     {
         usleep(3333); //Pausa por 100000 microsegundos, 0.1 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
         printf(".");
     } //pausa de un segundo (10 *0.1 = 1)
     srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
-    for(i; i < 3; i++) 
-        uid[i] = rand() % (max - min + 1) + min; 
+    for(i=0; i < 3; i++) 
+        uid[i] = (char) rand() % (max - min + 1) + min;//genera ABC 
 
-    uid[i] = '-';
-    i++;
+    uid[i] = '-';//ABC-
 
-    for(i; i < 7; i++)
-        uid[i] = rand() % ('9' - '1' + 1) + '1';//Limites para generar digitos entre 1-9
-    uid[i] = '\0';
+    for(i++; i < 7; i++)
+        uid[i] = (char) rand() % ('9' - '1' + 1) + '1';//Limites para generar digitos entre 1-9 ABC-123
+    uid[i] = '\0';//ABC-123\0
 }
 	
 NODO *creaNodo (int urgencia, int operaciones, char uid[8]) {
@@ -197,11 +201,14 @@ SALIDA tiempoID() {
 	strftime(salida.id, sizeof(salida.id), "%d%m%y%H%M", tmp); //formato diamesaniohoraminuto
 	return salida;
 }
+
 void guardarSesion(NODO *raiz) {
 	FILE *sesion;
+	/*
 	char fileID[23];
 	snprintf(fileID, sizeof(fileID), "clientes%s.bin", tiempoID().id); //generando 	//clientesdiamesañohoraminutos.bin 23
-	sesion = fopen(fileID, "wb"); //Abrir archivo en modo escritura
+	sesion = fopen(fileID, "wb"); */
+	sesion = fopen("lastSession.bin", "wb"); //Abrir archivo en modo escritura binaria
 	if (sesion == NULL) printf("Error abriendo el archivo");
 	else
 	{
