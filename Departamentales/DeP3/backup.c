@@ -1,7 +1,7 @@
 #include <time.h> //generar semilla en base a tiempo
 #include <stdio.h>
 #include <stdlib.h> // funciones rand
-#include <malloc.h> 
+#include <malloc.h>
 #include <string.h>
 #include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID, WINDOWS)
 typedef struct NODO {
@@ -9,20 +9,16 @@ typedef struct NODO {
 	int urgencia, operaciones;
 	struct NODO *sig;
 }NODO;
-
 typedef struct SALIDA //Estructura de salida
 {
 	char id[11];
 }SALIDA;
-/*https://www.upgrad.com/tutorials/software-engineering/c-tutorial/macros-in-c/*/
-/*Las directivas precedidas por # pertenecen al conjunto de intrucciones de preprocesador, se ejecutan
-antes de la compilacion de un programa,*/
+
 void systemCLS() {
-    #if defined( _WIN32) //Antes de la compilacion verifica si la constante WIN32 esta definida en el sistema
-        system("cls"); //sino ejecutara esta seccion de codigo (no necesita libreria)
+    #if defined( _WIN32) //Si es windows
+        system("cls"); //ejecuta comando (no necesita libreria)
     #else //Si no, usar clear (linux y mac)
-        system("clear"); //Si encuentra la variable, antes de la compilacion ELIMINARA esta seccion de codigo
-						 //y viceversa
+        system("clear"); //ejecuta comando (no necesita libreria)
 	#endif
 }
 
