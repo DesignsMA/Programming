@@ -9,6 +9,10 @@ typedef struct NODO {
 	int urgencia, operaciones;
 	struct NODO *sig;
 }NODO;
+typedef struct SALIDA //Estructura de salida
+{
+	char id[11];
+}SALIDA;
 
 void systemCLS() {
     #if defined( _WIN32) //Si es windows
@@ -180,16 +184,20 @@ NODO *atenderCliente(NODO *raiz) {
     return raiz;
 }
 
-void guardarSesion(NODO *raiz) {
-	FILE *sesion;
+SALIDA tiempoID() {
+	SALIDA salida;
 	struct tm *tmp ; //structura con datos del  tiempo (separados)
 	time_t t; //variable donde el tiempo se almacena en entero
 	time(&t); //obtenemos el tiempo actual
 	tmp = localtime(&t); //transformamos a tiempo local y almacenamos separado en tmp
-
-	sesion = fopen("lastSession.bin", "wb"); //Abrir archivo en modo escritura
-	//clientesdiamesañohoraminutos 18
-	mktime(s)
+	strftime(salida.id, sizeof(salida.id), "%d%m%y%H%M", tmp); //formato diamesaniohoraminuto
+	return salida;
+}
+void guardarSesion(NODO *raiz) {
+	FILE *sesion;
+	char fileID[23];
+	snprintf(fileID, sizeof(fileID), "clientes%s.bin", tiempoID().id); //generando 	//clientesdiamesañohoraminutos.bin 23
+	sesion = fopen(fileID, "wb"); //Abrir archivo en modo escritura
 	if (sesion == NULL) printf("Error abriendo el archivo");
 	else
 	{
