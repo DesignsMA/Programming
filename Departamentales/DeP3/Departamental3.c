@@ -1,11 +1,9 @@
 #include <time.h> //generar semilla en base a tiempo
-#include <stdio.h>
+#include <stdio.h> 
 #include <stdlib.h> // funciones rand
 #include <malloc.h> 
 #include <string.h>
 #include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID, WINDOWS)
-
-
 
 typedef struct NODO {
 	char uid[8]; //ABC-789\0
@@ -46,21 +44,21 @@ semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
 de caracteres de forma &uid[0]. */
 
 void  uidGen(char *uid) {
-    int min = 65, max = 90, i;//limites para generar letras entre A-Z
+	int i = 0, j;
     printf("\nRegistrando en la lista");
-    for(i=0; i < 10; i++) 
+    for(j = 0; j < 10; j++) 
     {
-        usleep(3333); //Pausa por 100000 microsegundos, 0.1 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
+        usleep(33333); //Pausa por 100000 microsegundos, 0.1 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
         printf(".");
     } //pausa de un segundo (10 *0.1 = 1)
+
     srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
-    for(i=0; i < 3; i++) 
-        uid[i] = (char) rand() % (max - min + 1) + min;//genera ABC 
-
+    for(i = i; i < 3; i++)
+        uid[i] = (rand()%('Z' - 'A' + 1) + 'A');//genera ABC 
     uid[i] = '-';//ABC-
-
-    for(i++; i < 7; i++)
-        uid[i] = (char) rand() % ('9' - '1' + 1) + '1';//Limites para generar digitos entre 1-9 ABC-123
+    i++;
+    for(i = i; i < 7; i++)
+        uid[i] = (rand()%('9' - '1' + 1) + '1');//Limites para generar digitos entre 1-9 ABC-123
     uid[i] = '\0';//ABC-123\0
 }
 	
@@ -216,7 +214,9 @@ void guardarSesion(NODO *raiz) {
 		{
 			fwrite(&raiz->urgencia, sizeof(raiz->urgencia), 1, sesion);
 			fwrite(&raiz->operaciones, sizeof(raiz->operaciones), 1, sesion);
-			fwrite(&raiz->uid, sizeof(char)*8, 1, sesion);
+			for ( int j = 0; j < 7; j++)
+				fwrite(&raiz->uid[j], sizeof(char), 1, sesion);
+			
 			raiz = raiz -> sig;
 		}
 	}
@@ -235,7 +235,8 @@ NODO *restablecerSesion(NODO *raiz) {
 		{
 			fread(&urgencia, sizeof(urgencia), 1, sesion); //No actualizara el bloque de memoria si no lee nada
 			fread(&operaciones, sizeof(operaciones), 1, sesion);
-			fread(&uids, sizeof(char)*8, 1, sesion);
+			for (int j = 0; j < 7; j++)
+				fread(&uids[j], sizeof(char), 1, sesion);
 			if ( urgencia == 0 ) break;
 			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
 			urgencia = 0;
