@@ -3,10 +3,7 @@
 #include <stdlib.h> // funciones rand
 #include <malloc.h> 
 #include <string.h>
-#include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC Y ANDROID, WINDOWS)
-
-
-
+#include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC, ANDROID, WINDOWS)
 typedef struct NODO {
 	char uid[8]; //ABC-789\0
 	int urgencia, operaciones;
@@ -24,9 +21,9 @@ antes de la compilacion de un programa,*/
 
 void systemCLS() {
 #if defined( _WIN32) //Antes de la compilacion verifica si la constante WIN32 esta definida en el sistema
-	system("cls"); //sino ejecutara esta seccion de codigo (no necesita libreria)
-#else //Si no, usar clear (linux y mac)
-	system("clear"); //Si encuentra la variable, antes de la compilacion ELIMINARA esta seccion de codigo
+	system("cls"); //Si lo esta ejecutara esta seccion de codigo (no necesita libreria)
+#else //Si no, usara clear (linux y mac, android)
+	system("clear"); //Si encuentra la variable, antes de la compilacion excluira esta seccion de codigo
 	//y viceversa
 #endif
 }
@@ -46,19 +43,21 @@ void imprimeLista(NODO *ap){
 	de caracteres de forma &uid[0]. */
 	
 void  uidGen(char *uid) {
-	int min = 65, max = 90, i;//limites para generar letras entre A-Z
-	printf("\nRegistrando en la lista");
-	for(i=0; i < 10; i++){
-		usleep(3333); //Pausa por 100000 microsegundos, 0.1 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
-		printf(".");
-	} //pausa de un segundo (10 *0.1 = 1)
-	srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
-	for(i=0; i < 3; i++) uid[i] = rand() % (max - min + 1) + min; 
-	
-	uid[i] = '-';
-	
-	for(i++; i < 7; i++) uid[i] = rand() % ('9' - '1' + 1) + '1';//Limites para generar digitos entre 1-9
-	uid[i] = '\0';
+	int i = 0;
+    printf("\nRegistrando en la lista");
+    for(i = i; i < 10; i++) 
+    {
+        usleep(25000); //Pausa por 50000 microsegundos, 0.025 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
+        printf(".");
+    } //pausa de un 1/4 segundo (10 *0.025 = 0.25)
+    srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
+    for(i = 0; i < 3; i++)
+        uid[i] = (rand()%('Z' - 'A' + 1) + 'A');//genera ABC 
+    uid[i] = '-';//ABC-
+    i++;
+    for(i = i; i < 7; i++)
+        uid[i] = (rand()%('9' - '1' + 1) + '1');//Limites para generar digitos entre 1-9 ABC-123
+    uid[i] = '\0';//ABC-123\0
 }
 
 NODO *creaNodo (int urgencia, int operaciones, char uid[8]) {
@@ -134,7 +133,7 @@ NODO *leerDatos(NODO *raiz) {
 		scanf("%d", &operaciones);
 		systemCLS();
 	}
-	uidGen(&uid[0]); //se envia el apuntador al primer caracter
+	uidGen(&uid[0]); //se envia la direccion al primer caracter
 	raiz = insertaUrgencia(raiz,urgencia,operaciones, uid);
 	return raiz;
 }
@@ -168,8 +167,6 @@ NODO *atenderCliente(NODO *raiz) {
 		printf("\nCliente atendido\n");
 		usleep(500000); //espera 0.5 segundos
 		systemCLS();
-		
-		
 	} else if(raiz == NULL){
 		printf("\nNo hay clientes en la fila\n");
 		sleep(1); //pausa de un segundo
@@ -184,7 +181,6 @@ SALIDA tiempoID() {
 	time(&t); //obtenemos el tiempo actual
 	tmp = localtime(&t); //transformamos a tiempo local y almacenamos separado en tmp
 	strftime(salida.id, sizeof(salida.id), "%d%m%y%H%M", tmp); //formato diamesaniohoraminuto
-	
 	return salida;
 }
 
@@ -198,7 +194,7 @@ void guardarSesion(NODO *raiz) {
 		while (raiz != NULL){
 			fwrite(&raiz->urgencia, sizeof(raiz->urgencia), 1, sesion);
 			fwrite(&raiz->operaciones, sizeof(raiz->operaciones), 1, sesion);
-			fwrite(&raiz->uid, sizeof(char)*8, 1, sesion);
+			fwrite(&raiz->uid, sizeof(char)*7, 1, sesion);
 			raiz = raiz -> sig;
 		}
 	}
@@ -237,7 +233,7 @@ NODO *restablecerSesion(NODO *raiz) {
 		do{
 			fread(&urgencia, sizeof(urgencia), 1, sesion); //No actualizara el bloque de memoria si no lee nada
 			fread(&operaciones, sizeof(operaciones), 1, sesion);
-			fread(&uids, sizeof(char)*8, 1, sesion);
+			fread(&uids, sizeof(char)*7, 1, sesion);
 			if ( urgencia == 0 ) break;
 			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
 			urgencia = 0;
@@ -278,8 +274,6 @@ int main() {
 	
 	guardarSesion(raiz);
 	while (raiz!=NULL) raiz = eliminarNodo(raiz);
-	
-	
 	return 0;
 }
 	
