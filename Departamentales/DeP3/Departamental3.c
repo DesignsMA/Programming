@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h> //Para usar sleep(), usleep() (FUNCIONA EN LINUX, MAC, ANDROID, WINDOWS)
 typedef struct NODO {
-	char uid[8]; //ABC-789\0
+	char uid[8], unico; //ABC-789\0
 	int urgencia, operaciones;
 	struct NODO *sig;
 }NODO;
@@ -43,38 +43,39 @@ void imprimeLista(NODO *ap){
 	de caracteres de forma &uid[0]. */
 	
 void  uidGen(char *uid) {
-	int i = 0;
+	int i, j;
     printf("\nRegistrando en la lista");
-    for(i = i; i < 10; i++) 
+    for(i = 0; i < 10; i++) 
     {
         usleep(25000); //Pausa por 50000 microsegundos, 0.025 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
         printf(".");
     } //pausa de un 1/4 segundo (10 *0.025 = 0.25)
     srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
-    for(i = 0; i < 3; i++)
-        uid[i] = (rand()%('Z' - 'A' + 1) + 'A');//genera ABC 
-    uid[i] = '-';//ABC-
-    i++;
-    for(i = i; i < 7; i++)
-        uid[i] = (rand()%('9' - '1' + 1) + '1');//Limites para generar digitos entre 1-9 ABC-123
-    uid[i] = '\0';//ABC-123\0
+    for(j = 0; j < 3; j++)
+        uid[j] = (char)( rand()%('Z' - 'A' + 1) + 'A');//genera ABC 
+    uid[j] = '-';//ABC-
+    j++;
+    for(j; j < 7; j++)
+        uid[j] = (char)( rand()%('9' - '1' + 1) + '1');//Limites para generar digitos entre 1-9 ABC-123
+    uid[j] = '\0';//ABC-123\0
 }
 
-NODO *creaNodo (int urgencia, int operaciones, char uid[8]) {
+NODO *creaNodo (int urgencia, int operaciones, char uid[8], char unico) {
 	NODO *nuevo;
 	nuevo=(NODO *)malloc(sizeof(NODO));
 	if (nuevo != NULL){
 		nuevo->urgencia=urgencia;
 		nuevo->operaciones=operaciones;
+		nuevo->unico = unico; //indica si es unico o no S/N
 		strcpy(nuevo->uid, uid);
 		nuevo->sig=NULL;
 	}
 	return nuevo;
 }
 
-NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones, char uid[8]) {
+NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones, char uid[8], char unico) {
 	NODO *aux, *nuevo;	
-	nuevo=creaNodo(urgencia,operaciones, uid);
+	nuevo=creaNodo(urgencia,operaciones, uid, unico);
 	if (nuevo == NULL) return ap;
 	if (ap==NULL) ap=nuevo;
 	else {
@@ -134,7 +135,7 @@ NODO *leerDatos(NODO *raiz) {
 		systemCLS();
 	}
 	uidGen(&uid[0]); //se envia la direccion al primer caracter
-	raiz = insertaUrgencia(raiz,urgencia,operaciones, uid);
+	raiz = insertaUrgencia(raiz,urgencia,operaciones, uid, 'S');
 	return raiz;
 }
 /*Funcion que tal cual dice su nombre, solo borra un nodo y actualiza la lista
@@ -146,6 +147,20 @@ NODO *eliminarNodo(NODO *raiz) {
 	free(aux);
 	return raiz;
 }
+void generarLogTemp(NODO *raiz){
+	FILE *log;
+	log = fopen("temp.txt", "a+");
+	fseek(log, 0, SEEK_END);
+	if ( ftell(log) == 0) fprintf(log, "\tREPORTE DE CLIENTES\n\nUrgencia | Operaciones | ID\n\n");
+	fclose(log);
+
+	log = fopen("temp.txt", "a+"); //colocar al final, el apuntador apunta al ultimo caracter
+	fprintf(log, "%03d\t   %03d\t	 %s\n", raiz->urgencia, raiz->operaciones, raiz->uid);         
+	fclose(log);
+}
+
+
+
 /*Funcion para realizar las operaciones al atender un cliente, (guarda datos y manda a eliminar el nodo)
 Si el cliente tiene operaciones pendientes lo vuelve a formar*/
 NODO *atenderCliente(NODO *raiz) {
@@ -155,15 +170,17 @@ NODO *atenderCliente(NODO *raiz) {
 		operaciones = raiz->operaciones; //guardamos los datos para despues hacer logs
 		urgencia = raiz->urgencia;
 		strcpy(uid, raiz->uid); //guardar uid
+
+		if (raiz->unico == 'S') generarLogTemp(raiz);
+
 		if ( operaciones-3 > 0 ) //Si las operaciones exceden las 3
 		{
 			printf("\nVolviendo a formar\n");
-			
 			raiz = eliminarNodo(raiz);
-			raiz = insertaUrgencia(raiz, urgencia, operaciones - 3, uid); //Volver a formar si tiene operaciones pendientes
+			raiz = insertaUrgencia(raiz, urgencia, operaciones - 3, uid, 'N'); //Volver a formar si tiene operaciones pendientes
 		}
 		else raiz = eliminarNodo(raiz);
-		/*Instrucciones para guardar logs*/
+		
 		printf("\nCliente atendido\n");
 		usleep(500000); //espera 0.5 segundos
 		systemCLS();
@@ -190,14 +207,16 @@ void guardarSesion(NODO *raiz) {
 	snprintf(fileID, sizeof(fileID), "clientes%s.bin", tiempoID().id); //generando 	//clientesdiamesa�ohoraminutos.bin 23
 	sesion = fopen(fileID, "wb"); //Abrir archivo en modo escritura
 	if (sesion == NULL) printf("Error abriendo el archivo");
-	else{
+	else {
 		while (raiz != NULL){
 			fwrite(&raiz->urgencia, sizeof(raiz->urgencia), 1, sesion);
 			fwrite(&raiz->operaciones, sizeof(raiz->operaciones), 1, sesion);
 			fwrite(&raiz->uid, sizeof(char)*7, 1, sesion);
+			fwrite(&raiz->unico, sizeof(char), 1, sesion);
 			raiz = raiz -> sig;
 		}
 	}
+
 	fclose(sesion);//se cierra el log de la sesion
 	sesion = fopen("lastSession.bin", "wb"); //se almacena el nombre para acceder despues
 	fwrite(fileID, sizeof(char)*23, 1, sesion);//escribimos el nombre
@@ -207,7 +226,7 @@ void guardarSesion(NODO *raiz) {
 NODO *restablecerSesion(NODO *raiz) {
 	FILE *sesion;
 	int urgencia = 0, operaciones; //Lugares donde se almacenan los  bloques de memoria recuperados de un bin
-	char uids[8], nombre[23], opcion;
+	char uids[8], nombre[23], opcion, unico;
 	
 	printf("1. Abrir ultimo archivo\n2. Ingresar nombre especifico (revisar carpeta)\nOpcion: ");
 	fflush(stdin);
@@ -234,13 +253,20 @@ NODO *restablecerSesion(NODO *raiz) {
 			fread(&urgencia, sizeof(urgencia), 1, sesion); //No actualizara el bloque de memoria si no lee nada
 			fread(&operaciones, sizeof(operaciones), 1, sesion);
 			fread(&uids, sizeof(char)*7, 1, sesion);
+			fread(&unico, sizeof(char), 1, sesion);
 			if ( urgencia == 0 ) break;
-			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids);
+			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids, unico);
 			urgencia = 0;
 		} while (1);
 	}
 	fclose(sesion);
 	return raiz;
+}
+
+void generarReporte() {
+	char logs[22];
+	snprintf(logs, sizeof(logs), "reporte%s.txt", tiempoID().id);
+	rename("temp.txt", logs);
 }
 
 int main() {
@@ -273,7 +299,9 @@ int main() {
 	} while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
 	
 	guardarSesion(raiz);
-	while (raiz!=NULL) raiz = eliminarNodo(raiz);
+	if ( raiz == NULL) generarReporte();
+	else while (raiz!=NULL) raiz = eliminarNodo(raiz);
+
 	return 0;
 }
 	

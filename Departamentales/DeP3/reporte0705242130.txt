@@ -1,0 +1,7 @@
+REPORTE DE CLIENTES
+	------
+Urgencia | Operaciones | ID
+
+001	005	CKP-826
+004	005	MHG-246
+006	003	SUC-762
