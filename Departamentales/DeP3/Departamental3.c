@@ -159,8 +159,6 @@ void generarLogTemp(NODO *raiz){
 	fclose(log);
 }
 
-
-
 /*Funcion para realizar las operaciones al atender un cliente, (guarda datos y manda a eliminar el nodo)
 Si el cliente tiene operaciones pendientes lo vuelve a formar*/
 NODO *atenderCliente(NODO *raiz) {
@@ -218,7 +216,7 @@ void guardarSesion(NODO *raiz) {
 	}
 
 	fclose(sesion);//se cierra el log de la sesion
-	sesion = fopen("lastSession.bin", "wb"); //se almacena el nombre para acceder despues
+	sesion = fopen("ultimaSesion.bin", "wb"); //se almacena el nombre para acceder despues
 	fwrite(fileID, sizeof(char)*23, 1, sesion);//escribimos el nombre
 	fclose(sesion);
 }
@@ -233,7 +231,7 @@ NODO *restablecerSesion(NODO *raiz) {
 	scanf("%c", &opcion);
 	
 	if(opcion=='1'){
-		if ((sesion=fopen("lastSession.bin", "rb"))!=NULL) {
+		if ((sesion=fopen("ultimaSesion.bin", "rb"))!=NULL) {
 			fread(nombre, sizeof(char)*23, 1, sesion); //lee la sesion anterior
 			fclose(sesion);
 		}
@@ -264,9 +262,15 @@ NODO *restablecerSesion(NODO *raiz) {
 }
 
 void generarReporte() {
-	char logs[22];
+	char logs[22], datos[50];
+	FILE *log;
 	snprintf(logs, sizeof(logs), "reporte%s.txt", tiempoID().id);
 	rename("temp.txt", logs);
+	log = fopen(logs, "r");
+	while (fgets(datos, 50, log) != NULL) {
+        printf("%s", datos);
+    }
+	fclose(log);
 }
 
 int main() {

@@ -1,5 +1,0 @@
-		REPORTE DE CLIENTES
-
-Urgencia | Operaciones | ID
-
-001	   001		 UQF-358
