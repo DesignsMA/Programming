@@ -37,26 +37,22 @@ void imprimeLista(NODO *ap){
 	printf("\n------------------------------------------------------\n\n");
 } 
 	
-	/*Recibe un apuntador al primer caracter de una cadena, la modifica y genera un
-	codigo de forma ABC-123 donde las letras y numeros son aleatorias en base a la 
-	semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
-	de caracteres de forma &uid[0]. */
-	
+/*Recibe un apuntador al primer caracter de una cadena, la modifica y genera un
+codigo de forma ABC-123 donde las letras y numeros son aleatorias en base a la 
+semilla generada por el tiempo, recibe como  parametro un apuntador a un arreglo
+de caracteres de forma &uid[0]. */
 void  uidGen(char *uid) {
 	int i, j;
     printf("\nRegistrando en la lista");
-    for(i = 0; i < 10; i++) 
-    {
-        usleep(25000); //Pausa por 50000 microsegundos, 0.025 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
+    for(i = 0; i < 10; i++) {
+        usleep(25000); //Pausa por 0.25 segundos, USAMOS USLEEP porque Sleep es exclusivo de windows
         printf(".");
-    } //pausa de un 1/4 segundo (10 *0.025 = 0.25)
+    } 
     srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
-    for(j = 0; j < 3; j++)
-        uid[j] = (char)( rand()%('Z' - 'A' + 1) + 'A');//genera ABC 
-    uid[j] = '-';//ABC-
+    for(j = 0; j < 3; j++) uid[j] = (char)( rand()%('Z' - 'A' + 1) + 'A');//genera ABC 
+	uid[j] = '-';//ABC-
     j++;
-    for(j; j < 7; j++)
-        uid[j] = (char)( rand()%('9' - '1' + 1) + '1');//Limites para generar digitos entre 1-9 ABC-123
+    for(j; j < 7; j++) uid[j] = (char)( rand()%('9' - '1' + 1) + '1');//Limites para generar digitos entre 1-9 ABC-123
     uid[j] = '\0';//ABC-123\0
 }
 
@@ -105,10 +101,9 @@ NODO *insertaUrgencia(NODO *ap, int urgencia, int operaciones, char uid[8], char
 					return ap;
 				}
 			}
-			else{ /*Si no, significa que no encontro ninguna cola correspondiente, es decir es menos urgente que todos los anteriores
-				, lo coloca al final*/
-				aux->sig = nuevo;
-				nuevo->sig = NULL;
+			else{
+				aux->sig = nuevo; //Si no, significa que no encontro ninguna cola correspondiente, es decir 
+				nuevo->sig = NULL; //es menos urgente que todos los anteriores , lo coloca al final
 				return ap;
 			}
 			aux=aux->sig; //se recorre al siguiente nodo
@@ -138,8 +133,6 @@ NODO *leerDatos(NODO *raiz) {
 	raiz = insertaUrgencia(raiz,urgencia,operaciones, uid, 'S');
 	return raiz;
 }
-/*Funcion que tal cual dice su nombre, solo borra un nodo y actualiza la lista
-(el primer nodo en la lista)*/
 NODO *eliminarNodo(NODO *raiz) {
 	NODO *aux;
 	aux = raiz; //se guarda la raiz
@@ -147,16 +140,14 @@ NODO *eliminarNodo(NODO *raiz) {
 	free(aux);
 	return raiz;
 }
+
 void generarLogTemp(NODO *raiz){
 	FILE *log;
-	log = fopen("temp.txt", "a+");
-	fseek(log, 0, SEEK_END);
-	if ( ftell(log) == 0) fprintf(log, "\tREPORTE DE CLIENTES\n\nUrgencia | Operaciones | ID\n\n");
-	fclose(log);
-
-	log = fopen("temp.txt", "a+"); //colocar al final, el apuntador apunta al ultimo caracter
-	fprintf(log, "%03d\t   %03d\t	 %s\n", raiz->urgencia, raiz->operaciones, raiz->uid);         
-	fclose(log);
+	log = fopen("temp.txt", "a+"); //abre o crea temp.txt en modo append
+	fseek(log, 0, SEEK_END); //movemos el apuntador hasta el final
+	if ( ftell(log) == 0) fprintf(log, "\tREPORTE DE CLIENTES\n\nUrgencia | Operaciones | ID\n\n"); //si el apuntador es cero (el archivo aun no tiene nada) colocamos la cabecera
+	fprintf(log, "%03d\t   %03d\t	 %s\n", raiz->urgencia, raiz->operaciones, raiz->uid); //escribimos informacion de un cliente atendido (se coloca hasta el final)      
+    fclose(log);
 }
 
 /*Funcion para realizar las operaciones al atender un cliente, (guarda datos y manda a eliminar el nodo)
@@ -169,20 +160,20 @@ NODO *atenderCliente(NODO *raiz) {
 		urgencia = raiz->urgencia;
 		strcpy(uid, raiz->uid); //guardar uid
 
-		if (raiz->unico == 'S') generarLogTemp(raiz);
+		if (raiz->unico == 'S') generarLogTemp(raiz); //Si es la primera vez que pasa, colocamos en log
 
 		if ( operaciones-3 > 0 ) //Si las operaciones exceden las 3
 		{
 			printf("\nVolviendo a formar\n");
 			raiz = eliminarNodo(raiz);
-			raiz = insertaUrgencia(raiz, urgencia, operaciones - 3, uid, 'N'); //Volver a formar si tiene operaciones pendientes
+			raiz = insertaUrgencia(raiz, urgencia, operaciones - 3, uid, 'N'); //Volver a formar si tiene operaciones pendientes, indicamos que ya paso
 		}
 		else raiz = eliminarNodo(raiz);
 		
 		printf("\nCliente atendido\n");
 		usleep(500000); //espera 0.5 segundos
 		systemCLS();
-	} else if(raiz == NULL){
+	} else {
 		printf("\nNo hay clientes en la fila\n");
 		sleep(1); //pausa de un segundo
 	} 
@@ -194,20 +185,21 @@ SALIDA tiempoID() {
 	struct tm *tmp ; //structura con datos del  tiempo (separados)
 	time_t t; //variable donde el tiempo se almacena en entero
 	time(&t); //obtenemos el tiempo actual
-	tmp = localtime(&t); //transformamos a tiempo local y almacenamos separado en tmp
-	strftime(salida.id, sizeof(salida.id), "%d%m%y%H%M", tmp); //formato diamesaniohoraminuto
-	return salida;
+	tmp = localtime(&t); //transformamos a tiempo local y almacenamos como struct en tmp
+	strftime(salida.id, sizeof(salida.id), "%d%m%y%H%M", tmp); //formato diamesaniohoraminuto, https://www.geeksforgeeks.org/strftime-function-in-c/
+	return salida;//retornamos el struct para acceder a la cadena
 }
 
 void guardarSesion(NODO *raiz) {
 	FILE *sesion;
 	char fileID[23];
-	snprintf(fileID, sizeof(fileID), "clientes%s.bin", tiempoID().id); //generando 	//clientesdiamesa�ohoraminutos.bin 23
+	snprintf(fileID, sizeof(fileID), "clientes%s.bin", tiempoID().id); //generando 	//clientesdiamesanioohoraminutos.bin 23
 	sesion = fopen(fileID, "wb"); //Abrir archivo en modo escritura
+
 	if (sesion == NULL) printf("Error abriendo el archivo");
 	else {
-		while (raiz != NULL){
-			fwrite(&raiz->urgencia, sizeof(raiz->urgencia), 1, sesion);
+		while (raiz != NULL){ //Mientras no se llegue al final de la lista
+			fwrite(&raiz->urgencia, sizeof(raiz->urgencia), 1, sesion); //Escribir bloques de memoria en el binario
 			fwrite(&raiz->operaciones, sizeof(raiz->operaciones), 1, sesion);
 			fwrite(&raiz->uid, sizeof(char)*7, 1, sesion);
 			fwrite(&raiz->unico, sizeof(char), 1, sesion);
@@ -230,7 +222,7 @@ NODO *restablecerSesion(NODO *raiz) {
 	fflush(stdin);
 	scanf("%c", &opcion);
 	
-	if(opcion=='1'){
+	if(opcion=='1' || opcion !='2'){
 		if ((sesion=fopen("ultimaSesion.bin", "rb"))!=NULL) {
 			fread(nombre, sizeof(char)*23, 1, sesion); //lee la sesion anterior
 			fclose(sesion);
@@ -239,24 +231,21 @@ NODO *restablecerSesion(NODO *raiz) {
 		printf("Nombre (formato clientesdiamesaniohoraminuto): ");
 		fflush(stdin);
 		scanf("%s", nombre);
-		printf("%s", nombre);
 		strcat(nombre, ".bin");
 	}	
 	
-	sesion = fopen(nombre,"rb");
-	// sesion = fopen("clientes.bin", "rb"); //Abrir archivo en modo lectura    
+	sesion = fopen(nombre,"rb"); //abrimos el archivo con el nombre introducido
 	if (sesion == NULL) return raiz; 
-	else{
-		do{
+	else do{
+			urgencia = 0;
 			fread(&urgencia, sizeof(urgencia), 1, sesion); //No actualizara el bloque de memoria si no lee nada
 			fread(&operaciones, sizeof(operaciones), 1, sesion);
 			fread(&uids, sizeof(char)*7, 1, sesion);
 			fread(&unico, sizeof(char), 1, sesion);
-			if ( urgencia == 0 ) break;
 			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids, unico);
-			urgencia = 0;
-		} while (1);
-	}
+
+	} while ( urgencia != 0);
+
 	fclose(sesion);
 	return raiz;
 }
@@ -264,12 +253,10 @@ NODO *restablecerSesion(NODO *raiz) {
 void generarReporte() {
 	char logs[22], datos[50];
 	FILE *log;
-	snprintf(logs, sizeof(logs), "reporte%s.txt", tiempoID().id);
-	rename("temp.txt", logs);
-	log = fopen(logs, "r");
-	while (fgets(datos, 50, log) != NULL) {
-        printf("%s", datos);
-    }
+	snprintf(logs, sizeof(logs), "reporte%s.txt", tiempoID().id); //creamos el id del reporte (igual que el de clientes)
+	rename("temp.txt", logs); //renombramos el log temporal a su nombre final
+	log = fopen(logs, "r"); //imprimimos en pantalla el log
+	while (fgets(datos, 50, log) != NULL) printf("%s", datos);
 	fclose(log);
 }
 
@@ -277,34 +264,28 @@ int main() {
 	NODO *raiz;
 	char opcion;
 	raiz=NULL;
-	
 	raiz = restablecerSesion(raiz);
 	
 	do{
-	//Ejecutar instruccion primero
-	//Instruccion compuesta
 		imprimeLista(raiz);
 		printf("\tMenu\n1. Nuevo cliente\n2. Atender cliente\n3. Salir\nOpcion: ");
 		fflush(stdin);
 		opcion = (char) getchar();
-		systemCLS(); //Funcion personalizada, funciona en todos los OS
+		systemCLS(); //Funcion personalizada, funciona en todos los SO
 		switch(opcion){
-		case '1':
-			raiz = leerDatos(raiz);
+		case '1': raiz = leerDatos(raiz);
 			break;
 			
-		case '2':
-			raiz= atenderCliente(raiz);
+		case '2': raiz= atenderCliente(raiz);
 			break;
-		default: //Si no se elige una opcion valida, volver a iterar
-			break;
+		default: break;
 		}
-		systemCLS(); //Funcion personalizada, funciona en todos los OS
+		systemCLS(); //Funcion personalizada, funciona en todos los SO
 	} while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
 	
-	guardarSesion(raiz);
-	if ( raiz == NULL) generarReporte();
-	else while (raiz!=NULL) raiz = eliminarNodo(raiz);
+	guardarSesion(raiz); //Guardamos los nodos existentes en el binario
+	if ( raiz == NULL) generarReporte(); // si se llego al final generamos reporte
+	else while (raiz!=NULL) raiz = eliminarNodo(raiz); //si no liberamos memoria
 
 	return 0;
 }
