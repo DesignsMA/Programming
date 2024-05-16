@@ -1,0 +1,6 @@
+	REPORTE DE CLIENTES
+
+Urgencia | Operaciones | ID
+
+001	   001		 MKR-498
+001	   004		 SFO-125

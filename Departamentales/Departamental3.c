@@ -195,7 +195,6 @@ void guardarSesion(NODO *raiz) {
 	char fileID[23];
 	snprintf(fileID, sizeof(fileID), "clientes%s.bin", tiempoID().id); //generando 	//clientesdiamesanioohoraminutos.bin 23
 	sesion = fopen(fileID, "wb"); //Abrir archivo en modo escritura
-
 	if (sesion == NULL) printf("Error abriendo el archivo");
 	else {
 		while (raiz != NULL){ //Mientras no se llegue al final de la lista
@@ -206,7 +205,6 @@ void guardarSesion(NODO *raiz) {
 			raiz = raiz -> sig;
 		}
 	}
-
 	fclose(sesion);//se cierra el log de la sesion
 	sesion = fopen("ultimaSesion.bin", "wb"); //se almacena el nombre para acceder despues
 	fwrite(fileID, sizeof(char)*23, 1, sesion);//escribimos el nombre
@@ -233,18 +231,17 @@ NODO *restablecerSesion(NODO *raiz) {
 		scanf("%s", nombre);
 		strcat(nombre, ".bin");
 	}	
-	
 	sesion = fopen(nombre,"rb"); //abrimos el archivo con el nombre introducido
 	if (sesion == NULL) return raiz; 
-	else do{
-			urgencia = 0;
+	else do{	
 			fread(&urgencia, sizeof(urgencia), 1, sesion); //No actualizara el bloque de memoria si no lee nada
 			fread(&operaciones, sizeof(operaciones), 1, sesion);
 			fread(&uids, sizeof(char)*7, 1, sesion);
 			fread(&unico, sizeof(char), 1, sesion);
+			if (urgencia == 0) break; //tenemos que checar que exista, puesto que si no lee nada estamos en el final
 			raiz = insertaUrgencia(raiz, urgencia, operaciones, uids, unico);
-
-	} while ( urgencia != 0);
+			urgencia = 0;
+	} while (1);
 
 	fclose(sesion);
 	return raiz;
@@ -283,10 +280,14 @@ int main() {
 		systemCLS(); //Funcion personalizada, funciona en todos los SO
 	} while ( opcion != '3'); //Seguir repitiendo mientras no se haya elegido salir
 	
-	guardarSesion(raiz); //Guardamos los nodos existentes en el binario
-	if ( raiz == NULL) generarReporte(); // si se llego al final generamos reporte
-	else while (raiz!=NULL) raiz = eliminarNodo(raiz); //si no liberamos memoria
-
+	if ( raiz == NULL) {
+		remove("ultimaSesion.bin"); // elimina el archivo puesto que no hay ultima sesion
+		generarReporte();
+	} // si se llego al final generamos reporte
+	else {
+		guardarSesion(raiz); //Guardamos los nodos existentes en el binario
+		while (raiz!=NULL) raiz = eliminarNodo(raiz); //si no liberamos memoria
+	}
 	return 0;
 }
 	
