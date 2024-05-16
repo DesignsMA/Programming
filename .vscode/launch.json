@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "d:/Users/sepma/Downloads/Data/C728/Git/C-C++-C#/C/git/Departamentales/DeP3",
-      "program": "d:/Users/sepma/Downloads/Data/C728/Git/C-C++-C#/C/git/Departamentales/DeP3/build/Debug/outDebug",
+      "cwd": "d:/Users/sepma/Downloads/Data/C728/Git/C-C++-C#/C/git/Departamentales",
+      "program": "d:/Users/sepma/Downloads/Data/C728/Git/C-C++-C#/C/git/Departamentales/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
