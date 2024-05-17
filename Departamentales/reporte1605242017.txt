@@ -1,0 +1,11 @@
+	REPORTE DE CLIENTES
+
+Urgencia | Operaciones | ID
+
+001	   001		 KBK-964
+001	   024		 UUP-753
+003	   002		 LEK-719
+011	   002		 EVZ-633
+001	   002		 WNB-457
+004	   003		 CIX-163
+005	   002		 JUT-599

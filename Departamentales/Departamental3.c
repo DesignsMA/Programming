@@ -50,7 +50,7 @@ void  uidGen(char *uid) {
     } 
     srand(time(NULL));//se genera la semilla, tenemos que pausar 1 segundo para que la semilla sea diferente
     for(j = 0; j < 3; j++) uid[j] = (char)( rand()%('Z' - 'A' + 1) + 'A');//genera ABC 
-	uid[j] = '-';//ABC-
+	uid[j] = '-';//ABC- apuntador + tipo de dato*j
     j++;
     for(j; j < 7; j++) uid[j] = (char)( rand()%('9' - '1' + 1) + '1');//Limites para generar digitos entre 1-9 ABC-123
     uid[j] = '\0';//ABC-123\0
@@ -123,8 +123,8 @@ NODO *leerDatos(NODO *raiz) {
 		systemCLS();
 	}
 	/*Se permiten mas de 3 operaciones, cuando tiene mas de 3 se resta y se vuelve a formar con misma urgencia y operaciones-3*/
-	while(operaciones<1 ){
-		printf("Operaciones a realizar (Minimo 1), solo se atienden 3 a la vez, te volveras a formar si existen pendientes: ");
+	while(operaciones<1 || operaciones >24){
+		printf("Operaciones a realizar (Minimo 1, maximo 24), solo se atienden 3 a la vez, te volveras a formar si existen pendientes: ");
 		fflush(stdin);
 		scanf("%d", &operaciones);
 		systemCLS();
@@ -183,7 +183,7 @@ NODO *atenderCliente(NODO *raiz) {
 SALIDA tiempoID() {
 	SALIDA salida;
 	struct tm *tmp ; //structura con datos del  tiempo (separados)
-	time_t t; //variable donde el tiempo se almacena en entero
+	time_t t; //variable donde el tiempo se almacena en entero 120924434344343
 	time(&t); //obtenemos el tiempo actual
 	tmp = localtime(&t); //transformamos a tiempo local y almacenamos como struct en tmp
 	strftime(salida.id, sizeof(salida.id), "%d%m%y%H%M", tmp); //formato diamesaniohoraminuto, https://www.geeksforgeeks.org/strftime-function-in-c/
@@ -194,7 +194,7 @@ void guardarSesion(NODO *raiz) {
 	FILE *sesion;
 	char fileID[23];
 	snprintf(fileID, sizeof(fileID), "clientes%s.bin", tiempoID().id); //generando 	//clientesdiamesanioohoraminutos.bin 23
-	sesion = fopen(fileID, "wb"); //Abrir archivo en modo escritura
+	sesion = fopen(fileID, "wb+"); //Abrir archivo en modo escritura
 	if (sesion == NULL) printf("Error abriendo el archivo");
 	else {
 		while (raiz != NULL){ //Mientras no se llegue al final de la lista
@@ -231,6 +231,7 @@ NODO *restablecerSesion(NODO *raiz) {
 		scanf("%s", nombre);
 		strcat(nombre, ".bin");
 	}	
+	//abrir clientes1605241946.bin
 	sesion = fopen(nombre,"rb"); //abrimos el archivo con el nombre introducido
 	if (sesion == NULL) return raiz; 
 	else do{	
