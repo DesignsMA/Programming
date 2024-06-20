@@ -69,17 +69,26 @@ void baseChanger(int dec, int base) {
 }
 
 int main() {
-    int dec;
+    int dec, custom = 0;
     do
     {
         printf("Enter a decimal number: ");
         scanf("%d", &dec);
+        while ( custom < 2)
+        {
+            fflush(stdin);     
+            printf("Enter a custom system conversion number: ");
+            scanf("%d", &custom);
+        }
         hexadecimal(dec);
         printf(" Hex |\t");
         baseChanger(dec,8);
         printf(" Oct |\t");
         baseChanger(dec,2);
-        printf(" Bin\n");
-        fflush(stdin);     
+        printf(" Bin |\t");
+        baseChanger(dec,custom);
+        printf(" Custom\n");
+        fflush(stdin);
+        custom = 0;     
     } while (getchar() != 'x');
 }
