@@ -44,10 +44,11 @@ int main () {
     scanf("%lf", &a);
     printf("\nIntroduzca el numero de anios: ");
     scanf("%lf", &n);
-    printf("\nIntroduzca la frecuencia de composicion (M, D, C): ");
-    scanf(" %c", &frec);
+   
     do
     {
+        printf("\nIntroduzca la frecuencia de composicion (M, D, C): ");
+        scanf(" %c", &frec);
         switch (frec)
         {
         case 'M':
