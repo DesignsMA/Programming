@@ -54,8 +54,13 @@ public class Book {
 
     public static void main(String[] args) {
         // Instanciating class (creating object)
-        Book book1 = new Book("1984", "George Orwell", 1949, 264, "Dystopian Novel", "Editores Mexicanos Unidos");
-        System.out.println(book1.toString());
+        Book book = new Book("1984", "George Orwell", 1949, 264, "Dystopian Novel", "Editores Mexicanos Unidos");
+        System.out.println(book.toString());
 
+        /* Using the same variable when working with the same class is a good practice, unreferenced objects are elegible for the 
+         * Java Garbage Collector reducing the memory used instead of creating multiple variables of the same class
+         */
+        book = new Book("Killing Floor", "Lee Child", 1997, 522, "Novel", "Putnam");
+        System.out.println(book.toString());
     }
 }
