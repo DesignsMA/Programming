@@ -16,6 +16,7 @@ class Scanners {
         System.out.print("Float: ");
         float flt = scan.nextFloat();
         System.out.println("You entered: " + flt);
+        scan.close();
     }
 
 }
