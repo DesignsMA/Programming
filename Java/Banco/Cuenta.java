@@ -2,13 +2,13 @@ package Banco; //Paquete
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
-
 public class Cuenta { //Clase
     //Atributos
     private int numeroCuenta;
     private String titular;
     private double saldo;
     private static int actual; //Se conserva entre instancias
+    private Scanner in = new Scanner( System.in );
 
     //Constructores 
 
@@ -16,7 +16,7 @@ public class Cuenta { //Clase
     public Cuenta () { 
         numeroCuenta = numCuenta();
         titular = "John Doe";
-        saldo = 0;
+        saldo = 0f;
         actual++;
     }
 
@@ -43,34 +43,31 @@ public class Cuenta { //Clase
 
     public int numCuenta () {
         Date fecha = new Date();
-        SimpleDateFormat idFormato = new SimpleDateFormat("ddMMyykkmm" + actual);
-        return Integer.parseInt( idFormato.format(fecha) );// Dandole formato a la fecha actual y guardando numero de cuenta
+        SimpleDateFormat idFormato = new SimpleDateFormat("ddMMyy");
+        return Integer.parseInt( idFormato.format(fecha)+actual );// Dandole formato a la fecha actual y guardando numero de cuenta
     }
     
     //Comportamiento
 
     public void depositar () {
-        Scanner in = new Scanner( System.in );
-        double cantidad;
+        double cantidad = 0.0f;
         do
         {
-            System.out.println("Ingrese la cantidad a depositar (Mínimo $1): ");
+            System.out.println("\nIngrese la cantidad a depositar (Mínimo $1): ");
             cantidad = in.nextDouble(); //Leer numero de doble precision | No se manejan errores
-        } while ( cantidad <= 1.0 );
+        } while ( cantidad <= 1.0f);
         saldo += cantidad;
         System.out.println("Deposito exitoso");
-        in.close();
     }
 
     public void retirar () {
-        if ( saldo > 1.0) {
-            Scanner in = new Scanner( System.in );
-            double cantidad;
+        double cantidad = 0.0f;
+        if ( saldo >= 1.0f) {
             do
             {
-                System.out.println("Ingrese la cantidad a retirar (Mínimo $1): ");
+                System.out.println("\nIngrese la cantidad a retirar (Mínimo $1): ");
                 cantidad = in.nextDouble(); //Leer numero de doble precision | No se manejan errores
-            } while ( cantidad <= 1.0 );
+            } while ( cantidad <= 1.0f );
 
             if ( saldo < cantidad ) System.out.println("Saldo insuficiente");
             else
@@ -78,7 +75,6 @@ public class Cuenta { //Clase
                 saldo -= cantidad;
                 System.out.println("Retiro exitoso");
             }
-            in.close();
         }
         else System.out.println("Actualmente no cuentas con saldo en tu cuenta");
     }

@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class Banco { //Clase principal
 
-    public static void main () {
+    public static void main ( String [] args) {
         Scanner in = new Scanner( System.in );
         String nombre;
 
@@ -17,7 +17,7 @@ public class Banco { //Clase principal
         System.out.println(c1.getSaldo());
         System.out.println(c1.toString());
 
-        System.out.println("Ingrese el nombre del titular de la cuenta: ");
+        System.out.println("\nIngrese el nombre del titular de la cuenta: ");
         nombre = in.nextLine();
         c2 = new Cuenta(nombre); //objeto
         c2.datosCuenta(); //Estado
