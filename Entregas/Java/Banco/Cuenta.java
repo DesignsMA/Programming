@@ -1,15 +1,12 @@
 package Banco; //Paquete
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.Scanner;
 public class Cuenta { //Clase
     //Atributos
     private int numeroCuenta;
     private String titular;
     private double saldo;
     private static int actual; //Se conserva entre instancias
-    Scanner in = new Scanner( System.in );
-
     //Constructores 
 
     //Constructor por defecto
@@ -49,26 +46,13 @@ public class Cuenta { //Clase
     
     //Comportamiento
 
-    public void depositar () {
-        double cantidad = 0.0f;
-        do
-        {
-            System.out.println("\nIngrese la cantidad a depositar (Mínimo $1): ");
-            cantidad = in.nextDouble(); //Leer numero de doble precision | No se manejan errores
-        } while ( cantidad <= 1.0f);
+    public void depositar (double cantidad) {
         saldo += cantidad;
         System.out.println("Deposito exitoso");
     }
 
-    public void retirar () {
-        double cantidad = 0.0f;
+    public void retirar (double cantidad) {
         if ( saldo >= 1.0f) {
-            do
-            {
-                System.out.println("\nIngrese la cantidad a retirar (Mínimo $1): ");
-                cantidad = in.nextDouble(); //Leer numero de doble precision | No se manejan errores
-            } while ( cantidad <= 1.0f );
-
             if ( saldo < cantidad ) System.out.println("Saldo insuficiente");
             else
             {
