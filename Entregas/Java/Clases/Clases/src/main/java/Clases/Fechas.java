@@ -1,4 +1,4 @@
-package Entregas.Java.Fechas;
+package Clases;
 import java.util.Scanner;
 class Fecha {
     private int dia;
