@@ -3,6 +3,6 @@
   <gresource prefix="/com.github.designsnma/gtk/PI">
     <file>Montserrat.ttf</file>
     <file preprocess="xml-stripblanks">main.ui</file>
-    <file alias="ui.css">ui.css</file>
+    <file>ui.css</file>
   </gresource>
 </gresources>

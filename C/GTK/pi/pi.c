@@ -19,16 +19,13 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_resources_register(res); //registering resource to access its files
     // Creating gtk app
     // Load the UI data into the builder
-    GtkCssProvider *css= gtk_css_provider_new(); //initializing
-    gtk_css_provider_load_from_resource(css, "/com.github.designsnma/gtk/PI/ui.css");
-    /* select builder widgets with */
-    gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(css), GTK_STYLE_PROVIDER_PRIORITY_USER); //set css as default style for display
 
     GtkBuilder *builder = gtk_builder_new();
     gtk_builder_add_from_resource(builder, "/com.github.designsnma/gtk/PI/main.ui", NULL);
-    
+
     GObject *window = gtk_builder_get_object( builder , "window");
     gtk_window_set_application(GTK_WINDOW(window), app);
+
 
     GObject *button = gtk_builder_get_object( builder, "button1");
     g_signal_connect_swapped (button, "clicked", G_CALLBACK (arquimedes), NULL);
@@ -41,6 +38,10 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     button = gtk_builder_get_object (builder, "button4");
     g_signal_connect_swapped (button, "clicked", G_CALLBACK ( gtk_window_close), window);
+
+    GtkCssProvider *css = gtk_css_provider_new(); //initializing
+    gtk_css_provider_load_from_resource(css, "/com.github.designsnma/gtk/PI/ui.css");
+    gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(css), GTK_STYLE_PROVIDER_PRIORITY_USER); //set css as default style for display
 
     gtk_widget_set_visible (GTK_WIDGET (window), TRUE);
     

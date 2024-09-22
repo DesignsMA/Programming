@@ -53,7 +53,7 @@
 
                 <child>
                     <object id="button4" class="GtkButton">
-                        <property name="name">quit</property>
+                        <property name="name">button4</property>
                         <property name="label">SALIR</property>
                         <layout>
                             <property name="column">0</property>
