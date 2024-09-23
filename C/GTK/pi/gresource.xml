@@ -2,7 +2,7 @@
 <gresources>
   <gresource prefix="/com.github.designsnma/gtk/PI">
     <file>Montserrat.ttf</file>
-    <file preprocess="xml-stripblanks">main.ui</file>
+    <file>main.ui</file>
     <file>ui.css</file>
   </gresource>
 </gresources>

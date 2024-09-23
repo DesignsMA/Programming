@@ -71,7 +71,7 @@
             "-lgio-2.0",
             "-lglib-2.0",
             "-c",
-            "-o", "${fileDirname}/resources.o"
+            "-o","${fileDirname}/gresource.o"
         ],
         "options": {
             "cwd": "C:/msys64/mingw64/bin"
@@ -103,7 +103,7 @@
          "-IC:/msys64/mingw64/include/gdk-pixbuf-2.0",
          "-IC:/msys64/mingw64/include/webp",
          "-DLIBDEFLATE_DLL",
-         "-I${fileDirname}", // include file directory headers
+         "-I${fileDirname}", 
          "-IC:/msys64/mingw64/include/graphene-1.0",
          "-IC:/msys64/mingw64/lib/graphene-1.0/include",
          "-mfpmath=sse",
@@ -112,7 +112,7 @@
          "-mwindows",
      
          "${file}",
-         "resources.o", //adding resources
+         "${fileDirname}/gresource.o", 
      
          "-LC:/msys64/mingw64/lib",
          "-lgtk-4",
