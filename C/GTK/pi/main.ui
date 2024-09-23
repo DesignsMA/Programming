@@ -6,25 +6,17 @@
         <property name="height-request">720</property>
         <child>
             <object id="grid" class="GtkGrid">
+            <property name="name">grid</property>
             <property name="halign">GTK_ALIGN_CENTER</property>
-            <property name="row_spacing">40</property>
-                <child>
-                    <object id="label1" class="GtkLabel">
-                        <property name="label" translatable="yes">METODOS</property>
-                        <layout>
-                            <property name="column">0</property>
-                            <property name="row">0</property>
-                        </layout>
-                    </object>
-                </child>
-
+            <property name="margin">30</property>
+            <property name="row_spacing">30</property>
                 <child>
                     <object id="button1" class="GtkButton">
                         <property name="name">button</property>
                         <property name="label">Arquímedes | Polígonos</property>
                         <layout>
                             <property name="column">0</property>
-                            <property name="row">1</property>
+                            <property name="row">0</property>
                         </layout>
                     </object>
                 </child>
@@ -35,7 +27,7 @@
                         <property name="label">Basilea | Series</property>
                         <layout>
                             <property name="column">0</property>
-                            <property name="row">2</property>
+                            <property name="row">1</property>
                         </layout>
                     </object>
                 </child>
@@ -46,7 +38,7 @@
                         <property name="label">Newton | Series</property>
                         <layout>
                             <property name="column">0</property>
-                            <property name="row">3</property>
+                            <property name="row">2</property>
                         </layout>
                     </object>
                 </child>
@@ -57,11 +49,24 @@
                         <property name="label">SALIR</property>
                         <layout>
                             <property name="column">0</property>
+                            <property name="row">3</property>
+                        </layout>
+                    </object>
+                </child>
+                <child>
+                    <object id="button5" class="GtkButton">
+                        <property name="name">button4</property>
+                        <property name="label">OOOO</property>
+                        <layout>
+                            <property name="column">0</property>
                             <property name="row">4</property>
                         </layout>
                     </object>
                 </child>
-
+            </object>
+        </child>
+        <child>
+            <object id="label" class="GtkLabel">
             </object>
         </child>
     </object>

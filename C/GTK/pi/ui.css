@@ -1,3 +1,10 @@
 #button4 button{
-    background: red;
+    background-color: blue;
+    color: magenta;
+    font-family: Noto Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 30px;
+    border-radius: 30px;
 }
+

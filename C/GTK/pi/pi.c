@@ -26,7 +26,6 @@ static void activate(GtkApplication *app, gpointer user_data) {
     GObject *window = gtk_builder_get_object( builder , "window");
     gtk_window_set_application(GTK_WINDOW(window), app);
 
-
     GObject *button = gtk_builder_get_object( builder, "button1");
     g_signal_connect_swapped (button, "clicked", G_CALLBACK (arquimedes), NULL);
 
@@ -39,6 +38,12 @@ static void activate(GtkApplication *app, gpointer user_data) {
     button = gtk_builder_get_object (builder, "button4");
     g_signal_connect_swapped (button, "clicked", G_CALLBACK ( gtk_window_close), window);
 
+    button = gtk_builder_get_object (builder, "button5");
+    g_signal_connect_swapped (button, "clicked", G_CALLBACK ( gtk_window_close), window);
+
+    GObject *label = gtk_builder_get_object(builder, "label");
+    gtk_label_set_text(GTK_LABEL(label), "Hello, World!");
+
     GtkCssProvider *css = gtk_css_provider_new(); //initializing
     gtk_css_provider_load_from_resource(css, "/com.github.designsnma/gtk/PI/ui.css");
     gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(css), GTK_STYLE_PROVIDER_PRIORITY_USER); //set css as default style for display
@@ -47,6 +52,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     
     /* We do not need the builder any more */
     g_object_unref (builder);
+    gtk_window_present(GTK_WINDOW(window)); //show the window
+
 }
 
 int main (int    argc, char **argv)
