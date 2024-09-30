@@ -18,7 +18,12 @@
             "compilerPath": "C:/msys64/mingw64/bin/gcc.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-gcc-x64"
+            "intelliSenseMode": "windows-gcc-x64",
+            "compilerArgs": [
+                "-IC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
+                "-LC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
+                "-lgmp"
+            ]
         }
     ],
     "version": 4

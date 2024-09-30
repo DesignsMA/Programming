@@ -2,16 +2,17 @@
 <interface>
     <object id="window" class="GTKWindow">
         <property name="title" translatable="yes">Calculadora de PI | Por Marco Ciprian</property>
-        <property name="width-request">1280</property>
-        <property name="height-request">720</property>
+        <property name="resizable">TRUE</property>
         <child>
             <object id="grid" class="GtkGrid">
+                <property name="width-request">600</property>
                 <property name="halign">GTK_ALIGN_CENTER</property>
                 <property name="margin-top">30</property>
-                <property name="row_spacing">10</property>
+                <property name="row-spacing">10</property>
                 <child>
                     <object id="bt1" class="GtkButton">
                         <property name="label">Arquímedes | Polígonos</property>
+                        <property name="hexpand">TRUE</property>
                         <layout>
                             <property name="column">0</property>
                             <property name="row">0</property>
@@ -22,6 +23,7 @@
                 <child>
                     <object id="bt2" class="GtkButton">
                         <property name="label">Basilea | Series</property>
+                        <property name="hexpand">TRUE</property>
                         <layout>
                             <property name="column">0</property>
                             <property name="row">1</property>
@@ -32,32 +34,59 @@
                 <child>
                     <object id="bt3" class="GtkButton">
                         <property name="label">Newton | Series</property>
+                        <property name="hexpand">TRUE</property>
                         <layout>
                             <property name="column">0</property>
                             <property name="row">2</property>
                         </layout>
                     </object>
                 </child>
+
                 <child>
-                    <object id="input"class="GtkEntry">
-                    <layout>
+                    <object id="bt4" class="GtkButton">
+                        <property name="label">Suma de áreas | Trapecios</property>
+                        <property name="hexpand">TRUE</property>
+                        <layout>
                             <property name="column">0</property>
                             <property name="row">3</property>
-                    </layout>
-                      <attributes>
-                      </attributes>
+                        </layout>
                     </object>
                 </child>
-                
+
                 <child>
-                    <object id="lb1" class="GtkLabel">
-                        <property name="label">PI</property>
-                        <property name = "width-request">600</property>
-                        <property name="margin-top">15</property>
-                        <attributes></attributes>
+                    <object id="input" class="GtkEntry">
+                        <property name="hexpand">TRUE</property>
                         <layout>
                             <property name="column">0</property>
                             <property name="row">4</property>
+                        </layout>
+                    </object>
+                </child>
+
+                <child>
+                    <object id="input2" class="GtkEntry">
+                        <property name="hexpand">TRUE</property>
+                        <layout>
+                            <property name="column">0</property>
+                            <property name="row">5</property>
+                        </layout>
+                    </object>
+                </child>
+
+                <child>
+                    <object id="lb1" class="GtkLabel">
+                        <property name="hexpand">FALSE</property>
+                        <property name="halign">GTK_ALIGN_START</property>
+                        <property name="xalign">0</property>
+                        <property name="margin-top">15</property>
+                        <property name="wrap">TRUE</property> <!-- Enable line wrapping GTK_NATURAL_WRAP_WORD-->
+                        <property name="natural-wrap-mode">GTK_NATURAL_WRAP_WORD</property>
+                        <property name="wrap-mode">PANGO_WRAP_WORD_CHAR</property> <!-- Wrap by word character -->
+                        <property name="max-width-chars">256</property> <!-- Set a maximum width in characters -->
+                        <property name="margin-top">15</property>
+                        <layout>
+                            <property name="column">0</property>
+                            <property name="row">6</property>
                         </layout>
                     </object>
                 </child>
