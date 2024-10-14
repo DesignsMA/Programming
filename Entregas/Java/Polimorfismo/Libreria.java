@@ -1,5 +1,3 @@
-package Polimorfismo.Libreria;
-
 class Item {
     private int id;
     private String title;
