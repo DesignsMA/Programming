@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <malloc.h>
-#include <unistd.h> // for usleep()
 #include <string.h>
 #include <gmp.h>
 
@@ -16,22 +14,18 @@ void clear_screen() {
     #endif
 }
 
-void f(mpf_t result, const mpf_t x, int precision) {
-    mpf_t temp;
+void f(mpf_t result,  mpf_t x, int precision) {
+    mpf_t temp, temp2;
     mpf_init2(temp, precision);
+    mpf_init2(temp2, precision);
     
-    // Calculate x^2
-    mpf_pow_ui(temp, x, 2);         // temp = x^2
-    
-    mpf_t one; 
-    mpf_init_set_ui(one, 1); // Initialize one to 1
-    mpf_sub(temp, one, temp); // temp = 1 - x^2
+    // Calculate 2 / (1 + x^2)
+    mpf_set_ui(temp, 2);
+    mpf_pow_ui(temp2, x, 2);
+    mpf_add_ui(temp2, temp2, 1);
+    mpf_div(result, temp, temp2);  // result = 2 / (x^2 + 1)
 
-    // Calculate sqrt(1 - x^2)
-    mpf_sqrt(result, temp);        // result = sqrt(1 - x^2)
-
-    // Clear the temporary variable
-    mpf_clear(one);
+    mpf_clear(temp2);
     mpf_clear(temp);
 }
 
@@ -46,22 +40,21 @@ char *trapeze(long int n, int precision) {
     mpf_init2(b, precision);
     mpf_init2(result, precision);
     mpf_init2(sum, precision);
-    mpf_init(h);
-    mpf_init(x1);
-    mpf_init(x2);
+    mpf_init2(h, precision);
+    mpf_init2(x1, precision);
+    mpf_init2(x2, precision);
     mpf_init2(f_x1, precision);
     mpf_init2(f_x2, precision);
 
     // Limits
     mpf_set_si(a, -1);
     mpf_set_si(b, 1);
-    // h = (b - a) / n
+     // h = (b - a) / n
     mpf_sub(h, b, a);
     mpf_div_ui(h, h, n);
     mpf_set_ui(sum, 0);
-    mpf_set_ui(result, 0); // Initialize result
 
-    for (long int i = 0; i < n; i++) {
+    for (long int i = 0; i < n; i++) { //sumar partes
         // x1 = a + i*h
         mpf_mul_ui(x1, h, i);
         mpf_add(x1, a, x1);
@@ -77,13 +70,8 @@ char *trapeze(long int n, int precision) {
         mpf_mul(sum, sum, h);
         // Accumulate to result
         mpf_add(result, result, sum);
-        usleep(10);
-        printf(".");
-        clear_screen();
+
     }
-
-    mpf_mul_ui(result, result, 2); // multiply by two
-
     end = clock();
     cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
     mpf_str = mpf_get_str(NULL, &mp_exponent, 10, 0, result);
@@ -97,8 +85,7 @@ char *trapeze(long int n, int precision) {
 
     c = mpf_str[0];
     strcpy(substr, (char *)mpf_str + 1);
-    snprintf(str, strlen(mpf_str) + 50, "Aproximacion: %c.%s\nTiempo de ejecucion: %.35f s", c, substr, cpu_time_used);
-
+    snprintf(str, strlen(mpf_str) + 50, "%c.%s\nTiempo de ejecucion: %.15f m", c, substr, cpu_time_used/60.0);
     // Clear memory
     mpf_clear(h);
     mpf_clear(sum);
@@ -116,33 +103,45 @@ char *trapeze(long int n, int precision) {
 
 int main() {
     long int n;
-    int precision;
+    int precision, i;
     do
     {
-        printf("Numero de particiones (n) (-1 para salir): ");
+        printf("\nNumero de particiones (n) (-1 para salir): ");
         scanf("%ld", &n);
         printf("\nPrecision decimal (mayor que 256 bits y divisible entre 2): ");
         scanf("%d", &precision);
         
 
         if ( n >=1 && precision >=256 && precision%2==0) {
-            printf("\nArchivo output.txt siendo generado...");
             char *result = trapeze(n, precision);
-            printf("\n%s", result);
+            char *pi100 = (char*)malloc(150 * sizeof(char)); 
+            strcpy(pi100, "\nPrimeros 100 digitos:\n3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 74944 59230 78164 06286 20899 86280 34825 34211 7067\n");
+            printf("Aproximacion:\n%c%c", result[0], result[1]);
+            for ( i = 2; i < strlen(result); i++) {
+                for (int n = 0; n < 5 && i < strlen(result); n++) {
+                    putchar(result[i]);
+                    i++;
+                }
+                i--;
+                if (result[i] < '0' || result[i] > '9') break; //
+                printf(" "); // Print space after each group of 6
+            }
+            for ( i+=1 ; i < strlen(result); i++ ) putchar(result[i]);
+            printf("\nPrecision: %d\n%s", precision, pi100);
             if (result == NULL) {
                 fprintf(stderr, "Error ocurrido durante la ejecución.\n");
                 return EXIT_FAILURE;
             }
 
             // Write the result to a text file
-            FILE *file = fopen("output.txt", "w");
+            FILE *file = fopen("output.txt", "w+");
             if (file == NULL) {
                 fprintf(stderr, "Error de apertura de archivo output.txt.\n");
                 free(result);
                 return EXIT_FAILURE;
             }
-
-            fprintf(file, "%s\n", result);
+            free(pi100);
+            fprintf(file, "%s\nPrecision: %d", result, precision); //Escribir datos en archivo
             fclose(file);
             free(result);
         }

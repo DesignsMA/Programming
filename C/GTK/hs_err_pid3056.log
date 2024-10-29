@@ -1,0 +1,35 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_STACK_OVERFLOW (0xc00000fd) at pc=0x00007ffbdcc6afc3, pid=3056, tid=16476
+#
+# JRE version: OpenJDK Runtime Environment Temurin-17.0.12+7 (17.0.12+7) (build 17.0.12+7)
+# Java VM: OpenJDK 64-Bit Server VM Temurin-17.0.12+7 (17.0.12+7, mixed mode, tiered, compressed oops, compressed class ptrs, parallel gc, windows-amd64)
+# Problematic frame:
+# V  [jvm.dll+0x38afc3]
+#
+# No core dump will be written. Minidumps are not enabled by default on client versions of Windows
+#
+# If you would like to submit a bug report, please visit:
+#   https://github.com/adoptium/adoptium-support/issues
+#
+
+
+Command Line: --add-modules=ALL-SYSTEM --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/sun.nio.fs=ALL-UNNAMED -Declipse.application=org.eclipse.jdt.ls.core.id1 -Dosgi.bundles.defaultStartLevel=4 -Declipse.product=org.eclipse.jdt.ls.core.product -Djava.import.generatesMetadataFilesAtProjectRoot=false -DDetectVMInstallationsJob.disabled=true -Dfile.encoding=utf8 -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1G -Xms100m -Xlog:disable -javaagent:c:\Users\DS\.vscode\extensions\redhat.java-1.35.1-win32-x64\lombok\lombok-1.18.33.jar -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=c:\Users\DS\AppData\Roaming\Code\User\workspaceStorage\04765c5518d07783591fb2d63e6507ae\redhat.java -Daether.dependencyCollector.impl=bf c:\Users\DS\.vscode\extensions\redhat.java-1.35.1-win32-x64\server\plugins\org.eclipse.equinox.launcher_1.6.900.v20240613-2009.jar -configuration c:\Users\DS\AppData\Roaming\Code\User\globalStorage\redhat.java\1.35.1\config_win -data c:\Users\DS\AppData\Roaming\Code\User\workspaceStorage\04765c5518d07783591fb2d63e6507ae\redhat.java\jdt_ws --pipe=\\.\pipe\lsp-d8409ccc684a9005b3ed24b6166b61b1-sock
+
+Host: AMD Ryzen 3 2200G with Radeon Vega Graphics    , 4 cores, 13G,  Windows 10 , 64 bit Build 19041 (10.0.19041.5072)
+Time: Sun Oct 27 13:03:10 2024 Hora estándar, América Central elapsed time: 2434.555131 seconds (0d 0h 40m 34s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000029cbd415850):  JavaThread "pool-3-thread-1" [_thread_in_vm, id=16476, stack(0x000000ef81800000,0x000000ef81900000)]
+
+Stack: [0x000000ef81800000,0x000000ef81900000],  sp=0x000000ef818ff640,  free space=1021k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [jvm.dll+0x38afc3]
+V  [jvm.dll+0x67f842]
+V  [jvm.dll+0x38bc1b]
+V  [jvm.dll+0x38bea7]
+V  [jvm.dll+0x412861]
+V  [jvm.dll+0x7ec1f7]
+V  [jvm.dll+0x7e65dc]
