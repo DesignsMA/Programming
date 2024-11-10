@@ -41,8 +41,8 @@ codigo segment para 'code'
             INT 10h
 
             INC si
-            add bl, 2 ; Colores intercalados
             INC dl ; Columna
+            add bl, 2 ; Colores intercalados
             mov ah, 2
             INT 10h
 
@@ -51,9 +51,9 @@ codigo segment para 'code'
             JMP imprimir
 
         reiniciar:
-            mov bl, 10h; Reiniciando a: 0  0 0 0 0 0 0 1
+            mov bl, 18h; Reiniciando a: 0  0 0 0 0 0 0 1
             JMP imprimir
-            
+
         salir:
             RET
     Main ENDP
