@@ -3,7 +3,7 @@ pila segment para stack 'stack'
 pila ends
 
 datos segment para 'data'
-    tmenu db "1. Suma#2. Resta#3. Multiplicacion#4. Division#5. Salir#Elige una opcion#: ", '$'
+    tmenu db "F2 Suma#F3 Resta#F4 Multiplicacion#F5 Division#ESC Salir#Elige una opcion#: ", '$'
     tdato1 db "Dame dato 1 (0-9)#: ", '$'
     tdato2 db "Dame dato 2 (0-9)#: ", '$'
     tsuma db "La suma es : ", '$'
@@ -148,6 +148,18 @@ codigo segment para 'code'
         int 21h
         RET
     DIVI ENDP
+    
+    DATOSL PROC NEAR
+            call CLS
+            LEA si, tdato1
+            LEA di, d1
+            call LEER
+            LEA si, tdato2
+            LEA di, d2
+            call LEER
+    RET
+    DATOSL ENDP
+        
 
     Main PROC FAR
         assume cs:codigo, ds:datos, ss:pila
@@ -161,46 +173,44 @@ codigo segment para 'code'
         ; - 
         
         menu:
-            LEA si, tdato1
-            LEA di, d1
-            call LEER
-            LEA si, tdato2
-            LEA di, d2
-            call LEER
+            
 
             call CLS
             LEA si, tmenu
             call IMPRIME
-            mov ah, 1 ; opcion en al
-            int 21h
+            mov ah, 0 ; opcion en al
+            int 16H
             
-
-            cmp al, '1'
+            cmp ah, 3CH
             JE sum
-            cmp al, '2'
+            cmp ah, 3DH
             JE res
-            cmp al, '3'
+            cmp ah, 3EH
             JE multi
-            cmp al, '4'
+            cmp ah, 3FH
             JE divis
-            cmp al, '5'
+            cmp ah, 01H
             JE fin
             
             jmp menu
 
         sum:
+            call DATOSL
             call SUMA
             jmp siguiente	
         
         res:
+            call DATOSL     
             call RESTA
             jmp siguiente	
         
-        multi:
+        multi:   
+            call DATOSL 
             call MULT
             jmp siguiente	
         
-        divis:
+        divis:     
+            call DATOSL 
             call DIVI
             jmp siguiente
         
