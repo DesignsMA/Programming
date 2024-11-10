@@ -106,7 +106,7 @@ public class ExcepcionesCuentaBancaria {
                         System.out.println("ERROR: " + e.getMessage());
                     } catch (NullPointerException e2) {
                         System.out.println("ERROR:  No existe la cuenta. Busque o cree una cuenta");
-                    } catch (Exception e3) {
+                    } catch (RuntimeException e3) {
                         System.out.println("ERROR: " + e3.getMessage());
                     }
                     break;

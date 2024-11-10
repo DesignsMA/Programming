@@ -31,14 +31,14 @@ public class CuentaBancaria {
             this.balance = balance + cantidad;
     }
 
-    public void retirar(double cantidad) throws Exception { // Se debe usar la clausula throws para excepciones
-                                                            // personalizadas
+    public void retirar(double cantidad) { // Se debe usar la clausula throws para excepciones
+                                           // personalizadas
         if (cantidad < 0)
             throw new IllegalArgumentException(
                     "¡Cantidad negativa, no es posible depositar! Proporcione un valor positivo");
 
         if (balance - cantidad < 0)
-            throw new Exception("¡No hay fondos suficientes!");
+            throw new RuntimeException("¡No hay fondos suficientes!");
         else
             this.balance = balance - cantidad;
     }

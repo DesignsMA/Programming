@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+     {
+      "type": "process",
+      "label": "JavaFX build class",
+      "command": "C:/Program Files/Common Files/Oracle/Java/javapath/java.exe",
+      "args": [
+       "java",
+       "--module-path C:/openjfx-23.0.1_windows-x64_bin-sdk/javafx-sdk-23.0.1/lib",
+       "--add-modules javafx.controls",
+       "${file}"
+      ]
+    }
+     
+    ]
+   }
