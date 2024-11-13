@@ -1,9 +1,10 @@
+.model large 
 pila segment para stack 'stack'
     dw 64 dup(0)
 pila ends
 
 datos segment para 'data'
-    tmenu db "F2 Suma#F3 Resta#F4 Multiplicacion#F5 Division#ESC Salir#Elige una opcion#: ", '$'
+    tmenu db "#Elige una opcion#: ", '$'
     tdato1 db "Dame dato 1 (0-9)#: ", '$'
     tdato2 db "Dame dato 2 (0-9)#: ", '$'
     tsuma db "La suma es : ", '$'
@@ -11,18 +12,115 @@ datos segment para 'data'
     tmult db "La multiplicacion es : ", '$'
     tdiv db "Residuo: ", '$'
     tdiv2 db "#Cociente: ", '$'
-    continuar db "##Presiona cualquier tecla para continuar: ",'$'
+    continuar db "#Presiona cualquier tecla para continuar: ",'$'
     d1 db 0
     d2 db 0
     renglon db 0
+    tlista db "  [F2] Suma | [F3] Resta | [F4] Multiplicacion | [F5] Division | [ESC] Salir", '$'
+    estilo1 db 01110000b
+    estilo2 db 01110100b
 datos ends
 
+
 codigo segment para 'code'
+    UI PROC NEAR
+        mov dx, 0
+        mov bh, 0
+        mov ah,2
+        int 10h
+        mov ah, 9
+        mov al, ' '
+        LEA si, tlista
+        LEA di, estilo1
+        mov bl, [di]
+        mov cx, 80
+        int 10h
+
+        ; Primer margen superior
+        mov dh, 1           ; Fila 2 (moverse hacia abajo 2 líneas)
+        mov dl, 0           ; Columna 0
+        mov ah, 2           ; Función 2 de BIOS para mover el cursor
+        int 10h             ; Llamar a la interrupción BIOS para mover el cursor
+
+        mov dl, 218         ; Esquina superior izquierda '╔' (ASCII 218)
+        int 21h             ; Imprimir el carácter
+
+        mov dl, 196         ; Línea horizontal '═' (ASCII 196)
+        mov cx, 78          ; Número de repeticiones (78 veces)
+        m1:
+            int 21h         ; Imprimir el carácter
+            loop m1         ; Repetir 78 veces
+
+        mov dl, 191         ; Esquina superior derecha '╗' (ASCII 191)
+        int 21h             ; Imprimir el carácter
+
+        ; Lados izquierdo
+        mov cx, 22          
+        mov dh, 2           
+        mov dl, 0           ; Columna 0 (lado izquierdo)
+        int 10h             ; Mover el cursor a la posición (0, 3)
+
+        lados1:
+            mov dl, 179     ; Carácter de línea vertical '│' (ASCII 179)
+            int 21h         ; Imprimir el carácter
+            inc dh          ; Mover hacia abajo una línea
+            mov dl, 0       ; Columna 0 (lado izquierdo)
+            int 10h         ; Mover el cursor a la columna 0
+            loop lados1     ; Repetir 24 veces
+
+        ; Lados derecho
+        mov cx, 22          
+        mov dh, 2           
+        mov dl, 79          
+        int 10h             ; Mover el cursor a la posición (78, 3)
+
+        lados2:
+            mov dl, 179     ; Carácter de línea vertical '│' (ASCII 179)
+            int 21h         ; Imprimir el carácter
+            inc dh          ; Mover hacia abajo una línea
+            mov dl, 79      
+            int 10h         ; Mover el cursor a la columna 78
+            loop lados2     ; Repetir 24 veces
+
+        mov bh, 0
+        mov dx,0
+        mov ah,2
+        int 10h ; Posicionar cursor
+        cabecera:
+            mov al, [si]
+            cmp al, '$'
+            JE cerrar
+            mov ah, 9
+            mov bh,0
+            mov cx, 1
+            cmp al, '['
+            JE resaltado
+            sigue:
+            mov bl, [di]
+            int 10h  ; imprimir
+            inc dl
+            inc si
+            mov ah, 2
+            int 10h ; Posicionar cursor
+            cmp al, ']'
+            JE normal
+            JMP cabecera
+        
+        resaltado:
+            LEA di, estilo2
+            JMP  sigue
+        normal:
+            LEA di, estilo1
+            JMP cabecera
+        cerrar:
+        RET
+    UI ENDP
+
     CLS PROC NEAR
         mov ax, 0600h ; servicio 6 ; cero para limpiar toda la pantalla
-        mov bh, 00000111b ; atributo  fondo negro letras grises
-        mov cx, 0 ; recorrer desde renglon 0, columna 0
-        mov dx, 184fh ; hasta 24, 79 toda la pantalla
+        mov bh, 00011111b
+        mov cx, 0201h ; recorrer desde renglon 1, columna 1
+        mov dx, 184eh ; hasta 24, 78 toda la pantalla
         int 10h ; interrupcion de bios
         RET
     CLS ENDP
@@ -32,7 +130,6 @@ codigo segment para 'code'
         LEA bx, renglon
         mov [bx], 9
         dec si ; desfase
-
         saltolinea:
             mov bh, 0
             mov dl, 10
@@ -171,10 +268,8 @@ codigo segment para 'code'
         mov ds, ax
         mov es, ax
         ; - 
-        
+        call UI
         menu:
-            
-
             call CLS
             LEA si, tmenu
             call IMPRIME
