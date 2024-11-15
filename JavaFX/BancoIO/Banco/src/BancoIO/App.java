@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
@@ -16,6 +17,7 @@ import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.Node;
 
 public class App extends Application {
     Button b1, b2, b3, b4, b5;
@@ -32,17 +34,16 @@ public class App extends Application {
         c1.setSpacing(20);
 
         b1 = new Button("Agregar cuenta");
-        b1.setAlignment(Pos.CENTER);
         b2 = new Button("Depositar");
-        b2.setAlignment(Pos.CENTER);
         b3 = new Button("Retirar");
-        b3.setAlignment(Pos.CENTER);
         b4 = new Button("Mostrar Cuentas");
-        b4.setAlignment(Pos.CENTER);
         b5 = new Button("Salir");
-        b5.setAlignment(Pos.CENTER);
         c1.getChildren().addAll(b1, b2, b3, b4, b5);
-
+        for (Node bt : c1.getChildren()) {
+            // If you're certain all the children ARE TextFields, cast the bt now
+            ((Button) bt).setAlignment(Pos.CENTER);
+            ((Button) bt).setMinSize(220, 60);
+        }
         /*
          * // Agregar funcionalidad
          * ButtonListener escucha = new ButtonListener();
