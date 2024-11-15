@@ -1,7 +1,7 @@
 lib/
 *.MD
 .vscode/
-ejemplo.java
+src/BancoIO/ejemplo.java
 src/BancoIO/boringhello.class
 src/BancoIO/boringhello.jar
 src/BancoIO/boringhello.java
