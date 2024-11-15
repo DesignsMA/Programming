@@ -1,8 +1,8 @@
-lib\
+lib/
 *.MD
-.vscode\
+.vscode/
 ejemplo.java
-src\BancoIO\boringhello.class
-src\BancoIO\boringhello.jar
-src\BancoIO\boringhello.java
-src\BancoIO\ArchivosPre.java
+src/BancoIO/boringhello.class
+src/BancoIO/boringhello.jar
+src/BancoIO/boringhello.java
+src/BancoIO/ArchivosPre.java
