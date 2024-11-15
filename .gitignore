@@ -1,1 +1,4 @@
 /Entregas/Java/Clases/Clases/target/
+lib\
+*.MD
+.vscode\

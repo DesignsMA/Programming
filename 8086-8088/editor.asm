@@ -6,7 +6,6 @@ CURSOR MACRO ren, col
     mov dl, col
     int 10h
 ENDM
-
 ; Clear screen from (ren1, col1) to (ren2, col2)
 CLS MACRO ren1, col1, ren2, col2, ptrv
     mov ax, 0600h
@@ -24,8 +23,8 @@ IMPCAD MACRO ptrv
     int 21h
 ENDM
 
-IMPREP MACRO ren, col, cont, car
-    CURSOR ren, col
+IMPREP MACRO ren2, col2, cont, car
+    CURSOR ren2, col2
     mov dl, car
     repeat cont
     int 21h
@@ -43,11 +42,33 @@ pila segment para stack 'stack'
 pila ends
 
 datos segment para 'data'
-    estilo1 db 01001000b
+    ren db 0
+    col db 0
+    estilo1 db 01110000b ; fondo gris, letras negras
     estilo2 db 00011000b
 datos ends
 
 codigo segment para 'code'
+    UI PROC NEAR
+        LEA si, estilo1
+        CLS 0,0,0,79, si ;Cabecera fondo
+        ; Primer margen superior
+        IMPCAR 1, 0, 218 ;  Esquina superior izquierda           
+        IMPREP 1, 1, 78, 196
+        IMPCAR 1, 79, 191 ; Esquina superior derecha   
+        mov cx, 21 ; Iteraciones
+        LEA  si, ren
+        mov [si], 2
+        looplado2:
+            IMPCAR [si], 0, 179
+            IMPCAR [si], 79, 179
+            inc byte ptr [si]
+        loop looplado2
+        IMPCAR 22, 0, 192 ;  Esquina inferior izquierda           
+        IMPREP 22, 1, 78, 196
+        IMPCAR 22, 79, 217 ; Esquina inferior derecha 
+        RET
+    UI ENDP
 
     Main PROC FAR
         assume cs:codigo, ds:datos, ss:pila
@@ -59,13 +80,8 @@ codigo segment para 'code'
         mov ds, ax
         mov es, ax
         ; - 
-        LEA SI, estilo1
-        CLS 0, 0, 2, 10,si
-        LEA SI, estilo2
-        CLS 3, 0, 5, 10,si
-        IMPREP 0,0, 79, 41h
-        IMPREP 4,0, 79, 42h
-        HLT
+        call UI
+        RET
     Main ENDP
 codigo ends
     end Main
