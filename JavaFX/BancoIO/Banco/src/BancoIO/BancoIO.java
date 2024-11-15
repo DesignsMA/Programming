@@ -1,11 +1,9 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+package BancoIO;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
 
 public class BancoIO {
 
@@ -33,6 +31,7 @@ public class BancoIO {
         for (CuentaBancaria c : banco.getCuentas()) {
             out.format("%d %f\n", c.getNoCuenta(), c.getBalance());
         }
+        out.close();
     }
 
 }
