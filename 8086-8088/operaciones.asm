@@ -4,7 +4,7 @@ pila segment para stack 'stack'
 pila ends
 
 datos segment para 'data'
-    tmenu db "#Elige una opcion#: ", '$'
+    tmenu db "Elige una opcion#: ", '$'
     tdato1 db "Dame dato 1 (0-9)#: ", '$'
     tdato2 db "Dame dato 2 (0-9)#: ", '$'
     tsuma db "La suma es : ", '$'
@@ -12,7 +12,7 @@ datos segment para 'data'
     tmult db "La multiplicacion es : ", '$'
     tdiv db "Residuo: ", '$'
     tdiv2 db "#Cociente: ", '$'
-    continuar db "#Presiona cualquier tecla para continuar: ",'$'
+    continuar db "##Presiona cualquier tecla para continuar: ",'$'
     d1 db 0
     d2 db 0
     renglon db 0
@@ -37,50 +37,67 @@ codigo segment para 'code'
         int 10h
 
         ; Primer margen superior
-        mov dh, 1           ; Fila 2 (moverse hacia abajo 2 líneas)
-        mov dl, 0           ; Columna 0
-        mov ah, 2           ; Función 2 de BIOS para mover el cursor
-        int 10h             ; Llamar a la interrupción BIOS para mover el cursor
+        mov dh, 1           
+        mov dl, 0         
+        mov ah, 2           
+        int 10h             
 
-        mov dl, 218         ; Esquina superior izquierda '╔' (ASCII 218)
-        int 21h             ; Imprimir el carácter
+        mov dl, 218         
+        int 21h             
 
-        mov dl, 196         ; Línea horizontal '═' (ASCII 196)
-        mov cx, 78          ; Número de repeticiones (78 veces)
+        mov dl, 196         
+        mov cx, 78          
         m1:
-            int 21h         ; Imprimir el carácter
-            loop m1         ; Repetir 78 veces
+            int 21h         
+            loop m1        
 
-        mov dl, 191         ; Esquina superior derecha '╗' (ASCII 191)
-        int 21h             ; Imprimir el carácter
+        mov dl, 191         
+        int 21h             
 
         ; Lados izquierdo
         mov cx, 22          
         mov dh, 2           
-        mov dl, 0           ; Columna 0 (lado izquierdo)
-        int 10h             ; Mover el cursor a la posición (0, 3)
+        mov dl, 0           
+        int 10h             
 
         lados1:
-            mov dl, 179     ; Carácter de línea vertical '│' (ASCII 179)
-            int 21h         ; Imprimir el carácter
-            inc dh          ; Mover hacia abajo una línea
-            mov dl, 0       ; Columna 0 (lado izquierdo)
-            int 10h         ; Mover el cursor a la columna 0
-            loop lados1     ; Repetir 24 veces
+            mov dl, 179     
+            int 21h         
+            inc dh          
+            mov dl, 0       
+            int 10h        
+            loop lados1    
 
         ; Lados derecho
         mov cx, 22          
         mov dh, 2           
         mov dl, 79          
-        int 10h             ; Mover el cursor a la posición (78, 3)
+        int 10h           
 
         lados2:
-            mov dl, 179     ; Carácter de línea vertical '│' (ASCII 179)
-            int 21h         ; Imprimir el carácter
-            inc dh          ; Mover hacia abajo una línea
+            mov dl, 179    
+            int 21h         
+            inc dh          
             mov dl, 79      
-            int 10h         ; Mover el cursor a la columna 78
-            loop lados2     ; Repetir 24 veces
+            int 10h        
+            loop lados2     
+        
+        mov dh, 23
+        mov dl, 0
+        mov ah, 2
+        int 10h
+
+        mov dl, 192   
+        int 21h             
+
+        mov dl, 196         
+        mov cx, 78          
+        m2:
+            int 21h         
+            loop m2         
+
+        mov dl, 217         
+        int 21h           
 
         mov bh, 0
         mov dx,0
@@ -120,7 +137,7 @@ codigo segment para 'code'
         mov ax, 0600h ; servicio 6 ; cero para limpiar toda la pantalla
         mov bh, 00011111b
         mov cx, 0201h ; recorrer desde renglon 1, columna 1
-        mov dx, 184eh ; hasta 24, 78 toda la pantalla
+        mov dx, 164eh ; hasta 24, 78 toda la pantalla
         int 10h ; interrupcion de bios
         RET
     CLS ENDP
@@ -257,7 +274,6 @@ codigo segment para 'code'
     RET
     DATOSL ENDP
         
-
     Main PROC FAR
         assume cs:codigo, ds:datos, ss:pila
         ; Protocolo
@@ -322,5 +338,3 @@ codigo segment para 'code'
     Main ENDP
 codigo ends
     end Main
-    
-    

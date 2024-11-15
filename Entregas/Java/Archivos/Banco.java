@@ -7,6 +7,10 @@ public class Banco {
         noC = 0;
     }
 
+    public CuentaBancaria[] getCuentas() {
+        return cuentas;
+    }
+
     public void agregarCuenta(CuentaBancaria cuenta) {
         if (noC == cuentas.length) {
             System.out.println("El banco está lleno. No se agregó la cuenta.");
