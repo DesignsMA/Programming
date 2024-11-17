@@ -1,0 +1,12 @@
+@font-face {
+    font-family: "Montserrat";
+    src: url("Res/Montserrat.ttf");
+}
+.button {
+    -fx-border-color: #c3c3c3; /* Set border color */
+    -fx-border-width: 2px;  /* Set border width */
+    -fx-border-radius: 5px; /* Set border radius for rounded corners */
+    -fx-background-color: lightblue; /* Button background */
+    -fx-text-fill: white; /* Text color */
+    -eff
+}

@@ -13,13 +13,15 @@ public class Banco {
         return cuentas;
     }
 
+    public int getNoC() {
+        return noC;
+    }
+
     public void agregarCuenta(CuentaBancaria cuenta) {
         if (noC == cuentas.length) {
-            System.out.println("El banco está lleno. No se agregó la cuenta.");
-            return;
+            throw new RuntimeException("El banco está lleno. No se agregó la cuenta.");
         }
-        this.cuentas[noC] = cuenta;
-        noC++;
+        this.cuentas[noC++] = cuenta;
     }
 
     public CuentaBancaria buscarCuenta(int noCuenta) {
