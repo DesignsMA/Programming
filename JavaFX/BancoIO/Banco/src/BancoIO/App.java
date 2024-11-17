@@ -90,10 +90,7 @@ public class App extends Application {
         try {
             BancoIO.leerArchivo("file.txt", b);
         } catch (FileNotFoundException e) {
-            Alert a = new Alert(AlertType.WARNING);
-            a.setTitle("Error");
-            a.setContentText("Archivo no encontrado\n" + e.getStackTrace());
-            a.showAndWait();
+            alerta(e.getMessage());
         }
         b1.setOnAction(e -> listener(e, b));
         b2.setOnAction(e -> listener(e, b));
@@ -220,16 +217,20 @@ public class App extends Application {
         /* Mostrar cuentas */
         if (e.getSource() == b4) {
             l2.setText("" + banco);
-            l2.setVisible(true);
-            l2.setManaged(true); /* Mostrar cuentas */
+            mostrar(new Control[] { l2, b6 }, true);
             b6.setOnAction(evento -> {
-                l2.setVisible(false);
-                l2.setManaged(false); /* Mostrar botones */
+
+                mostrar(new Control[] { l2, b6 }, false);
                 mostrar(new Control[] { b1, b2, b3, b4, b5 }, true);
             });
         }
 
         if (e.getSource() == b5) {
+            try {
+                BancoIO.escribirArchivo("file.txt", banco);
+            } catch (FileNotFoundException e4) {
+                alerta(e4.getMessage());
+            }
             Platform.exit(); // Cerrar ventana, amigable con javafx
         }
     }
