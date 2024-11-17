@@ -8,6 +8,7 @@ import java.util.InputMismatchException;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -44,6 +45,7 @@ public class App extends Application {
         c1.setSpacing(20);
         c11.setAlignment(Pos.CENTER);
         c11.setSpacing(10);
+
         b1 = new Button("Agregar cuenta");
         b2 = new Button("Depositar");
         b3 = new Button("Retirar");
@@ -54,8 +56,8 @@ public class App extends Application {
         l2 = new Label();
         tf1 = new TextField();
         tf2 = new TextField();
-        b6.setVisible(false);
-        b6.setManaged(false);
+        b6.setVisible(false); //
+        b6.setManaged(false); //
         c11.getChildren().addAll(tf1, tf2);
         for (Node nd : c11.getChildren()) {
             ((TextField) nd).setAlignment(Pos.CENTER);
@@ -93,11 +95,11 @@ public class App extends Application {
             a.setContentText("Archivo no encontrado\n" + e.getStackTrace());
             a.showAndWait();
         }
-        b1.setOnAction(e -> listener(e, c1, b));
-        b2.setOnAction(e -> listener(e, c1, b));
-        b3.setOnAction(e -> listener(e, c1, b));
-        b4.setOnAction(e -> listener(e, c1, b));
-        b5.setOnAction(e -> listener(e, c1, b));
+        b1.setOnAction(e -> listener(e, b));
+        b2.setOnAction(e -> listener(e, b));
+        b3.setOnAction(e -> listener(e, b));
+        b4.setOnAction(e -> listener(e, b));
+        b5.setOnAction(e -> listener(e, b));
 
         Scene escena = new Scene(c1, 720, 500);
         // Agregar escena a escenario.
@@ -123,70 +125,112 @@ public class App extends Application {
         banco.agregarCuenta(cuenta);
     }
 
-    public void listener(ActionEvent e, VBox contenedor, Banco banco) {
-        // Hide all controls in the container initially
-        for (Node nd : contenedor.getChildren()) {
-            if (nd instanceof Control) {
-                nd.setVisible(false);
-                nd.setManaged(false); // Ensure it doesn't occupy space
-            }
+    public void mostrar(Control[] controles, boolean valor) {
+        for (Control control : controles) {
+            control.setVisible(valor);
+            control.setManaged(valor);
+        }
+    }
+
+    public void listener(ActionEvent e, Banco banco) {
+        int noCuenta = 12345;
+        double balance = 0;
+
+        mostrar(new Control[] { b1, b2, b3, b4, b5 }, false);
+
+        if (e.getSource() == b1) {
+            l2.setText("");
+            l1.setText("Introduce los datos de la cuenta");
+            tf1.setPromptText("Número de cuenta");
+            tf2.setPromptText("Balance inicial");
+            mostrar(new Control[] { tf1, tf2, l1, b6 }, true); // Mostrar todos estos elementos
+            /*
+             * B6 mostrara al usuario el menu original hasta que los datos sean correctos
+             * cada vez que falle muestra una alerta
+             */
+            b6.setOnAction(evento -> {
+                try {
+                    nuevaCuenta(noCuenta, balance, banco); // <---
+                    // Notify user
+                    l2.setText("Cuenta agregada exitosamente\n" + banco.getCuentas()[banco.getNoC() - 1]);
+                    l2.setVisible(true);
+                    l2.setManaged(true);
+                    mostrar(new Control[] { tf1, tf2, l1, b6 }, false);
+                    mostrar(new Control[] { b1, b2, b3, b4, b5 }, true);
+                } catch (NumberFormatException ex) {
+                    alerta("Por favor, introduce valores numéricos válidos.");
+                } catch (IllegalArgumentException e2) {
+                    alerta(e2.getMessage());
+                } catch (RuntimeException e3) {
+                    alerta(e3.getMessage());
+                }
+            });
+        }
+        if (e.getSource() == b2 && banco.getNoC() != 0) {
+            l2.setText("");
+            l1.setText("Introduce la cantidad depositar");
+            tf1.setPromptText("Deposito");
+            mostrar(new Control[] { tf1, l1, b6 }, true); // Mostrar todos estos elementos
+            b6.setOnAction(evento -> {
+                try {
+                    CuentaBancaria cuenta = banco.getCuentas()[banco.getNoC() - 1]; // Obtener cuenta actual
+                    cuenta.depositar(Double.parseDouble(tf1.getText()));
+                    l2.setText("Estado actual\n" + banco.getCuentas()[banco.getNoC() - 1]);
+                    l2.setVisible(true);
+                    l2.setManaged(true);
+                    mostrar(new Control[] { tf1, l1, b6 }, false);
+                    mostrar(new Control[] { b1, b2, b3, b4, b5 }, true);
+                } catch (NumberFormatException ex) {
+                    alerta("Por favor, introduce valores numéricos válidos.");
+                } catch (IllegalArgumentException e2) {
+                    alerta(e2.getMessage());
+                } catch (RuntimeException e3) {
+                    alerta(e3.getMessage());
+                }
+            });
+        } else if (e.getSource() == b2 && banco.getNoC() == 0) {
+            alerta("No hay cuentas aún");
+        }
+        /* Retirar */
+        if (e.getSource() == b3 && banco.getNoC() != 0) {
+            l2.setText("");
+            l1.setText("Introduce la cantidad a retirar");
+            tf1.setPromptText("Retiro");
+            mostrar(new Control[] { tf1, l1, b6 }, true); // Mostrar todos estos elementos
+            b6.setOnAction(evento -> {
+                try {
+                    CuentaBancaria cuenta = banco.getCuentas()[banco.getNoC() - 1]; // Obtener cuenta actual
+                    cuenta.retirar(Double.parseDouble(tf1.getText()));
+                    l2.setText("Estado actual\n" + banco.getCuentas()[banco.getNoC() - 1]);
+                    l2.setVisible(true);
+                    l2.setManaged(true);
+                    mostrar(new Control[] { tf1, l1, b6 }, false);
+                    mostrar(new Control[] { b1, b2, b3, b4, b5 }, true);
+                } catch (NumberFormatException ex) {
+                    alerta("Por favor, introduce valores numéricos válidos.");
+                } catch (IllegalArgumentException e2) {
+                    alerta(e2.getMessage());
+                } catch (RuntimeException e3) {
+                    alerta(e3.getMessage());
+                }
+            });
+        } else if (e.getSource() == b2 && banco.getNoC() == 0) {
+            alerta("No hay cuentas aún");
+        }
+        /* Mostrar cuentas */
+        if (e.getSource() == b4) {
+            l2.setText("" + banco);
+            l2.setVisible(true);
+            l2.setManaged(true); /* Mostrar cuentas */
+            b6.setOnAction(evento -> {
+                l2.setVisible(false);
+                l2.setManaged(false); /* Mostrar botones */
+                mostrar(new Control[] { b1, b2, b3, b4, b5 }, true);
+            });
         }
 
-        try {
-            // Variables for potential use
-            int noCuenta = 0;
-            double balance = 0;
-            CuentaBancaria cuenta;
-            if (banco.getNoC() > 0) {
-                cuenta = banco.getCuentas()[banco.getNoC() - 1];
-            }
-
-            // Check which button triggered the event
-            if (e.getSource() == b1) { // Add account button
-                l1.setText("Introduce los datos de la cuenta");
-                l1.setVisible(true);
-                l1.setManaged(true);
-
-                tf1.setPromptText("Número de cuenta");
-                tf2.setPromptText("Balance inicial");
-                tf1.setVisible(true);
-                tf2.setVisible(true);
-                tf1.setManaged(true);
-                tf2.setManaged(true);
-
-                b6.setVisible(true);
-                b6.setManaged(true);
-
-                // Set action for Aceptar button
-                b6.setOnAction(evento -> {
-                    try {
-                        nuevaCuenta(noCuenta, balance, banco);
-                        // Notify user
-                        l2.setText("Cuenta agregada exitosamente\n" + banco.getCuentas()[banco.getNoC() - 1]);
-                        l2.setVisible(true);
-                        l2.setManaged(true);
-
-                        // Hide input fields and Aceptar button
-                        tf1.setVisible(false);
-                        tf2.setVisible(false);
-                        tf1.setManaged(false);
-                        tf2.setManaged(false);
-                        b6.setVisible(false);
-                        b6.setManaged(false);
-                    } catch (NumberFormatException ex) {
-                        alerta("Por favor, introduce valores numéricos válidos.");
-                    } catch (IllegalArgumentException e2) {
-                        alerta(e2.getMessage());
-                    } catch (RuntimeException e3) {
-                        alerta(e3.getMessage());
-                    }
-                });
-            }
-
-        } catch (IllegalArgumentException e2) {
-            alerta(e2.getMessage());
-        } catch (RuntimeException e3) {
-            alerta(e3.getMessage());
+        if (e.getSource() == b5) {
+            Platform.exit(); // Cerrar ventana, amigable con javafx
         }
     }
 }
