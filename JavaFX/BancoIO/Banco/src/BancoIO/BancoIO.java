@@ -29,7 +29,8 @@ public class BancoIO {
         PrintWriter out;
         out = new PrintWriter(nombreArchivo);
         for (CuentaBancaria c : banco.getCuentas()) {
-            out.format("%d %f\n", c.getNoCuenta(), c.getBalance());
+            if (c != null)
+                out.format("%d %f\n", c.getNoCuenta(), c.getBalance());
         }
         out.close();
     }

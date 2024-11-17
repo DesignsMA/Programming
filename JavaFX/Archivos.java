@@ -1,18 +1,5 @@
-import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.event.EventHandler;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 
-public class Archivos extends Application {
+public class Archivos {
     public static void main(String[] args) {
         Banco b = new Banco(50);
         try {
@@ -20,7 +7,8 @@ public class Archivos extends Application {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        b.agregarCuenta(new CuentaBancaria(0, 77742));
+        BancoIO.escribirArchivo("file.txt", b);
 
-        System.out.println(b);
     }
 }
