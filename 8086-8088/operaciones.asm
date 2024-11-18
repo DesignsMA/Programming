@@ -176,7 +176,6 @@ codigo segment para 'code'
         leerop:
             mov ah, 1
             int 21h
-
             cmp al, 39h
             JG leerop
             cmp al, 30h
