@@ -1,0 +1,8 @@
+lib/
+*.MD
+.vscode/
+src/BancoIO/ejemplo.java
+src/BancoIO/boringhello.class
+src/BancoIO/boringhello.jar
+src/BancoIO/boringhello.java
+src/BancoIO/ArchivosPre.java
