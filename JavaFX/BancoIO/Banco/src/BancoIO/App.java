@@ -1,37 +1,26 @@
 package BancoIO;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.InputMismatchException;
-
-import org.w3c.dom.css.CSSStyleDeclaration;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.css.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
-import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Node;
 
 public class App extends Application {
-    Button b1, b2, b3, b4, b5, b6;
-    Label l1, l2;
-    TextField tf1, tf2;
+    private Button b1, b2, b3, b4, b5, b6;
+    private Label l1, l2;
+    private TextField tf1, tf2;
 
     public static void main(String[] args) {
         launch(args);
@@ -107,14 +96,14 @@ public class App extends Application {
 
     }
 
-    public void alerta(String msg) {
+    private void alerta(String msg) {
         Alert a = new Alert(AlertType.WARNING);
         a.setTitle("Error");
         a.setContentText(msg);
         a.showAndWait();
     }
 
-    public void nuevaCuenta(int n, double b, Banco banco) {
+    private void nuevaCuenta(int n, double b, Banco banco) {
         CuentaBancaria cuenta;
         n = Integer.parseInt(tf1.getText());
         b = Double.parseDouble(tf2.getText());
@@ -122,14 +111,14 @@ public class App extends Application {
         banco.agregarCuenta(cuenta);
     }
 
-    public void mostrar(Control[] controles, boolean valor) {
+    private void mostrar(Control[] controles, boolean valor) {
         for (Control control : controles) {
             control.setVisible(valor);
             control.setManaged(valor);
         }
     }
 
-    public void listener(ActionEvent e, Banco banco) {
+    private void listener(ActionEvent e, Banco banco) {
         int noCuenta = 12345;
         double balance = 0;
 
