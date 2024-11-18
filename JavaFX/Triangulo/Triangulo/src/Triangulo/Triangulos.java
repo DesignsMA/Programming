@@ -1,7 +1,5 @@
 package Triangulo;
 
-import java.util.Scanner;
-
 class Recta {
     private Punto p1;
     private Punto p2;
@@ -140,15 +138,24 @@ class Triangulo {
         this.p3 = p3;
     }
 
-    public double Altura() { // No es obligatorio que p2-p3 sea la base
+    public double Altura() {
         Recta base = Base();
-        Punto[] puntos = { p1, p2, p3 };
-        for (Punto punto : puntos) {
-            if (punto != base.getP1() && punto != base.getP2()) {
-                return base.distanciaPunto(punto);
-            }
+        Punto puntoFueraBase = null; // Punto que no está en la base
+        if (!base.getP1().equals(p1) && !base.getP2().equals(p1)) {
+            puntoFueraBase = p1;
+        } else if (!base.getP1().equals(p2) && !base.getP2().equals(p2)) {
+            puntoFueraBase = p2;
+        } else {
+            puntoFueraBase = p3;
         }
-        return 0.0;
+        // Calcular la distancia del punto fuera de la base a la recta base
+        return base.distanciaPunto(puntoFueraBase);
+    }
+
+    public double Area() {
+        double baseLongitud = Base().Longitud();
+        double altura = Altura();
+        return (baseLongitud * altura) / 2;
     }
 
     public Recta Base() { // Encuentra el lado mayor ( base ) y retorna la recta correspondiente
@@ -170,71 +177,10 @@ class Triangulo {
         return p1.distancia(p2) + p1.distancia(p3) + p2.distancia(p3);
     }
 
-    public double Area() {
-        return (Base().Longitud() * Altura()) / 2;
-    }
-
 }
 
 public class Triangulos {
     public static void main(String[] args) {
-        int opt;
-        Scanner sc = new Scanner(System.in);
-        Punto p1 = new Punto(2, 0);
-        Punto p2 = new Punto(3, 4);
-        Punto p3 = new Punto(-2, 5);
-        Triangulo t = new Triangulo(p1, p2, p3);
-        do {
-            System.out.println(
-                    "\n1. Modificar los puntos\n2. Altura\n3. Base\n4. Perimetro\n5. Area\n6. Imprimir puntos\n7. Salir");
-            System.out.print(": ");
-            opt = sc.nextInt();
-            switch (opt) {
-
-                case 1:
-                    do {
-                        System.out.println(
-                                "\n1. Modificar punto 1\n2. Modificar punto 2\n3. Modificar punto 3\n4. Regresar");
-                        System.out.print(": ");
-                        opt = sc.nextInt();
-                        switch (opt) {
-                            case 1:
-                                System.out.print("x: ");
-                                p1.setX(sc.nextDouble());
-                                System.out.print("y: ");
-                                p1.setY(sc.nextDouble());
-                                break;
-                            case 2:
-                                System.out.print("x: ");
-                                p2.setX(sc.nextDouble());
-                                System.out.print("y: ");
-                                p2.setY(sc.nextDouble());
-                                break;
-                            case 3:
-                                System.out.print("x: ");
-                                p3.setX(sc.nextDouble());
-                                System.out.print("y: ");
-                                p3.setY(sc.nextDouble());
-                                break;
-                        }
-                    } while (opt != 4);
-                    break;
-                case 2:
-                    System.out.println("Altura: " + t.Altura());
-                    break;
-                case 3:
-                    System.out.println("Base: " + t.Base() + " Longitud: " + t.Base().Longitud());
-                    break;
-                case 4:
-                    System.out.println("Perimetro: " + t.Perimetro());
-                    break;
-                case 5:
-                    System.out.println("Area: " + t.Area());
-                    break;
-                case 6:
-                    System.out.println("P1: " + p1 + " P2: " + p2 + " P3: " + p3);
-                    break;
-            }
-        } while (opt != 7);
+        // ....
     }
 }
