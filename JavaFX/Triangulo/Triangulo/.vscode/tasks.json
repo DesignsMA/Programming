@@ -1,0 +1,53 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "javac: compile",
+        "type": "shell",
+        "command": "javac",
+        "args": [
+          "--module-path", "C:\\openjfx-23.0.1_windows-x64_bin-sdk\\javafx-sdk-23.0.1\\lib",
+          "--add-modules", "javafx.controls,javafx.fxml",
+          "-d", "out", "src\\Triangulo\\*.java"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": [],
+        "detail": "Compiles the current Java file using javac."
+      },
+      /*jar -cvfm App.jar MANIFEST.MF -C out/BancoIO . -C lib/ .*/
+      {
+        "label": "jar: create jar",
+        "type": "shell",
+        "command": "jar",
+        "args": [
+            "-cvfm", "${fileBasenameNoExtension}.jar",
+            "MANIFEST.MF",
+            "-C", "out/",
+            ".", "-C", "lib/", "."
+        ],
+        "group": {
+            "kind": "build",
+            "isDefault": false
+        },
+        "problemMatcher": [],
+        "detail": "Creates a JAR file from the compiled classes."
+      }, 
+      {
+        "label": "java: run",
+        "type": "shell",
+        "command": "java",
+        "args": [
+          "--module-path", "C:\\openjfx-23.0.1_windows-x64_bin-sdk\\javafx-sdk-23.0.1\\lib",
+          "--add-modules", "javafx.controls,javafx.fxml",
+          "-jar", "${fileBasenameNoExtension}.jar"  // This uses the currently open file as the argument
+        ],
+        "dependsOn": "javac: compile", // Ensure this task depends on the compile task
+        "group": "test",
+        "problemMatcher": [],
+        "detail": "Runs the compiled Java program."
+      }  
+    ]
+   }
