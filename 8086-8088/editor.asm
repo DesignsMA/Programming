@@ -112,20 +112,6 @@ codigo segment para 'code'
         RET
     CABECERA ENDP
 
-    LEER PROC NEAR
-        leerop:
-            mov ah, 1
-            int 21h
-
-            cmp al, 39h
-            JG leerop
-            cmp al, 30h
-            JL leerop
-            sub al, 30h
-            mov [di], al
-        RET
-    LEER ENDP
-
     Main PROC FAR
         assume cs:codigo, ds:datos, ss:pila
         ; Protocolo
@@ -137,7 +123,6 @@ codigo segment para 'code'
         mov es, ax
         ; - 
         call UI
-        call LEER
         RET
     Main ENDP
 codigo ends
