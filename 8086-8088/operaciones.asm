@@ -288,7 +288,7 @@ codigo segment para 'code'
             call CLS
             LEA si, tmenu
             call IMPRIME
-            mov ah, 0 ; opcion en al
+            mov ah, 0 ; opcion en ah
             int 16H
             
             cmp ah, 3CH
