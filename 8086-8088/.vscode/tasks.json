@@ -1,0 +1,43 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Compilar y ejecutar ${fileBasenameNoExtension}",
+        "type": "shell",
+        "command": "C:\\Program Files\\DOSBox Staging\\dosbox_with_debugger.exe",
+        "args": [
+          "-c", "mount D D:\\Users\\sepma\\Downloads\\Data\\C728\\Git\\C-C++-C#\\C\\git\\8086-8088",
+          "-c", "mount C c:\\MASM\\BIN",
+          "-c", "C:", 
+          "-c", "masm d:\\${fileBasenameNoExtension}.asm",
+          "-c", "link ${fileBasenameNoExtension}.obj,,nul,,;",
+          "-c", "cls",
+          "-c", "${fileBasenameNoExtension}.exe"
+        ],
+        "problemMatcher": [],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Compilar y depurar ${fileBasenameNoExtension}",
+        "type": "shell",
+        "command": "C:\\Program Files\\DOSBox Staging\\dosbox_with_debugger.exe",
+        "args": [
+          "-c", "mount D D:\\Users\\sepma\\Downloads\\Data\\C728\\Git\\C-C++-C#\\C\\git\\8086-8088",
+          "-c", "mount C c:\\MASM\\BIN",
+          "-c", "C:", 
+          "-c", "masm d:\\${fileBasenameNoExtension}.asm",
+          "-c", "link ${fileBasenameNoExtension}.obj,,nul,,;",
+          "-c", "cls",
+          "-c", "debug ${fileBasenameNoExtension}.exe"        
+        ],
+        "problemMatcher": [],
+        "group": {
+          "kind": "test",
+          "isDefault": false
+        }
+      }
+    ]
+  }

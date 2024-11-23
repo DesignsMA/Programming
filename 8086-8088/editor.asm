@@ -23,12 +23,14 @@ IMPCAD MACRO ptrv
     int 21h
 ENDM
 
-IMPREP MACRO ren2, col2, cont, car
-    CURSOR ren2, col2
+IMPREP MACRO ren, col, cont, car
+    local @et1
+    CURSOR ren, col
     mov dl, car
-    repeat cont
-    int 21h
-    endm
+    mov cx, cont
+    @et1:
+        int 21h
+    loop @et1
 ENDM
 
 IMPCAR MACRO ren, col, car
@@ -58,6 +60,13 @@ LEER MACRO ren, col, ptrv
     JE dirIz
     cmp ah, 4dh
     JE dirDer
+    cmp ah, 50h
+    JE dirAb
+    cmp ah, 48h
+    JE dirAr
+    cmp ah, 1ch
+    JE enter
+
     ;Comparando con teclas especiales
     ;cmp [si], 3BH
     ;je f1
@@ -67,16 +76,17 @@ LEER MACRO ren, col, ptrv
     ;je f3
     ;cmp [si], 3EH
     ;je f4
-    ;cmp [si], 3FH
-    ;je f5
+    cmp ah, 3FH
+    JE limpiar
     mov byte ptr [ptrv], al
 ENDM
 
-LIMPIARMEM MACRO
+LIMPIARMEM MACRO 
     LEA DI, tcuerpo       ; Cargar la dirección del arreglo.
-    MOV CX, 10           ; Número de bytes a limpiar.
+    MOV CX, 1404           ; Número de bytes a limpiar.
+    CLD
     MOV AL, 0            ; Valor 0 a llenar.
-    REP STOSB            ; Limpiar el arreglo llenando con 0.
+    REP STOSB            ; Limpiar el arreglo llenando con 0
 ENDM
 
 pila segment para stack 'stack'
@@ -90,6 +100,10 @@ datos segment para 'data'
     estilo2 db 11110100b
     tcabecera db "     [F2] Editar [F3] Buscar [F4] Reemplazar [F5] Limpiar pantalla [ESC] Fin", '$'
     tcuerpo db 1404 dup(0), '$' ;Almacenando memoria de  el texto escrito
+    tbuscar db "Palabra a buscar: $"
+    tcantidad db "Cantidad: $"
+    tdecimal db "00000", '$' 
+
 datos ends
 
 codigo segment para 'code'
@@ -210,9 +224,42 @@ codigo segment para 'code'
             mov byte ptr [si], 0
             CLS [di], [di+1], [di], [di+1], 00011111b
             jmp editorf
-
-        enter:
         
+        enter:
+            cmp byte ptr [di], 19 ; si es ultima linea no hacer nada
+            JE editorf
+            mov dl, 79 ;calcular bytes a recorrer
+            sub dl, [di+1]
+            mov ch,0
+            mov cl, dl
+            recorrerSI:
+                inc si
+            loop recorrerSI
+            inc byte ptr [di]
+            mov byte ptr [di+1],1
+            jmp editorf
+        
+        dirAr:
+            cmp byte ptr [di],2
+            JE editorf ;primera linea
+            mov cx, 0078
+            recorrerSI2:
+                dec si
+            loop recorrerSI2
+            dec byte ptr [di]
+            jmp editorf
+        
+        dirAb:
+            cmp byte ptr [di],19
+            JE editorf ;ultima linea
+            mov cx, 0078
+            recorrerSI3:
+                inc si
+            loop recorrerSI3
+            inc byte ptr [di]
+            jmp editorf
+            
+
         dirIz:
             dec si
             cmp byte ptr [di+1],1
@@ -241,6 +288,14 @@ codigo segment para 'code'
                 dirDer2:
                 jmp editor
         
+        limpiar:
+            LIMPIARMEM
+            LEA DI, ren
+            mov byte ptr [di], 2 ;iniciar el columna 1, renglon 2
+            mov byte ptr [di+1], 1
+            CLS 2,1,19,78, 00011111b
+            LEA si, tcuerpo
+            jmp editor
         
         finMain:
         RET
