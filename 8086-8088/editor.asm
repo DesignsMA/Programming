@@ -176,9 +176,9 @@ codigo segment para 'code'
         mov byte ptr [di], 2 ;iniciar el columna 1, renglon 2
         mov byte ptr [di+1], 1
         editor:
+            IMPCAR 20, 1, [si]
             cmp byte ptr [si], '$' ;Si se llego al final del cuerpo
             JE reset
-            
             LEER [di], [di+1], si ;Renglon, columna, actualiza el cuerpo
             IMPCARB [di], [di+1], [si], 00011111b 
             inc si
@@ -200,30 +200,35 @@ codigo segment para 'code'
         jmp editorf
 
         backspace:
-            cmp byte ptr [di+1], 1 ; Si es la primera columna
-            JE renAnterior
-            dec byte ptr [di+1] ;columna anterior
-            mov byte ptr [si], 0
-            dec si
-            CLS [di], [di+1], [di], [di+1], 00011111b
-            jmp editorf
+            cmp byte ptr [di+1], 1       ; ¿Estamos en la primera columna?
+            JE renAnterior               ; Si sí, ir al renglón anterior
+            dec si                       ; Retroceder en el buffer
+            dec byte ptr [di+1]          ; Mover el cursor a la columna anterior
+            mov byte ptr [si], 0         ; Borrar el carácter actual
+            CLS [di], [di+1], [di], [di+1], 00011111b ; Limpia visualmente
+            jmp editorf                  ; Regresar al editor principal
 
         renAnterior:
-            cmp byte ptr [di], 2
-            JE editorf
-            dec byte ptr [di]
-            mov byte ptr [di+1], 79
-            buscaCar:
-                cmp byte ptr [di+1], 1
-                JE terminaBusca
-                dec si
-                dec byte  ptr [di+1]
-                cmp byte ptr [si], 0 ; mientras sea vacio
-                JE buscaCar
-            terminaBusca:
-            mov byte ptr [si], 0
-            CLS [di], [di+1], [di], [di+1], 00011111b
-            jmp editorf
+            cmp byte ptr [di], 2         ; ¿Estamos en la primera fila?
+            JE editorf                   ; Si sí, no podemos retroceder más
+            dec byte ptr [di]            ; Mover al renglón anterior
+            mov byte ptr [di+1],78      ; Colocar el cursor en la última columna
+            dec si
+            cmp byte ptr [si], 0         ; ¿El buffer en esta posición está vacío?
+            JNE terminaBusca                   ; Si no está vacío, regresar al editor
+            inc si
+        buscaCar:
+            dec si
+            cmp byte ptr [di+1], 1       ; ¿Estamos en la primera columna?
+            JE terminaBusca              ; Si sí, terminar la búsqueda
+            dec byte ptr [di+1]          ; Mover el cursor a la columna anterior
+            cmp byte ptr [si], 0         ; ¿El buffer en esta posición está vacío?
+            JE buscaCar                  ; Si está vacío, seguir buscando
+
+        terminaBusca:
+            mov byte ptr [si], 0         ; Borrar el carácter actual
+            CLS [di], [di+1], [di], [di+1], 00011111b ; Limpia visualmente
+            jmp editor                   ; Regresar al editor principal
         
         enter:
             cmp byte ptr [di], 19 ; si es ultima linea no hacer nada
