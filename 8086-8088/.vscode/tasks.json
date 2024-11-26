@@ -29,7 +29,7 @@
           "-c", "mount C c:\\MASM\\BIN",
           "-c", "C:", 
           "-c", "masm d:\\${fileBasenameNoExtension}.asm",
-          "-c", "link ${fileBasenameNoExtension}.obj,,nul,,;",
+          "-c", "link ${fileBasenameNoExtension}.obj;",
           "-c", "cls",
           "-c", "debug ${fileBasenameNoExtension}.exe"        
         ],

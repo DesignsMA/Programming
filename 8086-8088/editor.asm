@@ -48,6 +48,27 @@ IMPCARB MACRO ren, col, car, color
     int 10h
 ENDM
 
+CADHEX MACRO ptrcad, ptrnum
+    mov dx, [ptrcad] ;mover  número : 12 -> 21 =  DX
+    sub dx, 3030h
+    mov al, dl ; mover 1
+    mov ah, 10
+    mul ah ; multiplica al*10
+    add dh, al ;resultado en al, 10+2
+    mov byte ptr [ptrnum], dh ;Mover número al apuntador
+ENDM
+
+LIMPIABARRAS MACRO
+    CLS 20,1,20,78, 10111111b ;barra inferior 1
+    CLS 21,1,21,78, 01111111b ;barra inferior 2
+ENDM
+
+LEERC MACRO ptrv
+    mov ah, 1h
+    int 21h
+    mov byte ptr [ptrv], al
+ENDM 
+
 LEER MACRO ren, col, ptrv
     CURSOR ren, col
     mov ah, 10h
@@ -66,14 +87,14 @@ LEER MACRO ren, col, ptrv
     JE dirAr
     cmp ah, 1ch
     JE enter
+    cmp ah, 3DH ;buscar
+    JE f3
 
     ;Comparando con teclas especiales
     ;cmp [si], 3BH
     ;je f1
     ;cmp [si], 3CH
     ;je f2
-    ;cmp [si], 3DH
-    ;je f3
     ;cmp [si], 3EH
     ;je f4
     cmp ah, 3FH
@@ -81,9 +102,9 @@ LEER MACRO ren, col, ptrv
     mov byte ptr [ptrv], al
 ENDM
 
-LIMPIARMEM MACRO 
-    LEA DI, tcuerpo       ; Cargar la dirección del arreglo.
-    MOV CX, 1404           ; Número de bytes a limpiar.
+LIMPIARMEM MACRO ptrv, caracteres
+    LEA DI, ptrv       ; Cargar la dirección del arreglo.
+    MOV CX, caracteres           ; Número de bytes a limpiar.
     CLD
     MOV AL, 0            ; Valor 0 a llenar.
     REP STOSB            ; Limpiar el arreglo llenando con 0
@@ -100,18 +121,22 @@ datos segment para 'data'
     estilo2 db 11110100b
     tcabecera db "     [F2] Editar [F3] Buscar [F4] Reemplazar [F5] Limpiar pantalla [ESC] Fin", '$'
     tcuerpo db 1404 dup(0), '$' ;Almacenando memoria de  el texto escrito
+    tletras db "Caracteres en tu palabra: (01-20): $"
     tbuscar db "Palabra a buscar: $"
+    terror db "Solo numeros de 01-20 $"
+    tsize db 2 dup(0)
+    tbuscando db 21 dup(0) ;Alojar  memoria
     tcantidad db "Cantidad: $"
-    tdecimal db "00000", '$' 
-
+    tdecimal db "00000", '$'
+    renb db 0
+    colb db 0 
 datos ends
 
 codigo segment para 'code'
     UI PROC NEAR
         CLS 0,0,0,79, 01110000b ;Cabecera fondo
-        CLS 20,1,20,78, 10111111b ;barra inferior 1
-        CLS 21,1,21,78, 01111111b ;barra inferior 2
         CLS 2,1,19,78, 00011111b
+        LIMPIABARRAS
         IMPCAR 1, 0, 218 ;  Esquina superior izquierda           
         IMPREP 1, 1, 78, 196
         IMPCAR 1, 79, 191 ; Esquina superior derecha   
@@ -129,6 +154,40 @@ codigo segment para 'code'
         call CABECERA 
         RET
     UI ENDP
+    ;En renb, colb gaurdamos las direcciones  actuales
+    BUSCAR PROC NEAR
+        LEA bx, tsize
+        CADHEX bx, bx ;convertir cadena a número
+        cmp byte ptr [bx], 1
+        JL buscaErr
+        cmp byte ptr [bx], 20
+        JG buscaErr
+        xor cx, cx
+        mov cl, [bx]
+        LEA bx, tbuscando ;bx para no interrumpir el flujo 
+        LIMPIABARRAS
+        CURSOR 20,1
+        IMPCAD tbuscar
+        leerpalabra:
+            LEERC bx
+            INC bx
+        loop leerpalabra
+        mov byte ptr [bx], '$'
+        jmp buscaFin
+        
+        buscaErr:
+        CURSOR 21, 1
+        IMPCAD terror
+
+        buscaFin:
+        LEA bx, ren
+        LIMPIABARRAS
+        CURSOR [bx],[bx+1]
+        CURSOR 20,1
+        IMPCAD  tbuscando
+        LIMPIARMEM tbuscando, 21
+        jmp editor
+    BUSCAR ENDP
 
     CABECERA PROC NEAR
         LEA si, tcabecera
@@ -294,12 +353,21 @@ codigo segment para 'code'
                 jmp editor
         
         limpiar:
-            LIMPIARMEM
+            LIMPIARMEM tcuerpo, 1404
             LEA DI, ren
             mov byte ptr [di], 2 ;iniciar el columna 1, renglon 2
             mov byte ptr [di+1], 1
             CLS 2,1,19,78, 00011111b
             LEA si, tcuerpo
+            jmp editor
+        
+        f3:
+            LIMPIABARRAS
+            CURSOR 20, 1 ;posicionar en primera barra
+            IMPCAD tletras
+            LEERC tsize
+            LEERC tsize+1 ;guardar  en  memoria
+            call BUSCAR
             jmp editor
         
         finMain:
