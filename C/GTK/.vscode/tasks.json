@@ -1,177 +1,226 @@
 {
     "version": "2.0.0",
     "tasks": [
-     {
-      "type": "cppbuild",
-      "label": "C/C++: gcc.exe build active file",
-      "command": "C:/msys64/mingw64/bin/gcc.exe",
-      "args": [
-       "-fdiagnostics-color=always",
-       "-g",
-       "-IC:/msys64/mingw64/include/gtk-4.0",
-       "-IC:/msys64/mingw64/include/pango-1.0",
-       "-IC:/msys64/mingw64/include",
-       "-IC:/msys64/mingw64/include/glib-2.0",
-       "-IC:/msys64/mingw64/lib/glib-2.0/include",
-       "-IC:/msys64/mingw64/include/harfbuzz",
-       "-IC:/msys64/mingw64/include/freetype2",
-       "-IC:/msys64/mingw64/include/libpng16",
-       "-IC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
-       "-IC:/msys64/mingw64/include/fribidi",
-       "-IC:/msys64/mingw64/include/cairo",
-       "-IC:/msys64/mingw64/include/pixman-1",
-       "-IC:/msys64/mingw64/include/gdk-pixbuf-2.0",
-       "-IC:/msys64/mingw64/include/webp",
-       "-DLIBDEFLATE_DLL",
-       "-IC:/msys64/mingw64/include/graphene-1.0",
-       "-IC:/msys64/mingw64/lib/graphene-1.0/include",
-
-       "${file}",
-   
-       "-LC:/msys64/mingw64/lib",
-       "-LC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
-       "-lgmp",
-       "-lgtk-4",
-       "-lpangowin32-1.0",
-       "-lpangocairo-1.0",
-       "-lpango-1.0",
-       "-lharfbuzz",
-       "-lgdk_pixbuf-2.0",
-       "-lcairo-gobject",
-       "-lcairo",
-       "-lgraphene-1.0",
-       "-lgio-2.0",
-       "-lgobject-2.0",
-       "-lglib-2.0",
-       "-lintl",
-   
-       "-o",
-       "${fileDirname}\\${fileBasenameNoExtension}.exe"
-      ],
-      "options": {
-       "cwd": "C:/msys64/mingw64/bin"
-      },
-      "problemMatcher": [
-       "$gcc"
-      ],
-      "group": "build",
-      "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
-     },
-     {
-        "type": "cppbuild",
-        "label": "C/C++: gcc.exe gtk 4 build resources",
-        "command": "C:/msys64/mingw64/bin/gcc.exe",
-        "args": [
-            "-fdiagnostics-color=always",
-            "-IC:/msys64/mingw64/include/glib-2.0",
-            "-IC:/msys64/mingw64/lib/glib-2.0/include",
-            "${file}",
-            "-LC:/msys64/mingw64/lib",
-            "-lgtk-4",
-            "-lgio-2.0",
-            "-lglib-2.0",
-            "-c",
-            "-o","${fileDirname}/gresource.o"
-        ],
-        "options": {
-            "cwd": "C:/msys64/mingw64/bin"
-        },
-        "problemMatcher": [
-            "$gcc"
-        ],
-        "group": "build",
-        "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
-    },
-    {
-        "type": "cppbuild",
-        "label": "C/C++: gcc.exe glib build",
-        "command": "C:/msys64/mingw64/bin/gcc.exe",
-        "args": [
-            "-fdiagnostics-color=always",
-            "-g",  // Include debugging symbols
-            "-IC:/msys64/mingw64/include/gtk-4.0",
-            "-IC:/msys64/mingw64/include/glib-2.0",
-            "-IC:/msys64/mingw64/lib/glib-2.0/include",
-            "${file}",
-            "-LC:/msys64/mingw64/lib",
-            "-lgio-2.0",
-            "-lglib-2.0",
-            "-o", "${fileDirname}/${fileBasenameNoExtension}.exe"  // Output as executable
-        ],
-        "options": {
-            "cwd": "C:/msys64/mingw64/bin"
-        },
-        "problemMatcher": [
-            "$gcc"
-        ],
-        "group": {
-            "kind": "build",
-            "isDefault": false
-        },
-        "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
-    },
         {
-        "type": "cppbuild",
-        "label": "C/C++: gcc.exe gtk4 build with resources",
-        "command": "C:/msys64/mingw64/bin/gcc.exe",
-        "args": [
-         "-fdiagnostics-color=always",
-         "-g",
-         "-IC:/msys64/mingw64/include/gtk-4.0",
-         "-IC:/msys64/mingw64/include/pango-1.0",
-         "-IC:/msys64/mingw64/include",
-         "-IC:/msys64/mingw64/include/glib-2.0",
-         "-IC:/msys64/mingw64/lib/glib-2.0/include",
-         "-IC:/msys64/mingw64/include/harfbuzz",
-         "-IC:/msys64/mingw64/include/freetype2",
-         "-IC:/msys64/mingw64/include/libpng16",
-         "-IC:/msys64/mingw64/include/fribidi",
-         "-IC:/msys64/mingw64/include/cairo",
-         "-IC:/msys64/mingw64/include/pixman-1",
-         "-IC:/msys64/mingw64/include/gdk-pixbuf-2.0",
-         "-IC:/msys64/mingw64/include/webp",
-         "-DLIBDEFLATE_DLL",
-         "-I${fileDirname}", 
-         "-IC:/msys64/mingw64/include/graphene-1.0",
-         "-IC:/msys64/mingw64/lib/graphene-1.0/include",
-         "-IC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
-         "-mfpmath=sse",
-         "-msse",
-         "-msse2",
-         "-mwindows",
-     
-         "${file}",
-         "${fileDirname}/gresource.o", 
-     
-         "-LC:/msys64/mingw64/lib",
-         "-LC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
-         "-lgmp",
-         "-lgtk-4",
-         "-lpangowin32-1.0",
-         "-lpangocairo-1.0",
-         "-lpango-1.0",
-         "-lharfbuzz",
-         "-lgdk_pixbuf-2.0",
-         "-lcairo-gobject",
-         "-lcairo",
-         "-lgraphene-1.0",
-         "-lgio-2.0",
-         "-lgobject-2.0",
-         "-lglib-2.0",
-         "-lintl",
-     
-         "-o",
-         "${fileDirname}\\${fileBasenameNoExtension}.exe"
-        ],
-        "options": {
-         "cwd": "C:/msys64/mingw64/bin"
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe build active file",
+            "command": "C:/msys64/mingw64/bin/gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-IC:/msys64/mingw64/include/gtk-4.0",
+                "-IC:/msys64/mingw64/include/pango-1.0",
+                "-IC:/msys64/mingw64/include",
+                "-IC:/msys64/mingw64/include/glib-2.0",
+                "-IC:/msys64/mingw64/lib/glib-2.0/include",
+                "-IC:/msys64/mingw64/include/harfbuzz",
+                "-IC:/msys64/mingw64/include/freetype2",
+                "-IC:/msys64/mingw64/include/libpng16",
+                "-IC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
+                "-IC:/msys64/mingw64/include/fribidi",
+                "-IC:/msys64/mingw64/include/cairo",
+                "-IC:/msys64/mingw64/include/pixman-1",
+                "-IC:/msys64/mingw64/include/gdk-pixbuf-2.0",
+                "-IC:/msys64/mingw64/include/webp",
+                "-DLIBDEFLATE_DLL",
+                "-IC:/msys64/mingw64/include/graphene-1.0",
+                "-IC:/msys64/mingw64/lib/graphene-1.0/include",
+                "${file}",
+                "-LC:/msys64/mingw64/lib",
+                "-LC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
+                "-lgmp",
+                "-lgtk-4",
+                "-lpangowin32-1.0",
+                "-lpangocairo-1.0",
+                "-lpango-1.0",
+                "-lharfbuzz",
+                "-lgdk_pixbuf-2.0",
+                "-lcairo-gobject",
+                "-lcairo",
+                "-lgraphene-1.0",
+                "-lgio-2.0",
+                "-lgobject-2.0",
+                "-lglib-2.0",
+                "-lintl",
+                "-lpthread",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "C:/msys64/mingw64/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
         },
-        "problemMatcher": [
-         "$gcc"
-        ],
-        "group": "build",
-        "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
-       }
-  
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe gtk 4 build resources",
+            "command": "C:/msys64/mingw64/bin/gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-IC:/msys64/mingw64/include/glib-2.0",
+                "-IC:/msys64/mingw64/lib/glib-2.0/include",
+                "${file}",
+                "-LC:/msys64/mingw64/lib",
+                "-lgtk-4",
+                "-lgio-2.0",
+                "-lglib-2.0",
+                "-c",
+                "-o",
+                "${fileDirname}/gresource.o"
+            ],
+            "options": {
+                "cwd": "C:/msys64/mingw64/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe glib build",
+            "command": "C:/msys64/mingw64/bin/gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-IC:/msys64/mingw64/include/gtk-4.0",
+                "-IC:/msys64/mingw64/include/glib-2.0",
+                "-IC:/msys64/mingw64/lib/glib-2.0/include",
+                "${file}",
+                "-LC:/msys64/mingw64/lib",
+                "-lgio-2.0",
+                "-lglib-2.0",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "C:/msys64/mingw64/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe gtk4 build with resources",
+            "command": "C:/msys64/mingw64/bin/gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-IC:/msys64/mingw64/include/gtk-4.0",
+                "-IC:/msys64/mingw64/include/pango-1.0",
+                "-IC:/msys64/mingw64/include",
+                "-IC:/msys64/mingw64/include/glib-2.0",
+                "-IC:/msys64/mingw64/lib/glib-2.0/include",
+                "-IC:/msys64/mingw64/include/harfbuzz",
+                "-IC:/msys64/mingw64/include/freetype2",
+                "-IC:/msys64/mingw64/include/libpng16",
+                "-IC:/msys64/mingw64/include/fribidi",
+                "-IC:/msys64/mingw64/include/cairo",
+                "-IC:/msys64/mingw64/include/pixman-1",
+                "-IC:/msys64/mingw64/include/gdk-pixbuf-2.0",
+                "-IC:/msys64/mingw64/include/webp",
+                "-DLIBDEFLATE_DLL",
+                "-I${fileDirname}",
+                "-IC:/msys64/mingw64/include/graphene-1.0",
+                "-IC:/msys64/mingw64/lib/graphene-1.0/include",
+                "-IC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
+                "-mfpmath=sse",
+                "-msse",
+                "-msse2",
+                "-mwindows",
+                "${file}",
+                "${fileDirname}/gresource.o",
+                "-LC:/msys64/mingw64/lib",
+                "-LC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
+                "-lgmp",
+                "-lgtk-4",
+                "-lpangowin32-1.0",
+                "-lpangocairo-1.0",
+                "-lpango-1.0",
+                "-lharfbuzz",
+                "-lgdk_pixbuf-2.0",
+                "-lcairo-gobject",
+                "-lcairo",
+                "-lgraphene-1.0",
+                "-lgio-2.0",
+                "-lgobject-2.0",
+                "-lglib-2.0",
+                "-lintl",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "C:/msys64/mingw64/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe build active file",
+            "command": "C:/msys64/mingw64/bin/gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-IC:/msys64/mingw64/include/gtk-4.0",
+                "-IC:/msys64/mingw64/include/pango-1.0",
+                "-IC:/msys64/mingw64/include",
+                "-IC:/msys64/mingw64/include/glib-2.0",
+                "-IC:/msys64/mingw64/lib/glib-2.0/include",
+                "-IC:/msys64/mingw64/include/harfbuzz",
+                "-IC:/msys64/mingw64/include/freetype2",
+                "-IC:/msys64/mingw64/include/libpng16",
+                "-IC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
+                "-IC:/msys64/mingw64/include/fribidi",
+                "-IC:/msys64/mingw64/include/cairo",
+                "-IC:/msys64/mingw64/include/pixman-1",
+                "-IC:/msys64/mingw64/include/gdk-pixbuf-2.0",
+                "-IC:/msys64/mingw64/include/webp",
+                "-DLIBDEFLATE_DLL",
+                "-IC:/msys64/mingw64/include/graphene-1.0",
+                "-IC:/msys64/mingw64/lib/graphene-1.0/include",
+                "${file}",
+                "-LC:/msys64/mingw64/lib",
+                "-LC:/Users/DS/Downloads/gmp-6.3.0/gmp-6.3.0",
+                "-lgmp",
+                "-lgtk-4",
+                "-lpangowin32-1.0",
+                "-lpangocairo-1.0",
+                "-lpango-1.0",
+                "-lharfbuzz",
+                "-lgdk_pixbuf-2.0",
+                "-lcairo-gobject",
+                "-lcairo",
+                "-lgraphene-1.0",
+                "-lgio-2.0",
+                "-lgobject-2.0",
+                "-lglib-2.0",
+                "-lintl",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "C:/msys64/mingw64/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "compiler: C:/msys64/mingw64/bin/gcc.exe"
+        }
     ]
    }
