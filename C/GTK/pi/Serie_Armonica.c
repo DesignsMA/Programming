@@ -49,34 +49,25 @@ void clear_screen() {
         2n+1
 */
 
-void f(int signo,  mpf_t result, unsigned long int n, int precision) { //Da el termino N
-    mpf_t temp, temp2; //flotantes de alta  precision
-    mpf_init2(temp, precision);
-    mpf_init2(temp2, precision);
-
-    mpf_set_si(temp, signo); //asignar 1  o -1
-    mpf_set_ui(temp2, n); //temp2 <- n
-    mpf_mul_ui(temp2, temp2, 2); //temp2 <- 2n
-    mpf_add_ui(temp2, temp2, 1);  //temp2 <- 2n + 1
-    mpf_div(temp, temp, temp2);  //temp <- -1^n / 2n + 1
-    mpf_mul_ui(temp, temp, 4); //temp <- temp*4
-    mpf_add(result, result, temp); //result  <- result+temp
-    mpf_clear(temp2); //Limpieza  de memoria
-    mpf_clear(temp);
+void f(mpf_t result, unsigned long int n, int precision) { //Da el termino N
+    mpf_t temp; //flotantes de alta  precision
+    if ( n!=0) {
+        mpf_init2(temp, precision);
+        mpf_set_ui(temp, 1); //asignar 1 
+        mpf_div_ui(temp, temp, n);  //temp <- 1/N
+        mpf_add(result, result, temp); //result  <- result+temp
+        mpf_clear(temp);
+    }
 }
 
 
-void *serieArctan(void *arg) { //Da el termino N
+void *serieArmonica(void *arg) { //Da el termino N
     ThreadData *datos = (ThreadData*)arg; //puntero a los datos
-    int signo = 1;
     mpf_t *result_ptr = malloc(sizeof(mpf_t));
     mpf_init2(*result_ptr, datos->precision); //inicializar contenido  de apuntador a mpf
-    if(datos->inicio % 2 != 0 ) { //si  es  impar
-        signo = -1;
-    }
+
     for (unsigned long int i = datos->inicio; i <= datos->fin; i++) { //Calculo de la sumatoria
-        f(signo, *result_ptr,  i, datos->precision); //calcular  termino y sumar
-        signo = -signo;
+        f(*result_ptr,  i, datos->precision); //calcular  termino y sumar
     }
     //se calcula la suma parcial de inicio  a fin
     pthread_exit((void *)result_ptr);
@@ -85,7 +76,7 @@ void *serieArctan(void *arg) { //Da el termino N
 char *serieTaylor(unsigned long int n, int precision) {
     mp_exp_t mp_exponent;
     char *str, *mpf_str, c, *substr;
-    int signo = 1, inicio=0, fin =0;
+    int inicio=0, fin =0;
     mpf_t result;
 
     clock_t start, end;
@@ -110,7 +101,7 @@ char *serieTaylor(unsigned long int n, int precision) {
         hilo_dato[i].precision = precision;
 
         // Crear el hilo
-        int rc = pthread_create(&hilos[i], NULL, serieArctan, (void *)&hilo_dato[i]);
+        int rc = pthread_create(&hilos[i], NULL, serieArmonica, (void *)&hilo_dato[i]);
         if (rc) {
             printf("Error creando hilo %d\n", i);
             exit(-1);
@@ -167,8 +158,6 @@ int main() {
         clear_screen();
         if ( n >=1 && precision >=256 && precision%2==0) {
             char *result = serieTaylor(n, precision);
-            char *pi100 = (char*)malloc(150 * sizeof(char)); 
-            strcpy(pi100, "\nPrimeros 100 digitos:\n3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 74944 59230 78164 06286 20899 86280 34825 34211 7067\n");
             printf("Aproximacion:\n%c%c", result[0], result[1]);
             for ( i = 2; i < strlen(result); i++) {
                 for (int n = 0; n < 5 && i < strlen(result); n++) {
@@ -180,7 +169,7 @@ int main() {
                 printf(" "); // Espacios entre digitos
             }
             for ( i+=1 ; i < strlen(result); i++ ) putchar(result[i]); //imprimir datos restantes
-            printf("\nPrecision: %d\n%s", precision, pi100);
+            printf("\nPrecision: %d\n", precision);
             if (result == NULL) {
                 fprintf(stderr, "Error ocurrido durante la ejecución.\n");
                 return EXIT_FAILURE;
@@ -193,7 +182,6 @@ int main() {
                 free(result);
                 return EXIT_FAILURE;
             }
-            free(pi100);
             fprintf(file, "%s\nPrecision: %d", result, precision); //Escribir datos en archivo
             fclose(file);
             free(result);

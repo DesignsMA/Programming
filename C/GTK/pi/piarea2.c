@@ -14,22 +14,18 @@ void clear_screen() {
     #endif
 }
 
-void f(mpf_t result, const mpf_t x, int precision) {
-    mpf_t temp;
+void f(mpf_t result,  mpf_t x, int precision) {
+    mpf_t temp, temp2;
     mpf_init2(temp, precision);
+    mpf_init2(temp2, precision);
     
-    // Calculate x^2
-    mpf_pow_ui(temp, x, 2);         // temp = x^2
-    
-    mpf_t one; 
-    mpf_init_set_ui(one, 1); // Initialize one to 1
-    mpf_sub(temp, one, temp); // temp = 1 - x^2
+    // Calculate 2 / (1 + x^2)
+    mpf_set_ui(temp, 2);
+    mpf_pow_ui(temp2, x, 2);
+    mpf_add_ui(temp2, temp2, 1);
+    mpf_div(result, temp, temp2);  // result = 2 / (x^2 + 1)
 
-    // Calculate sqrt(1 - x^2)
-    mpf_sqrt(result, temp);        // result = sqrt(1 - x^2)
-    mpf_mul_ui(result, result, 2); // multiply by two
-    // Clear the temporary variable
-    mpf_clear(one);
+    mpf_clear(temp2);
     mpf_clear(temp);
 }
 
