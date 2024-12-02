@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+
+<!-- Section 1-->
+<HBox spacing="20" minWidth="1280" minHeight="720" alignment="CENTER" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ahorcado.jugadorController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/> <!-- Espaciado entre elementos -->
+    </padding>
+    
+    <!-- Section 2-->
+    <VBox alignment="CENTER" minWidth="900">
+    <TextField fx:id="palabraField" promptText="Ingresa tu palabra" minWidth="300"/>
+    <Button text="Enviar" onAction="#handleEnviarPalabra" minWidth="150"/>
+    </VBox>
+
+    <!-- Section 3-->
+    <VBox alignment="CENTER" minWidth="900">
+        <TextField fx:id="palabraField" promptText="Ingresa tu palabra" minWidth="300"/>
+        <Button text="Enviar" onAction="#handleEnviarPalabra" minWidth="150"/>
+    </VBox>  
+
+     <!-- Section 3-->
+    <VBox alignment="CENTER">
+        <Text text="Estadisticas" style="-fx-font-size: 18px;"/>
+        <Text fx:id="palabrasAcertadas" text="Palabras acertadas: 0"/>
+        <Text fx:id="palabrasErradas" text="Palabras erradas: 0"/>
+        <Text fx:id="intentosRealizados" text="Intentos realizados: 0"/>
+        <Button text="Tabla de posiciones" onAction="#handleScoreboard" minWidth="150"/>
+    </VBox>  
+
+
+        
+</HBox>

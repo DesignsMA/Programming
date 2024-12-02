@@ -1,9 +1,10 @@
 module hellofx {
-    requires javafx.controls;
+    requires transitive javafx.controls;
     requires javafx.fxml;
-    requires Transitive javafx.graphics;
+    requires transitive javafx.graphics;
 
     opens ahorcado to javafx.fxml;
+
     exports ahorcado;
 
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+
+<VBox spacing="10" minWidth="1280" minHeight="720" alignment="CENTER" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ahorcado.registroController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/> <!-- Espaciado entre elementos -->
+    </padding>
+    
+    <!-- Título -->
+    <Label text="Iniciar Sesión" style="-fx-font-size: 24px;"/>
+    
+    <!-- Campo de usuario -->
+    <TextField fx:id="usernameField" promptText="Nombre de usuario" minWidth="300"/>
+    
+    <!-- Campo de contraseña -->
+    <PasswordField fx:id="passwordField" promptText="Contraseña | Solo administradores" minWidth="300"/>
+    
+    <!-- Botón para iniciar sesión como jugador, en click llamar a handleJugadorLogin-->
+    <Button text="Iniciar como Jugador" onAction="#handleJugadorLogin" minWidth="150"/>
+    
+    <!-- Botón para iniciar sesión como administrador -->
+    <Button text="Iniciar como Administrador" onAction="#handleAdminLogin" minWidth="150"/>
+
+</VBox>
