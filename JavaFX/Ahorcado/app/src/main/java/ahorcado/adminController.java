@@ -1,8 +1,12 @@
 package ahorcado;
 
+import java.io.File;
 import java.io.IOException;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 import java.util.ArrayList;
@@ -10,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
 
 public class adminController {
 
@@ -21,6 +26,9 @@ public class adminController {
 
     @FXML
     private Button btAceptar;
+
+    @FXML
+    private Button btMenu;
 
     @FXML
     private TextArea textArea; // texto de seccion 2
@@ -55,19 +63,21 @@ public class adminController {
     private void handleScoreboard() {
         textArea.setText("");
         mostrar(new Control[] { tf1, tf2, btAceptar }, false); // ocultar
-        List<Jugador> jugadores = new ArrayList<>();
-        for (Usuario usuario : MainApp.usuarios) {
-            if (usuario instanceof Jugador) {
-                jugadores.add((Jugador) usuario); // Hacemos un cast a Jugador
-            }
-        }
+        textArea.setText(tabla.tablaGen());
+    }
 
-        jugadores.stream()
-                .sorted((j1, j2) -> Integer.compare(j2.palabrasAcertadas, j1.palabrasAcertadas))
-                .forEach(jugador -> {
-                    // Concatenar el texto al TextArea
-                    textArea.appendText(jugador.getUsername() + " - Acertadas: " + jugador.palabrasAcertadas + "\n");
-                });
+    @FXML
+    private void handleReturn() {
+        try {
+            Parent parent = FXMLLoader.load(getClass().getResource("/registro.fxml"));
+            Scene scene = new Scene(parent); // cargar scena
+            scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm()); /* Recuperar estilos */
+            Stage stage = (Stage) textArea.getScene().getWindow(); // recuperar escenario
+            stage.setScene(scene);
+            stage.setTitle("Juego del Ahorcado - Iniciar Sesion");
+        } catch (IOException e) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Error al cargar la escena menu", e.getMessage(), true);
+        }
     }
 
     @FXML
@@ -75,10 +85,18 @@ public class adminController {
         try {
             switch (idbt) {
                 case 1: {
-                    AhorcadoIO.leerPalabras(tf1.getText());
-                    for (String cad : MainApp.palabras) {
-                        textArea.setText(textArea.getText() + cad + "\n");
-                    }
+                    /* Actualizamos el archivo que apunta a palabras */
+                    File file = new File(tf1.getText());
+                    if (file.exists()) {
+                        AhorcadoIO.escribirTexto("archivoPalabras.txt", tf1.getText());
+                        AhorcadoIO.leerPalabras(AhorcadoIO.leerTexto("archivoPalabras.txt"));
+                        for (String cad : MainApp.palabras) {
+                            textArea.setText(textArea.getText() + cad + "\n");
+                        }
+                    } else
+                        Alerta.mostrarAlerta(AlertType.WARNING, "ADVERTENCIA",
+                                "Archivo no existente\nLas palabras no se actualizaron", false);
+
                     break;
                 }
 
@@ -111,10 +129,14 @@ public class adminController {
                     while (iterator.hasNext()) { // remueve de forma segura
                         Usuario usr = iterator.next();
                         if (usr.getUsername().equals(nombre) && usr instanceof Jugador) {
+                            Alerta.mostrarAlerta(AlertType.INFORMATION, "Jugador " + nombre + " eliminado.",
+                                    "Visualize usuarios actuales.",
+                                    false);
                             iterator.remove(); // Elimina de la lista de forma segura
                             break;
                         }
                     }
+
                     AhorcadoIO.escribirBin("usuarios.bin", MainApp.usuarios);
                     textArea.setText(manejarUsuarios.listaATexto(MainApp.usuarios));
                 }

@@ -1,18 +1,15 @@
 package ahorcado;
 
+import java.io.IOException;
+
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class registroController {
 
@@ -36,7 +33,7 @@ public class registroController {
         // administrador)
 
         if (isJugador(username)) {
-            Alerta.mostrarAlerta(AlertType.WARNING, "ALERTA", "WIP" + MainApp.actual, true);
+            loadJugadorScene();
         }
 
     }
@@ -112,9 +109,10 @@ public class registroController {
     // Cargar la escena de jugador
     private void loadJugadorScene() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("jugador.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) usernameField.getScene().getWindow();
+            Parent loader = FXMLLoader.load(getClass().getResource("/jugador.fxml"));
+            Scene scene = new Scene(loader); // cargar scena
+            scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm()); /* Recuperar estilos */
+            Stage stage = (Stage) usernameField.getScene().getWindow(); // recuperar escenario
             stage.setScene(scene);
             stage.setTitle("Juego del Ahorcado - Jugador");
         } catch (IOException e) {

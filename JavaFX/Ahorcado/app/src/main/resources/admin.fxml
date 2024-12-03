@@ -14,22 +14,21 @@
     </padding>
     
     <!-- Section 2-->
-    <VBox alignment="CENTER" minWidth="900" styleClass="contenedor"> 
+    <VBox alignment="CENTER" minWidth="900" styleClass="contenedor" spacing="20"> 
         <TextArea fx:id="textArea" editable="false" promptText="..." minHeight="600"/>
     </VBox>
 
     <!-- Section 3-->
-    <VBox alignment="CENTER" styleClass="contenedor"> 
-        <Button text="Cargar palabra de archivo" onAction="#handlePalabras" minWidth="150"/>
-        <Button text="Agregar admin" onAction="#handleAgregarAdmin" minWidth="150"/>
-        <Button text="Remover jugador" onAction="#handleRemoverJugador" minWidth="150"/>
-        <Button text="Tabla de posiciones" onAction="#handleScoreboard" minWidth="150"/>
+    <VBox alignment="CENTER" styleClass="contenedor" spacing="20"> 
+        <Button text="Cargar archivo de palabras" onAction="#handlePalabras" minWidth="250"/>
+        <Button text="Agregar admin" onAction="#handleAgregarAdmin" minWidth="250"/>
+        <Button text="Remover jugador" onAction="#handleRemoverJugador" minWidth="250"/>
+        <Button text="Tabla de posiciones" onAction="#handleScoreboard" minWidth="250"/>
 
-        <TextField fx:id="tf1" promptText="Nombre" minWidth="150" visible="false" managed="false"/>
-        <PasswordField fx:id="tf2" promptText="Contraseña" minWidth="150" visible="false" managed="false"/>
-        <Button fx:id="btAceptar" text="ACEPTAR" onAction="#handleAceptar" minWidth="150" visible="false" managed="false"/>
-
-
+        <TextField fx:id="tf1" promptText="Nombre" minWidth="250" visible="false" managed="false"/>
+        <PasswordField fx:id="tf2" promptText="Contraseña" minWidth="250" visible="false" managed="false"/>
+        <Button fx:id="btAceptar" text="ACEPTAR" onAction="#handleAceptar" minWidth="250" visible="false" managed="false"/>
+        <Button fx:id="btMenu" text="MENU PRINCIPAL" onAction="#handleReturn" minWidth="250"/>
     </VBox>  
         
 </HBox>

@@ -22,7 +22,7 @@ public class MainApp extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/registro.fxml"));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-        stage.setTitle("Ahorcado");
+        stage.setTitle("Juego del Ahorcado - Iniciar Sesion");
         stage.setScene(scene);
         stage.show();
     }
