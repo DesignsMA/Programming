@@ -4,6 +4,7 @@ public class Jugador extends Usuario {
     public int palabrasAcertadas;
     public int palabrasErradas;
     public int intentosRealizados;
+    public boolean activo;
 
     // Constructor
     public Jugador(String username) {
@@ -11,11 +12,11 @@ public class Jugador extends Usuario {
         this.palabrasAcertadas = 0;
         this.palabrasErradas = 0;
         this.intentosRealizados = 0;
+        activo = false;
     }
 
     // Métodos específicos del jugador
     public void adivinarPalabra(boolean acierto) {
-        intentosRealizados++;
         if (acierto) {
             palabrasAcertadas++;
         } else {
@@ -47,11 +48,19 @@ public class Jugador extends Usuario {
         this.palabrasErradas = palabrasErradas;
     }
 
-    public void mostrarEstadisticas() {
-        System.out.println("Estadísticas de " + username + ":");
-        System.out.println("Palabras acertadas: " + palabrasAcertadas);
-        System.out.println("Palabras erradas: " + palabrasErradas);
-        System.out.println("Número de intentos: " + intentosRealizados);
+    public void actualizarIntentos(int intentos) {
+        this.intentosRealizados += intentos;
+
+    }
+
+    public String mostrarEstadisticas() {
+        return ("Estadísticas de " + username + ":\n\n" + "Palabras acertadas: " + palabrasAcertadas + "\n\nPalabras erradas: " + palabrasErradas + "\n" + //
+                        "\n" + //
+                        "Número de intentos: " + intentosRealizados);
+    }
+
+    public void switchActivo() {
+        activo = !activo;
     }
 
     @Override

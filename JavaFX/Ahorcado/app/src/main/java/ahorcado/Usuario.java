@@ -17,10 +17,5 @@ public abstract class Usuario implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "Usuario{username='" + username + "'}";
-    }
-
-    // Método abstracto que debe ser implementado por las clases hijas
-    public abstract void mostrarEstadisticas();
+    public abstract String toString();
 }

@@ -1,16 +1,20 @@
 package ahorcado;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.Random;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.Random;
 
 public class jugadorController {
 
@@ -68,6 +72,8 @@ public class jugadorController {
     @FXML
     private void handleReturn() {
         try {
+            ((Jugador)MainApp.actual).switchActivo(); //apagar
+            AhorcadoIO.escribirBin("usuarios.bin", MainApp.usuarios); //actualizar switch
             Parent parent = FXMLLoader.load(getClass().getResource("/registro.fxml"));
             Scene scene = new Scene(parent); // cargar scena
             scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm()); /* Recuperar estilos */
@@ -123,6 +129,7 @@ public class jugadorController {
         }
 
         if (intentos > 0 && palabraOculta.toString().equals(palabra.toString())) {
+            ((Jugador) MainApp.actual).actualizarIntentos(5-intentos);
             ((Jugador) MainApp.actual).adivinarPalabra(found);
             Alerta.mostrarAlerta(Alert.AlertType.INFORMATION, "GANASTE!",
                     "", true);
@@ -130,6 +137,7 @@ public class jugadorController {
             mostrar(new Control[] { ahorcadoText, palabraField, btEnviar, intentosLabel }, false);
 
         } else if (intentos <= 0) {
+            ((Jugador) MainApp.actual).actualizarIntentos(5);
             ((Jugador) MainApp.actual).adivinarPalabra(found);
             Alerta.mostrarAlerta(Alert.AlertType.INFORMATION, "PERDISTE! :C",
                     "La palabra era: " + palabra, true);
@@ -154,9 +162,7 @@ public class jugadorController {
         textArea.setText("");
         mostrar(new Control[] { btEstadisticas, btTabla }, false);
         mostrar(new Control[] { textArea, btAceptar }, true);
-        textArea.setText(
-                "Jugador: " + jugador.getUsername() + "\n\nPalabras acertadas: " + jugador.palabrasAcertadas
-                        + "\n\nPalabras erradas: " + jugador.palabrasErradas);
+        textArea.setText(jugador.mostrarEstadisticas());
     }
 
     @FXML

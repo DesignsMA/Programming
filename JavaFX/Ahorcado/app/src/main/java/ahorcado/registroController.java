@@ -22,6 +22,14 @@ public class registroController {
     // Método para manejar el login como jugador
     @FXML
     private void handleJugadorLogin() {
+        try {
+            MainApp.usuarios = AhorcadoIO.obtenerUsuarios("usuarios.bin");
+        } catch (IOException e) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e.getMessage(), true);
+        } catch (ClassNotFoundException e2) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e2.getMessage(), true);
+        }
+
         String username = usernameField.getText(); // obtener nombre
 
         if (username.isEmpty()) {
@@ -41,6 +49,14 @@ public class registroController {
     // Método para manejar el login como administrador
     @FXML
     private void handleAdminLogin() {
+        try {
+            MainApp.usuarios = AhorcadoIO.obtenerUsuarios("usuarios.bin");
+        } catch (IOException e) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e.getMessage(), true);
+        } catch (ClassNotFoundException e2) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e2.getMessage(), true);
+        }
+
         String username = usernameField.getText();
         String password = passwordField.getText();
 
@@ -59,8 +75,6 @@ public class registroController {
 
     // Verificar si el usuario es un jugador
     private boolean isJugador(String username) {
-        try {
-            MainApp.usuarios = AhorcadoIO.obtenerUsuarios("usuarios.bin");
             for (Usuario usuario : MainApp.usuarios) { // recorrer lista
                 if (usuario instanceof Jugador)
                     if (usuario.getUsername().equals(username)) { // Si el jugador existe
@@ -68,11 +82,6 @@ public class registroController {
                         return true;
                     }
             }
-        } catch (IOException e) {
-            Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e.getMessage(), true);
-        } catch (ClassNotFoundException e2) {
-            Alerta.mostrarAlerta(AlertType.ERROR, "Clase no encontrada", e2.getMessage(), true);
-        }
         /* Si el usuario no existe */
         try {
             if (!manejarUsuarios.encontrarUsuario(MainApp.usuarios, username)) {
@@ -93,22 +102,15 @@ public class registroController {
         if (username.equals("foxypato") && password.equals("admin123"))
             return true;
 
-        try {
-            MainApp.usuarios = AhorcadoIO.obtenerUsuarios("usuarios.bin");
-            for (Usuario usuario : MainApp.usuarios) { // recorrer lista
-                if (usuario instanceof Administrador)
-                    if (usuario.getUsername().equals(username)
-                            && ((Administrador) usuario).getPassword().equals(password)) { // Si el jugador existe
-                                                                                           // en
-                        // la lista
-                        MainApp.actual = usuario;
-                        return true;
-                    }
-            }
-        } catch (IOException e) {
-            Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e.getMessage(), true);
-        } catch (ClassNotFoundException e2) {
-            Alerta.mostrarAlerta(AlertType.ERROR, "Clase no encontrada", e2.getMessage(), true);
+        for (Usuario usuario : MainApp.usuarios) { // recorrer lista
+            if (usuario instanceof Administrador)
+                if (usuario.getUsername().equals(username)
+                        && ((Administrador) usuario).getPassword().equals(password)) { // Si el jugador existe
+                                                                                       // en
+                    // la lista
+                    MainApp.actual = usuario;
+                    return true;
+                }
         }
         return false;
     }
@@ -116,6 +118,8 @@ public class registroController {
     // Cargar la escena de jugador
     private void loadJugadorScene() {
         try {
+            ((Jugador)MainApp.actual).switchActivo();
+            AhorcadoIO.escribirBin("usuarios.bin", MainApp.usuarios); //actualizar switch
             Parent loader = FXMLLoader.load(getClass().getResource("/jugador.fxml"));
             Scene scene = new Scene(loader); // cargar scena
             scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm()); /* Recuperar estilos */

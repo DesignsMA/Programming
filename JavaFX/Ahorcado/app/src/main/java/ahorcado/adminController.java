@@ -2,18 +2,18 @@ package ahorcado;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Control;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class adminController {
@@ -92,7 +92,6 @@ public class adminController {
     private void handleAceptar() {
         try {
             MainApp.usuarios = AhorcadoIO.obtenerUsuarios("usuarios.bin");
-            tf1.clear();
             switch (idbt) {
                 case 1: {
                     /* Actualizamos el archivo que apunta a palabras */
@@ -136,20 +135,27 @@ public class adminController {
                 case 3: {
                     String nombre = tf1.getText();
                     Iterator<Usuario> iterator = MainApp.usuarios.iterator();
-                    while (iterator.hasNext()) { // remueve de forma segura
+                    while (iterator.hasNext()) {
                         Usuario usr = iterator.next();
-                        if (usr.getUsername().equals(nombre) && usr instanceof Jugador) {
-                            Alerta.mostrarAlerta(AlertType.INFORMATION, "Jugador " + nombre + " eliminado.",
-                                    "Visualize usuarios actuales.",
-                                    false);
-                            iterator.remove(); // Elimina de la lista de forma segura
-                            break;
+                        
+                        // Check if the user is a player and is active
+                        if (usr instanceof Jugador jugador) {
+                            
+                            if (jugador.activo) {
+                                // If the player is active, show an alert that they won't be deleted
+                                Alerta.mostrarAlerta(AlertType.INFORMATION, "Jugador " + nombre + " activo.", "No fue borrado.", false);
+                            } else if (usr.getUsername().equals(nombre)) {
+                                // If the player matches the name, show an alert and remove them
+                                Alerta.mostrarAlerta(AlertType.INFORMATION, "Jugador " + nombre + " eliminado.", "Visualize usuarios actuales.", false);
+                                iterator.remove();  // Safe removal from the collection
+                                break;  // Exit the loop once the player is removed
+                            }
                         }
                     }
-
                     AhorcadoIO.escribirBin("usuarios.bin", MainApp.usuarios);
-                    textArea.setText(manejarUsuarios.listaATexto(MainApp.usuarios));
+                    break;
                 }
+                
 
                 default:
                     break;
