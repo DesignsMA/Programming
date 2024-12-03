@@ -28,10 +28,10 @@
     <VBox alignment="CENTER" spacing="20" styleClass="contenedor">
         <Button fx:id="btEstadisticas" text="Estadisticas personales" onAction="#handleEstadisticasPersonales" minWidth="250"/>
         <Button fx:id="btTabla" text="Tabla de posiciones" onAction="#handleTablaPosiciones" minWidth="250"/>
-        <Label fx:id="intentosLabel" styleClass="textResaltar" text="Intentos: " visible="false" managed="false" minWidth="250"/>
         <Label fx:id="textArea" styleClass="textResaltar" visible="false" managed="false" minWidth="250"/>
         <Button fx:id="btAceptar" styleClass="btResaltadoSub" text="Aceptar" onAction="#handleAceptar" minWidth="250" visible="false" managed="false"/>
         <Button fx:id="btMenu" text="MENU PRINCIPAL" onAction="#handleReturn" minWidth="250"/>
+        <Label fx:id="intentosLabel" styleClass="textResaltar" text="Intentos: " visible="false" managed="false" minWidth="250"/>
     </VBox>  
 
         

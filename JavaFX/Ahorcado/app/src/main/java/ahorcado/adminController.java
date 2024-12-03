@@ -61,6 +61,14 @@ public class adminController {
 
     @FXML
     private void handleScoreboard() {
+        try {
+            MainApp.usuarios = AhorcadoIO.obtenerUsuarios("usuarios.bin");
+        } catch (IOException e) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e.getMessage(), true);
+        } catch (ClassNotFoundException e) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Clase no encontrada", e.getMessage(), true);
+        }
+
         textArea.setText("");
         mostrar(new Control[] { tf1, tf2, btAceptar }, false); // ocultar
         textArea.setText(tabla.tablaGen());
@@ -83,6 +91,8 @@ public class adminController {
     @FXML
     private void handleAceptar() {
         try {
+            MainApp.usuarios = AhorcadoIO.obtenerUsuarios("usuarios.bin");
+            tf1.clear();
             switch (idbt) {
                 case 1: {
                     /* Actualizamos el archivo que apunta a palabras */
@@ -148,7 +158,10 @@ public class adminController {
         } catch (IOException e) {
             Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e.getMessage(), true);
 
+        } catch (ClassNotFoundException e) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Clase no encontrada", e.getMessage(), true);
         }
+
         mostrar(new Control[] { tf1, tf2, btAceptar }, false); // ocultar
 
     }

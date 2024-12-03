@@ -8,8 +8,13 @@ import javafx.scene.control.Alert.AlertType;
 
 public class manejarUsuarios {
 
-    public static void encontrarUsuario(List<Usuario> usuarios) {
-
+    public static boolean encontrarUsuario(List<Usuario> usuarios, String username) {
+        for (Usuario usuario : usuarios) {
+            if (usuario.username.equals(username)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void agregarJugador(String username) {

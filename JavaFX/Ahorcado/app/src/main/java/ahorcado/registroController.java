@@ -74,11 +74,18 @@ public class registroController {
             Alerta.mostrarAlerta(AlertType.ERROR, "Clase no encontrada", e2.getMessage(), true);
         }
         /* Si el usuario no existe */
-        manejarUsuarios.agregarJugador(username);
-        Alerta.mostrarAlerta(AlertType.CONFIRMATION, "", "Usuario agregado exitosamente!", true);
+        try {
+            if (!manejarUsuarios.encontrarUsuario(MainApp.usuarios, username)) {
+                manejarUsuarios.agregarJugador(username);
+                Alerta.mostrarAlerta(AlertType.CONFIRMATION, "", "Usuario agregado exitosamente!", true);
+                AhorcadoIO.escribirBin("usuarios.bin", MainApp.usuarios);
+            }
+
+        } catch (IOException e) {
+            Alerta.mostrarAlerta(AlertType.ERROR, "Error al abrir archivo", e.getMessage(), true);
+        }
 
         return false;
-
     }
 
     // Verificar si el usuario es un administrador

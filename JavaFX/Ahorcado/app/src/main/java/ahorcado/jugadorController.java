@@ -58,6 +58,7 @@ public class jugadorController {
             palabraOculta.setCharAt(i, '_');
         }
 
+        intentosLabel.setText("Intentos: " + intentos);
         ahorcadoText.setText(palabraOculta.toString());
         mostrar(new Control[] { btJugar }, false);
         mostrar(new Control[] { ahorcadoText, palabraField, btEnviar, intentosLabel }, true);
@@ -115,7 +116,8 @@ public class jugadorController {
             }
             if (!found) { // if not found
                 intentos--;
-                Alerta.mostrarAlerta(AlertType.WARNING, "", "Letra incorrecta!", false);
+                if (intentos != 0)
+                    Alerta.mostrarAlerta(AlertType.WARNING, "", "Letra incorrecta!", false);
             }
             repeated = false;
         }
@@ -123,14 +125,14 @@ public class jugadorController {
         if (intentos > 0 && palabraOculta.toString().equals(palabra.toString())) {
             ((Jugador) MainApp.actual).adivinarPalabra(found);
             Alerta.mostrarAlerta(Alert.AlertType.INFORMATION, "GANASTE!",
-                    "", false);
+                    "", true);
             mostrar(new Control[] { btJugar }, true);
             mostrar(new Control[] { ahorcadoText, palabraField, btEnviar, intentosLabel }, false);
 
         } else if (intentos <= 0) {
             ((Jugador) MainApp.actual).adivinarPalabra(found);
-            Alerta.mostrarAlerta(Alert.AlertType.INFORMATION, "PERDISTE!",
-                    "", false);
+            Alerta.mostrarAlerta(Alert.AlertType.INFORMATION, "PERDISTE! :C",
+                    "La palabra era: " + palabra, true);
             mostrar(new Control[] { btJugar }, true);
             mostrar(new Control[] { ahorcadoText, palabraField, btEnviar, intentosLabel }, false);
         }
