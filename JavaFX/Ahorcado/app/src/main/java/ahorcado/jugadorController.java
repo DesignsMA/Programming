@@ -72,8 +72,8 @@ public class jugadorController {
     @FXML
     private void handleReturn() {
         try {
-            ((Jugador)MainApp.actual).switchActivo(); //apagar
-            AhorcadoIO.escribirBin("usuarios.bin", MainApp.usuarios); //actualizar switch
+            ((Jugador) MainApp.actual).switchActivo(); // apagar
+            AhorcadoIO.escribirBin("usuarios.bin", MainApp.usuarios); // actualizar switch
             Parent parent = FXMLLoader.load(getClass().getResource("/registro.fxml"));
             Scene scene = new Scene(parent); // cargar scena
             scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm()); /* Recuperar estilos */
@@ -94,14 +94,13 @@ public class jugadorController {
         }
 
         intentosLabel.setText("Intentos: " + intentos);
-        boolean acierto = esPalabraCorrecta(letra);
+        esPalabraCorrecta(letra);
         intentosLabel.setText("Intentos: " + intentos);
         palabraField.clear();
     }
 
     private boolean esPalabraCorrecta(String letra) {
         char car = palabraField.getText().toLowerCase().charAt(0);
-        boolean acierto = false;
 
         boolean found = false, repeated = false;
         for (int i = 0; i < palabraOculta.length(); i++) {
@@ -129,7 +128,7 @@ public class jugadorController {
         }
 
         if (intentos > 0 && palabraOculta.toString().equals(palabra.toString())) {
-            ((Jugador) MainApp.actual).actualizarIntentos(5-intentos);
+            ((Jugador) MainApp.actual).actualizarIntentos(5 - intentos);
             ((Jugador) MainApp.actual).adivinarPalabra(found);
             Alerta.mostrarAlerta(Alert.AlertType.INFORMATION, "GANASTE!",
                     "", true);
