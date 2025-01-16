@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 void printMatrix(int dim, int pos[]) {
     printf("\nE");
     if (dim >0)
