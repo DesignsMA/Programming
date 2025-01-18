@@ -20,6 +20,16 @@ char estaVacia(Pila *stack){
     return stack->tope==-1;
 }
 
+void realocar(void** ptr, int nsize){ //contiene una direccion a un apuntador que apunta a un arreglo
+    int *temp = (int *)realloc(*ptr, nsize * sizeof(int)); //devuelve NULL si no se aloja
+    if (temp == NULL) {
+        printf("\nError al reservar espacio.\n");
+        free(*ptr); // Liberar la memoria original antes de salir
+        exit(EXIT_FAILURE);
+    } else *ptr = temp; // Asignar el nuevo bloque de memoria al apuntador original
+}
+
+
 /*Realloc solo mueve de lugar el bloque original (si no puede ser extendido) o lo extiende, se conservan los  datos
   en caso de no poder ser extendido, el bloque de memoria original se libera tras copiarlo*/
 
@@ -27,13 +37,7 @@ void push(Pila *stack, int var){
     /*Si el proximo elemento es igual a la capacidad actual*/
     if ( stack->tope == (stack->capacidad-1)) { //Realizar el realojamiento de memoria menos veces es menos costoso
         stack->capacidad *=2;
-        int *temp = (int *)realloc(stack->datos, stack->capacidad * sizeof(int)); //devuelve NULL si no se aloja
-        if (temp == NULL) {
-            printf("\nError al reservar espacio.\n");
-            free(stack->datos); // Liberar la memoria original antes de salir
-            exit(EXIT_FAILURE);
-        } else stack->datos = temp; // Asignar el nuevo bloque de memoria
-        
+        realocar((void*)&stack->datos, stack->capacidad);
     }
 
     stack->datos[++stack->tope] = var; //inicia en -1s
@@ -48,13 +52,7 @@ void pop(Pila *stack){
         // Reducir la capacidad de la pila si está muy vacía
         if (stack->tope < stack->capacidad / 4) {
             stack->capacidad /= 2;
-            int *temp = (int *)realloc(stack->datos, stack->capacidad * sizeof(int));
-            if (temp == NULL) {
-                printf("Error al reducir espacio.\n");
-                free(stack->datos);
-                exit(EXIT_FAILURE);
-            }
-            stack->datos = temp;
+            realocar((void*)&stack->datos, stack->capacidad);
         }
     }
 }
