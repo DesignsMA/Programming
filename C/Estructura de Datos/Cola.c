@@ -43,9 +43,7 @@ void insertar( Cola *queue, int var) {
     if ( queue->final == (queue->capacidad)) {
         queue->capacidad *=2;
         printf("\nLa cola esta llena - Abriendo mas espacios\n");
-        printf("\nOriginal: %p | Contenido: %p\n", &queue->datos, queue->datos);
         realocar((void*)&queue->datos, queue->capacidad);
-        printf("\nModificado: %p | Contenido: %p\n", &queue->datos, queue->datos);
 
     }
     
