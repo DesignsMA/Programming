@@ -5,6 +5,7 @@ typedef struct Cola{
     int *datos;
     int frente;
     int final;
+    char ultimo;
     int capacidad;
 }Cola;
 
@@ -16,7 +17,11 @@ void comprobar( void* ptr) {
 }
 
 char estaVacia(Cola *queue){
-    return queue->frente == queue->final || queue->frente > (queue->capacidad-1);
+    return (queue->final)%(queue->capacidad) == queue->frente%(queue->capacidad) && queue->ultimo == 'E';
+}
+
+char estaLlena(Cola *queue){
+    return (queue->final)%(queue->capacidad) == queue->frente%(queue->capacidad) && queue->ultimo == 'I';
 }
 
 void realocar(void** ptr, int nsize){ //contiene una direccion a un apuntador que apunta a un arreglo
@@ -32,35 +37,38 @@ void inicializar(Cola *queue, int size){
     queue->datos = (int*)malloc(sizeof(int)*size);
     comprobar((void*)queue->datos);
     queue->capacidad = size;
-    queue->final = queue->frente = -1;
+    queue->final = queue->frente = 0;
+    queue->ultimo = 'E';
 }
 
 void insertar( Cola *queue, int var) {
-    if ( estaVacia(queue) ){
-        queue->frente = queue->final = 0;
-    }
     
-    if ( queue->final == (queue->capacidad)) {
+    if ( estaLlena(queue) ) {
         queue->capacidad *=2;
         printf("\nLa cola esta llena - Abriendo mas espacios\n");
-        printf("\nOriginal: %p | Contenido: %p\n", &queue->datos, queue->datos);
         realocar((void*)&queue->datos, queue->capacidad);
-        printf("\nModificado: %p | Contenido: %p\n", &queue->datos, queue->datos);
-
+        for (int i = 0; i < queue->frente; i++)
+        {
+            queue->datos[i+queue->capacidad/2] =  queue->datos[i]; //reordenando cola
+        }
+        
     }
     
-    queue->datos[queue->final++] = var;
+    queue->datos[(queue->final++)%(queue->capacidad)] = var;
+    queue->ultimo = 'I';
 }
 
 void eliminar(Cola *queue) {
     if (estaVacia(queue)) {
         printf("\nLa cola esta vacia.\n");
-    } else {
-        queue->frente++;
-        if (queue->frente > queue->capacidad / 2) {
+        if ( queue->capacidad > 5) {
             queue->capacidad /= 2;
             realocar((void*)&queue->datos, queue->capacidad);
         }
+        queue->frente = queue->final = 0;
+    } else {
+        queue->frente++;
+        queue->ultimo = 'E';        
     }
 }
 
@@ -68,6 +76,10 @@ void imprimir(Cola *queue) {
     if ( !estaVacia(queue) ){
         printf("\nCola\n");
         for (int i = queue->frente; i < queue->final ; i++){
+            printf("%d  ", queue->datos[i%(queue->capacidad)]);
+        }
+        printf("\n\nReal:\n");
+        for (int i = 0; i < queue->capacidad ; i++){
             printf("%d  ", queue->datos[i]);
         }
     }
@@ -96,7 +108,7 @@ int main( int argc, char **argv) {
             case 2:
                 eliminar(queue);
                 break;
-
+                
             default:
                 break;
         }
