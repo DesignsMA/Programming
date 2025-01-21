@@ -6,7 +6,7 @@ class Point():
         self.y = y
         
 points = []
-resolution = 1000
+resolution = 3000
 
 for i in range(12):
     points.append(Point(random.random(), random.random()))
