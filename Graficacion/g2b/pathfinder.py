@@ -37,9 +37,9 @@ pp(graph.dijkstra("12", "3"))
 with open('matrix.txt', 'w') as f:
         i = 0
         for p in points:
-            i +=1
             print(f"{i} |- {p.x} {p.y} 0\n")
-            f.write(f"{p.x} {p.y} 0\n")
+            f.write(f"{p.x} {p.y} 0 {i}\n")
+            i +=1
             
 with open('path.txt', 'w') as f:
         path = []
@@ -67,7 +67,8 @@ command = "gnuplot -e \"set terminal pngcairo;\
            'matrix.txt' using 1:2:3 with points title \'Matrix\' ps 3 pt 7 lc rgb '#6100ff',\
            'bezier_data.txt' using 1:2 with points title \'Bézier Curve\' ps 0.2 pt 7 lc rgb '#ff5353',\
             \'pathLines.txt\' using 1:2:($3-$1):($4-$2) title \'\' with vectors nohead lc rgb \'#ee5252\' lw 1.7,\
-            \'path.txt\' using 1:2:3 with points title \'Path\' ps 3 pt 7 lc rgb \'#ff5353\'\"\
+            \'path.txt\' using 1:2:3 with points title \'Path\' ps 3 pt 7 lc rgb \'#ff5353\',\
+            \'matrix.txt\' using 1:2:4 with labels title \'\' tc rgb \'#ffffff\' font \'DejaVu Sans,8\'\"\
             "
             
 subprocess.run(command, shell=True)
