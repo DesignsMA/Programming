@@ -1,6 +1,5 @@
 import spline #importar el generador de curva
 import subprocess
-import math
 import dijkstra
 from collections import namedtuple, deque
 
