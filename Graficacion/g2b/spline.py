@@ -46,17 +46,17 @@ def splinePoints(points: list[Point], fileName: str = "bezier_data.txt"):
     n = len(points) - 1
     cfs = []
     arc_length = 0
-    prev_pt = None  # Initialize previous point as None
+    prev_pt = None  # Inicializar como nulo
     polynomial_formula_x = ""
     polynomial_formula_y = ""
 
     with open(fileName, 'w') as f:
         for u in range(n + 1):
-            cfs.append(binomial(n, u))  # Calculate binomial coefficients
+            cfs.append(binomial(n, u))  # calcular coeficientes binomiales
 
         for i in range(resolution):
-            t = 0 + 1 * i / resolution  # For each t in the range 0-1
-            pt = Point(0, 0)  # Create a new point for each iteration
+            t = 0 + 1 * i / resolution  # generar (resolution)-puntos en el rango 0-1
+            pt = Point(0, 0)  
             term_x = ""
             term_y = ""
 
@@ -64,32 +64,30 @@ def splinePoints(points: list[Point], fileName: str = "bezier_data.txt"):
                 pt.x += cfs[u] * points[u].x * math.pow((1 - t), n - u) * math.pow(t, u)
                 pt.y += cfs[u] * points[u].y * math.pow((1 - t), n - u) * math.pow(t, u)
 
-                # Construct the polynomial terms
+                # Construir terminos del polinomio
                 term_x += f"{cfs[u] * points[u].x:.2f}*(1-t)^{n - u}*t^{u} + "
                 term_y += f"{cfs[u] * points[u].y:.2f}*(1-t)^{n - u}*t^{u} + "
 
-            # Remove the trailing " + " from the terms
+            #Remueve " + " de los terminos
             term_x = term_x[:-3]
             term_y = term_y[:-3]
 
-            
-
-            # Write the point to the file
+            # Escribir el punto al archivo | punto que pertenece a la curva
             f.write(f"{pt.x} {pt.y}\n")
 
             if prev_pt is not None:
-                dx = pt.x - prev_pt.x  # Calculate differential
+                dx = pt.x - prev_pt.x  # Calcular diferencial
                 dy = pt.y - prev_pt.y
-                arc_length += math.sqrt(dx**2 + dy**2)  # Add the distance to the arc length
+                arc_length += math.sqrt(dx**2 + dy**2)  # Añadir la distancia a la longitud de arco
 
-            # Update previous point to the current point
-            prev_pt = Point(pt.x, pt.y)  # Store a copy of the current point
+            # Actualizar el punto  anterior
+            prev_pt = Point(pt.x, pt.y)  # Guardar una copia del punto
         
-        # Append the terms to the polynomial formulas
+        # Concatenar terminos a la formula polinomial
         polynomial_formula_x += f"x(t) = {term_x}\n"
         polynomial_formula_y += f"y(t) = {term_y}\n"
         
-        for p in points:  # Write the control points
+        for p in points:  # Escribir puntos decontrol
             f.write(f"{p.x} {p.y} 0\n")
 
         print("Ecuación Parametrica:\n", polynomial_formula_x, polynomial_formula_y)
