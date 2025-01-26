@@ -58,13 +58,6 @@ void insertaMedio(int valor, int pos) {
     // Asignar el valor al nuevo nodo
     lista[nuevo].dato = valor;
 
-    // Caso especial: insertar al inicio (pos == 0)
-    if (pos == 0) {
-        lista[nuevo].sig = cabeza; // El nuevo nodo apunta a la cabeza actual
-        cabeza = nuevo;            // La nueva cabeza es el nuevo nodo
-        return;
-    }
-
     // Insertar el nuevo nodo en la posición `pos`
     lista[nuevo].sig = lista[pos].sig;
     lista[pos].sig = nuevo;
@@ -201,65 +194,67 @@ void imprimirLista() {
 
 // Función principal
 int main() {
-    inicializarLista(); // Inicializa la lista estática
+inicializarLista(); // Inicializa la lista estática
 
-    insertaMedio(700, 0);
-    insertaFinal(5);
-    insertaFinal(10);
-    insertaFinal(15);
-    insertaInicio(69);
-
-    printf("Lista después de las inserciones: ");
+    // Caso 1: Insertar al inicio
+    insertaInicio(10);
+    printf("Lista después de insertar 10 al inicio: ");
     imprimirLista();
 
-    int valorABuscar = 10;
-    int encontrado = buscarElemento(valorABuscar);
-    if (encontrado != -1) {
-        printf("Elemento %d encontrado en el nodo %d.\n", valorABuscar, encontrado);
-    } else {
-        printf("Elemento %d no encontrado en la lista.\n", valorABuscar);
-    }
-
-    int eliminado = borrarFinal();
-    if (eliminado != -1) {
-        printf("Nodo eliminado con valor: %d\n", eliminado);
-    }
-
-    printf("Lista después de eliminar el nodo final: ");
+    // Caso 2: Insertar al final
+    insertaFinal(20);
+    printf("Lista después de insertar 20 al final: ");
     imprimirLista();
 
-    printf("Lista después de insertar al inicio: ");
-    insertaInicio(69);
+    // Caso 3: Insertar en medio
+    insertaMedio(15, buscarElemento(10));
+    printf("Lista después de insertar 15 en medio: ");
     imprimirLista();
 
-    insertaFinal(70);
+    // Caso 4: Eliminar al inicio
+    borraInicio();
+    printf("Lista después de borrar al inicio: ");
     imprimirLista();
 
-    insertaMedio(71, buscarElemento(70));
+    // Caso 5: Eliminar al final
+    borrarFinal();
+    printf("Lista después de borrar al final: ");
     imprimirLista();
 
-    insertaMedio(72, buscarElemento(69));
+    // Caso 6: Eliminar en medio
+    insertaFinal(30); // Insertamos un nuevo elemento para tener una lista con más de un nodo
+    insertaFinal(40);
+    imprimirLista();
+    borraMedio(buscarElemento(30));
+    printf("Lista después de borrar en medio: ");
     imprimirLista();
 
-    insertaMedio(72, buscarElemento(5));
+    insertaInicio(77);
+    printf("Lista después de insertar 77 al inicio: ");
+    imprimirLista();
+
+    insertaMedio(78, buscarElemento(77));
+    printf("Lista después de insertar 78 en medio: ");
     imprimirLista();
 
     borraInicio();
+    printf("Lista después de borrar al inicio: ");
     imprimirLista();
 
-    insertaInicio(728);
+    insertaMedio(81, buscarElemento(40));
+    printf("Lista después de insertar 81 en medio: ");
     imprimirLista();
 
-    borraMedio(buscarElemento(728));
+    borraMedio(buscarElemento(15));
+    printf("Lista después de borrar en medio: ");
     imprimirLista();
 
-    borraMedio(buscarElemento(71));
+    borraMedio(buscarElemento(78));
+    printf("Lista después de borrar en medio: ");
     imprimirLista();
 
-    borraMedio(buscarElemento(5));
-    imprimirLista();
-
-    insertaMedio(111, buscarElemento(10));
+    borraMedio(buscarElemento(81));
+    printf("Lista después de borrar en medio: ");
     imprimirLista();
 
     return 0;
