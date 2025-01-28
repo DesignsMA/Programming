@@ -85,6 +85,12 @@ void imprimir(Cola *queue) {
     }
 }
 
+int verCola(Cola *queue) {
+    if ( estaVacia(queue) ) {
+         printf("\nLa cola esta vacia.\n");
+    } else return queue->datos[queue->frente%(queue->capacidad)];
+}
+
 int main( int argc, char **argv) {
     Cola *queue = (Cola*)malloc(sizeof(Cola));
     int opc, temp;
