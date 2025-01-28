@@ -22,21 +22,14 @@ int estaVacia(Pila *stack) {
     return stack->tope == -1;
 }
 
-void realocar(void** ptr, int nsize) {
-    char *temp = (char *)realloc(*ptr, nsize * sizeof(char));
-    if (temp == NULL) {
-        printf("\nError al reservar espacio.\n");
-        free(*ptr); // Liberar la memoria original antes de salir
-        exit(EXIT_FAILURE);
-    } else {
-        *ptr = temp; // Asignar el nuevo bloque de memoria al apuntador original
-    }
-}
-
 void push(Pila *stack, char var) {
     if (stack->tope == (stack->capacidad - 1)) {
         stack->capacidad *= 2;
-        realocar((void*)&stack->datos, stack->capacidad);
+        stack->datos = (char*)realloc(stack->datos, stack->capacidad * sizeof(char));
+        if (stack->datos == NULL) {
+            printf("\nError al reservar espacio.\n");
+            exit(EXIT_FAILURE);
+        }
     }
     stack->datos[++stack->tope] = var;
 }
@@ -70,55 +63,72 @@ int precedencia(char op) {
     }
 }
 
-void postfija(char cad[]) {
+void infijaAPostfija(char cad[]) {
     int i = 0, u = 0;
     char resultado[100];
     Pila stack;
     inicializar(&stack, 5);
 
     while (cad[i] != '\0') {
-        if (isdigit(cad[i])) {
+        if (isdigit(cad[i])) {  // Si es un dígito, se agrega al resultado
             resultado[u++] = cad[i];
-        } else if (cad[i] == '(') {
+        } else if (cad[i] == '(') {  // Si es un paréntesis de apertura, se apila
             push(&stack, cad[i]);
-        } else if (cad[i] == ')') {
+        } else if (cad[i] == ')') {  // Si es un paréntesis de cierre, se desapila hasta encontrar '('
             while (!estaVacia(&stack) && verTope(&stack) != '(') {
                 resultado[u++] = pop(&stack);
             }
             if (!estaVacia(&stack) && verTope(&stack) == '(') {
-                pop(&stack); // Sacar el '(' de la pila
+                pop(&stack);  // Sacar el '(' de la pila
             }
         } else if (cad[i] == '+' || cad[i] == '-' || cad[i] == '*' || cad[i] == '/') {
+            // Si es un operador, se desapila mientras haya operadores con mayor o igual precedencia
             while (!estaVacia(&stack) && precedencia(verTope(&stack)) >= precedencia(cad[i])) {
                 resultado[u++] = pop(&stack);
             }
-            push(&stack, cad[i]);
+            push(&stack, cad[i]);  // Se apila el operador actual
         }
         i++;
     }
 
+    // Vaciar la pila y agregar los operadores restantes al resultado
     while (!estaVacia(&stack)) {
         resultado[u++] = pop(&stack);
     }
 
-    resultado[u] = '\0'; // Terminar la cadena resultado
-    printf("\nResultado: %s\n", resultado);
+    resultado[u] = '\0';  // Terminar la cadena resultado
+    printf("\nExpresion postfija: %s\n", resultado);
 
-    free(stack.datos); // Liberar memoria ocupada
+    free(stack.datos);  // Liberar memoria ocupada por la pila
 }
+/*
+Pila:
+
+Se utiliza una pila para almacenar operadores y paréntesis durante la conversión.
+
+Recorrido de la cadena:
+
+Se recorre la cadena de entrada carácter por carácter.
+
+Si es un dígito, se agrega directamente al resultado.
+
+Si es un paréntesis de apertura (, se apila.
+
+Si es un paréntesis de cierre ), se desapila y se agrega al resultado hasta encontrar el paréntesis de apertura correspondiente.
+
+Si es un operador (+, -, *, /), se desapilan los operadores con mayor o igual precedencia y se apila el operador actual.
+
+Finalización:
+
+Al final, se vacía la pila y se agregan los operadores restantes al resultado.
+*/
 
 int main() {
     char cadena[100];
-    int opc;
 
-    do {
-        printf("\nIntroduce una expresion matemática: ");
-        scanf("%s", cadena); // Leer una cadena
-        postfija(cadena);
-
-        printf("\nIntroduce -1 para salir, cualquier otro numero para continuar: ");
-        scanf("%d", &opc);
-    } while (opc != -1);
+    printf("Introduce una expresion infija: ");
+    scanf("%s", cadena);  // Leer una cadena
+    infijaAPostfija(cadena);
 
     return 0;
 }

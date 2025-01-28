@@ -62,6 +62,12 @@ void eliminar(Cola *queue) {
     }
 }
 
+int verCola(Cola *queue) {
+    if ( estaVacia(queue) ) {
+         printf("\nLa cola esta vacia.\n");
+    } else return queue->datos[queue->frente];
+}
+
 void imprimir(Cola *queue) {
     if ( !estaVacia(queue) ){
         printf("\nCola\n");
