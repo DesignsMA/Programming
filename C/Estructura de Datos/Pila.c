@@ -68,6 +68,14 @@ void imprimir(Pila *stack) {
     }
 }
 
+char verTope(Pila *stack) {
+    if (estaVacia(stack)) {
+        printf("La pila se encuentra vacía\n");
+        exit(EXIT_FAILURE);
+    }
+    return stack->datos[stack->tope];
+}
+
 int main( int argc, char **argv){
     Pila *stack = (Pila*)malloc(sizeof(Pila));
     int opc, temp;
