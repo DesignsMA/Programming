@@ -1,80 +1,95 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Cola {
-    int *canciones;  // Almacena las canciones (usamos enteros para simplificar)
-    int frente;      // Índice del frente de la cola
-    int final;       // Índice del final de la cola
-    char ultimo;     // Indica si la última operación fue inserción ('I') o eliminación ('E')
-    int capacidad;   // Capacidad actual de la cola
-} Cola;
+typedef struct Cola{
+    int *datos;
+    int frente;
+    int final;
+    char ultimo;
+    int capacidad;
+}Cola;
 
-// Función para comprobar si la asignación de memoria fue exitosa
-void comprobar(void *ptr) {
+void comprobar( void* ptr) {
     if (ptr == NULL) {
         printf("\nError al reservar espacio.\n");
         exit(EXIT_FAILURE);
     }
 }
 
-// Función para verificar si la cola está vacía
-char estaVacia(Cola *queue) {
-    return (queue->final % queue->capacidad) == (queue->frente % queue->capacidad) && queue->ultimo == 'E';
+char estaVacia(Cola *queue){
+    return (queue->final)%(queue->capacidad) == queue->frente%(queue->capacidad) && queue->ultimo == 'E';
 }
 
-// Función para verificar si la cola está llena
-char estaLlena(Cola *queue) {
-    return (queue->final % queue->capacidad) == (queue->frente % queue->capacidad) && queue->ultimo == 'I';
+char estaLlena(Cola *queue){
+    return (queue->final)%(queue->capacidad) == queue->frente%(queue->capacidad) && queue->ultimo == 'I';
 }
 
-// Función para realocar memoria dinámicamente
-void realocar(void **ptr, int nsize) {
-    int *temp = (int *)realloc(*ptr, nsize * sizeof(int));
+void realocar(void** ptr, int nsize){ //contiene una direccion a un apuntador que apunta a un arreglo
+    int *temp = (int *)realloc(*ptr, nsize * sizeof(int)); //devuelve NULL si no se aloja
     if (temp == NULL) {
         printf("\nError al reservar espacio.\n");
-        free(*ptr);  // Liberar la memoria original antes de salir
+        free(*ptr); // Liberar la memoria original antes de salir
         exit(EXIT_FAILURE);
-    } else {
-        *ptr = temp;  // Asignar el nuevo bloque de memoria al apuntador original
-    }
+    } else *ptr = temp; // Asignar el nuevo bloque de memoria al apuntador original
 }
 
-// Función para inicializar la cola
-void inicializar(Cola *queue, int size) {
-    queue->canciones = (int *)malloc(sizeof(int) * size);
-    comprobar((void *)queue->canciones);
+void inicializar(Cola *queue, int size){
+    queue->datos = (int*)malloc(sizeof(int)*size);
+    comprobar((void*)queue->datos);
     queue->capacidad = size;
-    queue->frente = queue->final = 0;
+    queue->final = queue->frente = 0;
     queue->ultimo = 'E';
 }
 
-// Función para insertar una canción en la cola
-void insertar(Cola *queue, int cancion) {
-    if (estaLlena(queue)) {
-        queue->capacidad *= 2;
-        printf("\nLa cola está llena - Aumentando capacidad a %d\n", queue->capacidad);
-        realocar((void *)&queue->canciones, queue->capacidad);
+void insertar( Cola *queue, int var) {
+    
+    if ( estaLlena(queue) ) {
+        queue->capacidad *=2;
+        printf("\nLa cola esta llena - Abriendo mas espacios\n");
+        realocar((void*)&queue->datos, queue->capacidad);
+        for (int i = 0; i < queue->frente; i++)
+        {
+            queue->datos[i+queue->capacidad/2] =  queue->datos[i]; //reordenando cola
+        }
+        
     }
-    queue->canciones[queue->final % queue->capacidad] = cancion;
-    queue->final++;
+    
+    queue->datos[(queue->final++)%(queue->capacidad)] = var;
     queue->ultimo = 'I';
 }
 
-// Función para eliminar una canción de la cola
 void eliminar(Cola *queue) {
     if (estaVacia(queue)) {
-        printf("\nLa cola está vacía.\n");
-        if (queue->capacidad > 5) {
+        printf("\nLa cola esta vacia.\n");
+        if ( queue->capacidad > 5) {
             queue->capacidad /= 2;
-            realocar((void *)&queue->canciones, queue->capacidad);
+            realocar((void*)&queue->datos, queue->capacidad);
         }
         queue->frente = queue->final = 0;
     } else {
         queue->frente++;
-        queue->ultimo = 'E';
+        queue->ultimo = 'E';        
     }
 }
 
+void imprimir(Cola *queue) {
+    if ( !estaVacia(queue) ){
+        printf("\nCola\n");
+        for (int i = queue->frente; i < queue->final ; i++){
+            printf("%d  ", queue->datos[i%(queue->capacidad)]);
+        }
+        printf("\n\nReal:\n");
+        for (int i = 0; i < queue->capacidad ; i++){
+            printf("%d  ", queue->datos[i]);
+        }
+    }
+}
+
+int verCola(Cola *queue) {
+    if ( estaVacia(queue) ) {
+         printf("\nLa cola esta vacia.\n");
+    } else return queue->datos[queue->frente%(queue->capacidad)];
+}
 // Función para reproducir la lista de canciones
 void reproducir(Cola *queue,char **canciones) {
     if (estaVacia(queue)) {
@@ -85,11 +100,11 @@ void reproducir(Cola *queue,char **canciones) {
     printf("\nReproduciendo lista de canciones:\n");
     int i = queue->frente;
     while (i != queue->final) {
-        int cancion = queue->canciones[i % queue->capacidad];
+        int cancion = queue->datos[i % queue->capacidad];
         if (cancion == -1) {
             printf("Cancion dañada o inexistente - Saltando a la siguiente...\n");
         } else {
-            printf("Reproduciendo cancion: %d | %s\n", cancion, canciones[i]);
+            printf("Reproduciendo cancion: %d | %s\n", cancion, canciones[cancion]);
         }
         i++;
     }
@@ -155,7 +170,7 @@ int main() {
         }
     } while (opc != -1);
 
-    free(queue->canciones);  // Liberar memoria ocupada por las canciones
+    free(queue->datos);  // Liberar memoria ocupada por las canciones
     free(queue);             // Liberar memoria ocupada por la cola
 
     return 0;
