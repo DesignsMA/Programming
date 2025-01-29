@@ -12,15 +12,18 @@ void printMatrix(int dim, int pos[]) {
 (kn-1 -infn-1 ) + … + r1 * (k2 -inf2 ) + (k1 - inf1 )] * T*/
 long int polinomioDireccionamiento(int dim, int pos[], int sizes[], int bytes) {
     long int dir = 0;
-    for (int n = dim -1; n >= 0; n--) {
+    for (int n = 0; n < dim; n++) {
         long int r = 1;
 
-        for (int i = 0; i < n; i++) { //r1 * r2 * r3 * … * rn-1
-            r *= sizes[i]; //rangos
+        // Calcula r1 * r2 * ... * rn-1
+        for (int i = 0; i < n; i++) {
+            r *= sizes[i];
         }
-        dir += r * (pos[n]-1); //r1 * r2 * r3 * … * rn-1 * (kn -infn ), en  un arreglo real va de 0-ri
+
+        // Suma al resultado: r1 * r2 * ... * rn-1 * (kn - infn)
+        dir += r * pos[n]; // pos[n] ya está en base 0
     }
-    return dir*bytes; //Se regresa la direccion de memoria
+    return dir * bytes; // Multiplica por el tamaño del tipo de dato
 }
 
 int main(int argc, char **argv) {
@@ -79,9 +82,7 @@ int main(int argc, char **argv) {
     printMatrix(dim, sizes);
     printf("\nEl elemento en posicion: ");
     printMatrix(dim, pos); //Se imprimen las posiciones
-    printf("\nTiene una direccion de memoria aproximada de: DirE + %ld", polinomioDireccionamiento(dim, pos, sizes, bytes)); //Se imprime la direccion de memoria
-    //printf("\nDireccion real:%lu + %lu", (unsigned long)&test, ( (unsigned long)&test[pos[0]][pos[1]] - (unsigned long)&test ));
-    
+    printf("\nTiene una direccion de memoria aproximada de: DirE + %ld", polinomioDireccionamiento(dim, pos, sizes, bytes)); //Se imprime la direccion de memoria    
 
     
 }
