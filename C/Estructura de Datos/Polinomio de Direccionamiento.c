@@ -18,7 +18,7 @@ long int polinomioDireccionamiento(int dim, int pos[], int sizes[], int bytes) {
         for (int i = 0; i < n; i++) { //r1 * r2 * r3 * … * rn-1
             r *= sizes[i]; //rangos
         }
-        dir += r * (pos[n]); //r1 * r2 * r3 * … * rn-1 * (kn -infn ), en  un arreglo real va de 0-ri
+        dir += r * (pos[n]-1); //r1 * r2 * r3 * … * rn-1 * (kn -infn ), en  un arreglo real va de 0-ri
     }
     return dir*bytes; //Se regresa la direccion de memoria
 }
