@@ -8,14 +8,14 @@ typedef struct {
     int capacidad;
 } Pila;
 
-void inicializar(Pila *stack, int capacidad) {
-    stack->datos = (char*)malloc(sizeof(char) * capacidad);
+void inicializar(Pila *stack) {
+    stack->datos = (char*)malloc(sizeof(char));
     if (stack->datos == NULL) {
         printf("\nError al reservar espacio.\n");
         exit(EXIT_FAILURE);
     }
     stack->tope = -1; // La pila está vacía
-    stack->capacidad = capacidad;
+    stack->capacidad = 1;
 }
 
 int estaVacia(Pila *stack) {
@@ -67,7 +67,7 @@ void infijaAPostfija(char cad[]) {
     int i = 0, u = 0;
     char resultado[100];
     Pila stack;
-    inicializar(&stack, 5);
+    inicializar(&stack);
 
     while (cad[i] != '\0') {
         if (isdigit(cad[i])) {  // Si es un dígito, se agrega al resultado

@@ -28,10 +28,10 @@ void realocar(void** ptr, int nsize){ //contiene una direccion a un apuntador qu
     } else *ptr = temp; // Asignar el nuevo bloque de memoria al apuntador original
 }
 
-void inicializar(Cola *queue, int size){
-    queue->datos = (int*)malloc(sizeof(int)*size);
+void inicializar(Cola *queue){
+    queue->datos = (int*)malloc(sizeof(int));
     comprobar((void*)queue->datos);
-    queue->capacidad = size;
+    queue->capacidad = 1;
     queue->final = queue->frente = -1;
 }
 
@@ -42,7 +42,6 @@ void insertar( Cola *queue, int var) {
     
     if ( queue->final == (queue->capacidad)) {
         queue->capacidad *=2;
-        printf("\nLa cola esta llena - Abriendo mas espacios\n");
         realocar((void*)&queue->datos, queue->capacidad);
 
     }
@@ -81,7 +80,7 @@ int main( int argc, char **argv) {
     Cola *queue = (Cola*)malloc(sizeof(Cola));
     int opc, temp;
     comprobar(queue);
-    inicializar(queue, 5);
+    inicializar(queue);
 
     do
     {

@@ -6,14 +6,14 @@ typedef struct Pila{
     int capacidad;
 }Pila;
 
-void inicializar(Pila *stack, int capacidad){
-    stack->datos = (int*)malloc(sizeof(int)*capacidad);
+void inicializar(Pila *stack){
+    stack->datos = (int*)malloc(sizeof(int)); //inicializar
     if (stack->datos == NULL) {
         printf("\nError al reservar espacio.\n");
         exit(EXIT_FAILURE);
     }
     stack->tope = -1; //La pila esta vacia
-    stack->capacidad =capacidad;
+    stack->capacidad =1;
 }
 
 char estaVacia(Pila *stack){
@@ -85,7 +85,7 @@ int main( int argc, char **argv){
         exit(EXIT_FAILURE);
     }
 
-    inicializar(stack, 5);
+    inicializar(stack);
     do
     {
         printf("\n1. Insertar\n2. Eliminar\n-1. Salir\n: ");

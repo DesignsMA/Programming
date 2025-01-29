@@ -40,10 +40,10 @@ void realocar(void** ptr, int nsize) {
     } else *ptr = temp;
 }
 
-void inicializar(Cola *queue, int size) {
-    queue->datos = (Trabajo **)malloc(sizeof(Trabajo*) * size);  // Alocar espacio para punteros a trabajos
+void inicializar(Cola *queue) {
+    queue->datos = (Trabajo **)malloc(sizeof(Trabajo*));  // Alocar espacio para punteros a trabajos
     comprobar((void*)queue->datos);
-    queue->capacidad = size;
+    queue->capacidad = 1;
     queue->final = queue->frente = -1;
 }
 
@@ -54,7 +54,6 @@ void insertar(Cola *queue, int id, const char* nombre, int paginas, int priorida
 
     if (queue->final == queue->capacidad) {
         queue->capacidad *= 2;
-        printf("\nLa cola esta llena - Abriendo mas espacios\n");
         realocar((void*)&queue->datos, queue->capacidad);
     }
 
@@ -83,7 +82,7 @@ void eliminar(Cola *queue) {
 
 void imprimir(Cola *queue) {
     if (!estaVacia(queue)) {
-        printf("\nCola de impresión:\n");
+        printf("\nCola de impresion:\n");
         for (int i = queue->frente; i < queue->final; i++) {
             printf("ID: %d, Nombre: %s, Paginas: %d, Prioridad: %d\n", 
                    queue->datos[i]->id, queue->datos[i]->nombre, queue->datos[i]->paginas, queue->datos[i]->prioridad);
@@ -96,7 +95,7 @@ int main() {
     int opc, id, paginas, prioridad;
     char nombre[TAMANIO_MAX_CADENA];
     comprobar(queue);
-    inicializar(queue, 5);
+    inicializar(queue);
 
     do {
         printf("\n1. Insertar trabajo de impresion\n2. Procesar trabajo\n3. Ver cola\n-1. Salir\n: ");

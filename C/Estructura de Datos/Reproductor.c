@@ -33,10 +33,10 @@ void realocar(void** ptr, int nsize){ //contiene una direccion a un apuntador qu
     } else *ptr = temp; // Asignar el nuevo bloque de memoria al apuntador original
 }
 
-void inicializar(Cola *queue, int size){
-    queue->datos = (int*)malloc(sizeof(int)*size);
+void inicializar(Cola *queue){
+    queue->datos = (int*)malloc(sizeof(int));
     comprobar((void*)queue->datos);
-    queue->capacidad = size;
+    queue->capacidad = 1;
     queue->final = queue->frente = 0;
     queue->ultimo = 'E';
 }
@@ -45,7 +45,6 @@ void insertar( Cola *queue, int var) {
     
     if ( estaLlena(queue) ) {
         queue->capacidad *=2;
-        printf("\nLa cola esta llena - Abriendo mas espacios\n");
         realocar((void*)&queue->datos, queue->capacidad);
         for (int i = 0; i < queue->frente; i++)
         {
@@ -115,7 +114,7 @@ void reproducir(Cola *queue,char **canciones) {
 int main() {
     Cola *queue = (Cola *)malloc(sizeof(Cola));
     comprobar(queue);
-    inicializar(queue, 5);
+    inicializar(queue);
     char *canciones[] = {
     "Bohemian Rhapsody",
     "Stairway to Heaven",
