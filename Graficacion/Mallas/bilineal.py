@@ -64,7 +64,7 @@ class MallaBilineal():
         return self.mesh
 
 # MAIN
-malla = MallaBilineal( Point(0,0), Point(0,3), Point(3,1), Point(3,4), 20)  # Ajustes por defecto
+malla = MallaBilineal( Point(0,0), Point(0,3), Point(3,1), Point(3,4), 5)
 malla.generate_mesh()  # Generar malla
 
 # Convertir a un array de numpy para facilitar la visualización
