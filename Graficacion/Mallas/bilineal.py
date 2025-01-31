@@ -14,6 +14,9 @@ class Point():
     def __add__(self, otro):
         return Point(self.x + otro.x, self.y + otro.y, self.z +  otro.z)
     
+    def __radd__(self, otro):
+        return self.__add__(otro)
+    
     def __mul__(self, otro):
         if isinstance(otro, (float, int)):  # Multiplicar por un escalar
             return Point(self.x * otro, self.y * otro, self.z * otro)
@@ -96,6 +99,9 @@ ax.scatter(X, Y, Z, color='red')
 
 # Conectar los puntos con líneas
 for i in range(subdivisions):
+    #X[i, :]: Selecciona todas las columnas de la fila i de la matriz X.
+    # Esto representa las coordenadas x de los puntos a lo largo de la
+    # dirección u para un valor fijo de v
     ax.plot(X[i, :], Y[i, :], Z[i, :], color='black')  # Líneas en dirección u
     ax.plot(X[:, i], Y[:, i], Z[:, i], color='black')  # Líneas en dirección v
 
