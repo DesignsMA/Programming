@@ -125,7 +125,7 @@ int verificar(char *expresion)
 int main()
 {
     char expresion[100];
-    cargarExpresion(expresion);
+    CargarExpresion(expresion);
     if (verificar(expresion))
     {
         printf("si esta balanceada");
