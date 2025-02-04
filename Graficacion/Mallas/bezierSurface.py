@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import math
+import pprint as pp
 from mpl_toolkits.mplot3d import Axes3D  # Importar herramientas 3D
 
 #Funciones básicas
@@ -40,6 +40,21 @@ class Point():
 
     def __eq__(self, otro):
         return self.x == otro.x and self.y == otro.y and self.z == otro.z
+    
+    def __str__(self):
+        return f"({self.x} {self.y} {self.z})"
+    
+    def __format__(self, format_spec):
+        # Define how the Point should be formatted based on the format_spec
+        if format_spec == "coords":
+            return f"({self.x}, {self.y}, {self.z})"
+        elif format_spec == "verbose":
+            return f"Point(x={self.x}, y={self.y}, z={self.z})"
+        elif format_spec == "short":
+            return f"P({self.x},{self.y},{self.z})"
+        else:
+            # Default formatting
+            return f"({self.x}, {self.y}, {self.z})"
 
 # surfacePoints es una matriz de 4X4 que describe una superficie bicubica para metrica
 # sin necesidad de guardar cada punto interpolado, una superficie de bezier es una
@@ -65,7 +80,7 @@ class BezierSurface():
         """
         if self.surfacePoints is not None:
             # El grado es el número de puntos de control en una dirección menos 1
-            self.n = self.surfacePoints.shape[0] 
+            self.n = self.surfacePoints.shape[0]
         else:
             raise ValueError("surfacePoints no está inicializado")
         
@@ -104,28 +119,55 @@ class BezierSurface():
                      
 # MAIN
 # Definir los puntos de control para las curvas de Bézier
-malla = BezierSurface(subdivisions=20)
+mesh2 = np.array([
+            [Point(-1, 0, 0), Point(0, 0, 1), Point(1, 0, 0)],
+            [Point(-1, -1.5, 0), Point(0, -1.5, 1), Point(1, -1.5, 0)],
+            [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
+            ])
+
+malla = BezierSurface(surfacePoints=mesh2, subdivisions=5)
 malla.generate_mesh()  # Generar malla
 
 # Convertir a un array de numpy para facilitar la visualización
+# i.e 
+for point in malla.mesh:
+    
+    print(f"{point}", end=' | ')
+    
 mesh_points = np.array([[point.x, point.y, point.z] for point in malla.mesh])
 
+pp.pp(mesh_points)
 # Reorganizar los puntos en una cuadrícula para la visualización 3D
+# mesh_points[:, 0] DE TODAS LAS FILAS, EXTRAE EL ELEMENTO CERO
+# .reshape(subdivisions, subdivisions)  MODIFCA EL ARREGLO 1D A 2D,, es decir si el arreglo 1d tiene 3 elementos y realizas un reshape(1,3)
+# obtienes un arreglo 2d con 3 filas donde sea [1,2,3] -> [ [1], [2], [3] ]
 subdivisions = malla.subdivisions + 1
 X = mesh_points[:, 0].reshape(subdivisions, subdivisions)
 Y = mesh_points[:, 1].reshape(subdivisions, subdivisions)
 Z = mesh_points[:, 2].reshape(subdivisions, subdivisions)
 
+
+pp.pp(X)
+pp.pp(Y)
+pp.pp(Z)
 # Visualizar la malla en 3D
-fig = plt.figure()
+fig = plt.figure() #nueva ventana
+#ax = fig.add_subplot(111, projection='3d'): Añade un subplot (gráfico) en la figura con proyección 3D. El argumento 111 indica que es el primer (y único) gráfico en una cuadrícula de 1x1.
 ax = fig.add_subplot(111, projection='3d')  # Crear un gráfico 3D
 
-# Graficar la superficie
+# Graficar la superficie | la  superficie compuesta por los puntos
 ax.plot_surface(X, Y, Z, color='black', alpha=0.12)
 
 # Graficar los puntos de la malla
 ax.scatter(X, Y, Z, color='red')
-
+#extrae todos los elementos de la primera fila x[i,j] i = filas, j = columnas
+pp.pp(X[0,:])
+pp.pp(Y[0,:])
+pp.pp(Z[0,:])
+#extrae todos los elementos de la primera columna x[i,j] i = filas, j = columnas
+pp.pp(X[:,0])
+pp.pp(Y[:,0])
+pp.pp(Z[:,0])
 # Conectar los puntos con líneas
 for i in range(subdivisions):
     ax.plot(X[i, :], Y[i, :], Z[i, :], color='black')  # Líneas en dirección u
