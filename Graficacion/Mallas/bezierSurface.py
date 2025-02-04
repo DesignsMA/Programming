@@ -67,33 +67,32 @@ class BezierSurface():
             [Point(0, 3, 3), Point(1, 3, 5), Point(2, 3, 4), Point(3, 3, 6)] ])
 
     def bernstein_basis_polynomial(self, v: int, n: int, x: int): # ( n | v)
-        return binomial(n,v)*math.pow(x,v)*math.pow( (1-x), n-v )
+        return binomial(n,v)*x**v*(1-x)**(n-v)
     
     def generateCoordinate( self, u: float, v:float, attr: str):
         coord = 0
         for i in range(self.n):
             for j in range(self.n):
-                coord += getattr(self.surfacePoints[i,j], attr)*self.bernstein_basis_polynomial(i, self.n, u)\
-                         *self.bernstein_basis_polynomial(j, self.n, v)
+                coord += getattr(self.surfacePoints[i,j], attr)*self.bernstein_basis_polynomial(i, self.n-1, u)\
+                         *self.bernstein_basis_polynomial(j, self.n-1, v)
         return coord
                 
     def generate_mesh(self):
         if self.surfacePoints is None:
             self.create_bezier_patch()
-        
-        for x in range(self.subdivisions + 1):
-            u = x * (1 / self.subdivisions)  # Calcular u
-            for z in range(self.subdivisions + 1):
-                v = z * (1 / self.subdivisions)  # Calcular v
+
+        for u_index in range(self.subdivisions + 1):
+            u = u_index * (1.0 / self.subdivisions)  # Calculate u
+            for v_index in range(self.subdivisions + 1):
+                v = v_index * (1.0 / self.subdivisions)  # Calculate v
                 x = self.generateCoordinate(u, v, 'x')
                 y = self.generateCoordinate(u, v, 'y')
                 z = self.generateCoordinate(u, v, 'z')
-                self.mesh.append( Point(x,y,z) )
-                
+                self.mesh.append(Point(x, y, z))  # Append as a Point object           
+                     
 # MAIN
 # Definir los puntos de control para las curvas de Bézier
-
-malla = BezierSurface()
+malla = BezierSurface(n=4, subdivisions=20)
 malla.generate_mesh()  # Generar malla
 
 # Convertir a un array de numpy para facilitar la visualización
