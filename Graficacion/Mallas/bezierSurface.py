@@ -53,11 +53,21 @@ class BezierSurface():
     u: Parámetro u en el rango [0, 1].
     v: Parámetro v en el rango [0, 1].
     """
-    def __init__(self, surfacePoints: np.ndarray = None, n:int = 4, subdivisions: int = 10):
+    def __init__(self, surfacePoints: np.ndarray = None, subdivisions: int = 10):
         self.mesh = []
         self.surfacePoints = surfacePoints
         self.subdivisions = subdivisions
-        self.n = n
+        self.n = None
+        
+    def calculate_n(self):
+        """
+        Calcula el grado de la superficie (n) basado en el tamaño de surfacePoints.
+        """
+        if self.surfacePoints is not None:
+            # El grado es el número de puntos de control en una dirección menos 1
+            self.n = self.surfacePoints.shape[0] 
+        else:
+            raise ValueError("surfacePoints no está inicializado")
         
     def create_bezier_patch(self):
         self.surfacePoints = np.array([
@@ -80,6 +90,8 @@ class BezierSurface():
     def generate_mesh(self):
         if self.surfacePoints is None:
             self.create_bezier_patch()
+        
+        self.calculate_n()
 
         for u_index in range(self.subdivisions + 1):
             u = u_index * (1.0 / self.subdivisions)  # Calculate u
@@ -92,7 +104,7 @@ class BezierSurface():
                      
 # MAIN
 # Definir los puntos de control para las curvas de Bézier
-malla = BezierSurface(n=4, subdivisions=20)
+malla = BezierSurface(subdivisions=20)
 malla.generate_mesh()  # Generar malla
 
 # Convertir a un array de numpy para facilitar la visualización
