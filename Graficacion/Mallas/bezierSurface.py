@@ -53,27 +53,43 @@ class BezierSurface():
     u: Parámetro u en el rango [0, 1].
     v: Parámetro v en el rango [0, 1].
     """
-    def __init__(self, surfacePoints: np.ndarray, subdivisions: int = 10):
+    def __init__(self, surfacePoints: np.ndarray = None, n:int = 4, subdivisions: int = 10):
         self.mesh = []
         self.surfacePoints = surfacePoints
         self.subdivisions = subdivisions
+        self.n = n
         
-    def create_bezier_patch():
-        patch = [
+    def create_bezier_patch(self):
+        self.surfacePoints = np.array([
             [Point(0, 0, 0), Point(1, 0, 2), Point(2, 0, 1), Point(3, 0, 3)],
             [Point(0, 1, 1), Point(1, 1, 3), Point(2, 1, 2), Point(3, 1, 4)],
             [Point(0, 2, 2), Point(1, 2, 4), Point(2, 2, 3), Point(3, 2, 5)],
-            [Point(0, 3, 3), Point(1, 3, 5), Point(2, 3, 4), Point(3, 3, 6)]
-        ]
-        return patch
+            [Point(0, 3, 3), Point(1, 3, 5), Point(2, 3, 4), Point(3, 3, 6)] ])
 
-    def bernstein_basis_polynomial(v: int, n: int, x: int):
+    def bernstein_basis_polynomial(v: int, n: int, x: int): # ( n | v)
         return binomial(n,v)*math.pow(x,v)*math.pow( (1-x), n-v )
-
+    
+    def generateCoordinate( self, u: float, v:float, attr: str):
+        coord = 0
+        for i in range(self.n):
+            for j in range(self.n):
+                coord += getattr(self.surfacePoints[i,j], attr)*self.bernstein_basis_polynomial(i, self.n, u)\
+                         *self.bernstein_basis_polynomial(j, self.n, v)
+        return coord
+                
     def generate_mesh(self):
+        if self.surfacePoints is None:
+            self.create_bezier_patch()
+        
         for x in range(self.subdivisions + 1):
             u = x * (1 / self.subdivisions)  # Calcular u
-
+            for z in range(self.subdivisions + 1):
+                v = z * (1 / self.subdivisions)  # Calcular v
+                x = self.generateCoordinate(u, v, 'x')
+                y = self.generateCoordinate(u, v, 'y')
+                z = self.generateCoordinate(u, v, 'z')
+                self.mesh.append( Point(x,y,z) )
+                
 # MAIN
 # Definir los puntos de control para las curvas de Bézier
 
