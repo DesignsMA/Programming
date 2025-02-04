@@ -5,6 +5,7 @@
 typedef struct Nodo {
     int dato;
     int sig; // Índice del siguiente nodo en el arreglo
+    int ant; // Índice del anterior nodo
 } Nodo;
 
 // Arreglo estático para la lista
@@ -16,6 +17,7 @@ int libre = 0;   // Índice del primer nodo disponible
 void inicializarLista() {
     for (int i = 0; i < MAX - 1; i++) {
         lista[i].sig = i + 1; // Apunta al siguiente índice disponible
+        lista[i].ant = -1; //No apunta a ningun elemento por ahora
     }
     lista[MAX - 1].sig = -1; // Último nodo no tiene siguiente
 }
@@ -33,6 +35,7 @@ void insertaInicio(int valor) {
     // Asigna el valor al nuevo nodo y lo enlaza al inicio de la lista
     lista[nuevo].dato = valor;
     lista[nuevo].sig = cabeza;
+    lista[a]
 
     // El nuevo nodo será la nueva cabeza de la lista
     cabeza = nuevo;

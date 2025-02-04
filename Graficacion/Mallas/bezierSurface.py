@@ -1,0 +1,116 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+from mpl_toolkits.mplot3d import Axes3D  # Importar herramientas 3D
+
+#Funciones básicas
+def factorial(x: int):
+    if x == 1 or x == 0:
+        return 1
+    else:
+        return x * factorial(x - 1)
+
+def binomial(n: int, k: int): # (n | k)
+    return factorial(n) / (factorial(k) * factorial(n - k))
+
+#Clases
+class Point():
+    def __init__(self, x: float, y: float, z: float = 0.0):
+        self.y = y
+        self.x = x
+        self.z = z
+
+    def __str__(self):
+        return f"Point({self.x}, {self.y}, {self.z})"
+
+    def __add__(self, otro):
+        return Point(self.x + otro.x, self.y + otro.y, self.z + otro.z)
+    
+    def __radd__(self, otro):
+        return self.__add__(otro)
+    
+    def __mul__(self, otro):
+        if isinstance(otro, (float, int)):  # Multiplicar por un escalar
+            return Point(self.x * otro, self.y * otro, self.z * otro)
+        else:
+            raise TypeError("Solo se puede multiplicar por un escalar (int o float)")
+
+    def __rmul__(self, otro):
+        return self.__mul__(otro)
+
+    def __eq__(self, otro):
+        return self.x == otro.x and self.y == otro.y and self.z == otro.z
+
+# surfacePoints es una matriz de 4X4 que describe una superficie bicubica para metrica
+# sin necesidad de guardar cada punto interpolado, una superficie de bezier es una
+# generalizacion de una curva de bezier donde cada de una de las cuatro filas de puntos
+# de control pueden ser pensadas como una curva de bezier en dos dimensiones.
+
+# lo
+class BezierSurface():
+    """
+    surfacePoints: Matriz 4x4 de puntos de control.
+    u: Parámetro u en el rango [0, 1].
+    v: Parámetro v en el rango [0, 1].
+    """
+    def __init__(self, surfacePoints: np.ndarray, subdivisions: int = 10):
+        self.mesh = []
+        self.surfacePoints = surfacePoints
+        self.subdivisions = subdivisions
+        
+    def create_bezier_patch():
+        patch = [
+            [Point(0, 0, 0), Point(1, 0, 2), Point(2, 0, 1), Point(3, 0, 3)],
+            [Point(0, 1, 1), Point(1, 1, 3), Point(2, 1, 2), Point(3, 1, 4)],
+            [Point(0, 2, 2), Point(1, 2, 4), Point(2, 2, 3), Point(3, 2, 5)],
+            [Point(0, 3, 3), Point(1, 3, 5), Point(2, 3, 4), Point(3, 3, 6)]
+        ]
+        return patch
+
+    def bernstein_basis_polynomial(v: int, n: int, x: int):
+        return binomial(n,v)*math.pow(x,v)*math.pow( (1-x), n-v )
+
+    def generate_mesh(self):
+        for x in range(self.subdivisions + 1):
+            u = x * (1 / self.subdivisions)  # Calcular u
+
+# MAIN
+# Definir los puntos de control para las curvas de Bézier
+
+malla = BezierSurface()
+malla.generate_mesh()  # Generar malla
+
+# Convertir a un array de numpy para facilitar la visualización
+mesh_points = np.array([[point.x, point.y, point.z] for point in malla.mesh])
+
+# Reorganizar los puntos en una cuadrícula para la visualización 3D
+subdivisions = malla.subdivisions + 1
+X = mesh_points[:, 0].reshape(subdivisions, subdivisions)
+Y = mesh_points[:, 1].reshape(subdivisions, subdivisions)
+Z = mesh_points[:, 2].reshape(subdivisions, subdivisions)
+
+# Visualizar la malla en 3D
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')  # Crear un gráfico 3D
+
+# Graficar la superficie
+ax.plot_surface(X, Y, Z, color='black', alpha=0.12)
+
+# Graficar los puntos de la malla
+ax.scatter(X, Y, Z, color='red')
+
+# Conectar los puntos con líneas
+for i in range(subdivisions):
+    ax.plot(X[i, :], Y[i, :], Z[i, :], color='black')  # Líneas en dirección u
+    ax.plot(X[:, i], Y[:, i], Z[:, i], color='black')  # Líneas en dirección v
+
+# Etiquetar los ejes
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+
+# Agregar un título al gráfico
+plt.title('Malla Bipoligonal en 3D')
+
+# Mostrar el gráfico
+plt.show()
