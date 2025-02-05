@@ -1,0 +1,4 @@
+name,age,career,university (Meaning Comma Separated Values)
+juan,25,engineer,MIT
+julia,30,doctor,Harvard
+michael,45,lawyer,Yale

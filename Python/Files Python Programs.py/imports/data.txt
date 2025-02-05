@@ -1,0 +1,17 @@
+
+{
+      "throwables": [
+            {
+                  "name": "Shuriken",
+                  "range": 10,
+                  "thrown_at": 30,
+                  "on_hit": "kill"
+            },
+            {
+                  "name": "Juice Can",
+                  "range": 20,
+                  "thrown_at": 40,
+                  "on_hit": "stun"
+            }
+      ]
+}

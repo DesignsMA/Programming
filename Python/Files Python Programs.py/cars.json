@@ -1,0 +1,14 @@
+{
+      "cars": [
+            {
+                  "model": "Toyota Camry",
+                  "year": 2019,
+                  "color": "blue"
+            },
+            {
+                  "model": "Honda Civic",
+                  "year": 2020,
+                  "color": "red"
+            }
+      ]
+}
