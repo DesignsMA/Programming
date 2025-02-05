@@ -11,6 +11,7 @@ while True:
             line += '-'
         line += '\n'
 
+        #print(line, file=f) otra forma de escribir en archivo
         f.write(line)
     except EOFError:
         print("\nExiting...\n'notes.txt' was created.")
