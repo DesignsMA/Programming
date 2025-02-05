@@ -1,4 +1,3 @@
-import sys
 
 f =  open("notes.txt", "w+") #abrir archivo
 f.write("\t\t--NOTES--\n")
