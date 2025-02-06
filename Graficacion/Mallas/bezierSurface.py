@@ -125,7 +125,7 @@ mesh2 = np.array([
             [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
             ])
 
-malla = BezierSurface(surfacePoints=mesh2, subdivisions=5)
+malla = BezierSurface(surfacePoints=mesh2, subdivisions=20)
 malla.generate_mesh()  # Generar malla
 
 # Convertir a un array de numpy para facilitar la visualización
