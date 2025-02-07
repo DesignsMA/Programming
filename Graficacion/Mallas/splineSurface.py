@@ -56,58 +56,35 @@ class Point():
             # Default formatting
             return f"({self.x}, {self.y}, {self.z})"
 
-# surfacePoints es una matriz de 4X4 que describe una superficie bicubica para metrica
-# sin necesidad de guardar cada punto interpolado, una superficie de bezier es una
-# generalizacion de una curva de bezier donde cada de una de las cuatro filas de puntos
-# de control pueden ser pensadas como una curva de bezier en dos dimensiones.
-
-# lo
 class BezierSurface():
     """
-    surfacePoints: Matriz 4x4 de puntos de control.
+    controlPoints: Matriz de puntos de control.
     u: Parámetro u en el rango [0, 1].
     v: Parámetro v en el rango [0, 1].
     """
-    def __init__(self, surfacePoints: np.ndarray = None, subdivisions: int = 10):
+    def __init__(self, controlPoints: np.ndarray = None, subdivisions: int = 10):
         self.mesh = []
-        self.surfacePoints = surfacePoints
+        self.controlPoints = controlPoints
         self.subdivisions = subdivisions
-        self.n = None
-        
-    def calculate_n(self):
-        """
-        Calcula el grado de la superficie (n) basado en el tamaño de surfacePoints.
-        """
-        if self.surfacePoints is not None:
-            # El grado es el número de puntos de control en una dirección menos 1
-            self.n = self.surfacePoints.shape[0]
-        else:
-            raise ValueError("surfacePoints no está inicializado")
-        
-    def create_bezier_patch(self):
-        self.surfacePoints = np.array([
-            [Point(0, 0, 0), Point(1, 0, 2), Point(2, 0, 1), Point(3, 0, 3)],
-            [Point(0, 1, 1), Point(1, 1, 3), Point(2, 1, 2), Point(3, 1, 4)],
-            [Point(0, 2, 2), Point(1, 2, 4), Point(2, 2, 3), Point(3, 2, 5)],
-            [Point(0, 3, 3), Point(1, 3, 5), Point(2, 3, 4), Point(3, 3, 6)] ])
-
-    def bernstein_basis_polynomial(self, v: int, n: int, x: int): # ( n | v)
+        self.m = controlPoints.shape[0]
+        self.n = controlPoints.shape[1]
+                
+    def bernstein_basis_polynomial(self, v: int, n: int, x: int): # ( n | v) | Me
         return binomial(n,v)*x**v*(1-x)**(n-v)
     
-    def generateCoordinate( self, u: float, v:float, attr: str):
+    def generateCoordinate( self, func: function, u: float, v:float):
         coord = 0
-        for i in range(self.n):
+        for i in range(self.m):
             for j in range(self.n):
-                coord += getattr(self.surfacePoints[i,j], attr)*self.bernstein_basis_polynomial(i, self.n-1, u)\
-                         *self.bernstein_basis_polynomial(j, self.n-1, v)
+                coord += self.controlPoints[i,j]*function(i, self.n-1, u)\
+                         *function(j, self.n-1, v)
         return coord
                 
     def generate_mesh(self):
-        if self.surfacePoints is None:
-            self.create_bezier_patch()
+        if self.controlPoints is None:
+            print("Se necesita de una matriz de puntos de control.")
+            return
         
-        self.calculate_n()
-
         for u_index in range(self.subdivisions + 1):
             u = u_index * (1.0 / self.subdivisions)  # Calculate u
             for v_index in range(self.subdivisions + 1):
@@ -180,6 +157,6 @@ mesh2 = np.array([
             [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
             ])
 
-malla = BezierSurface(surfacePoints=mesh2, subdivisions=20)
+malla = BezierSurface(controlPoints=mesh2, subdivisions=20)
 malla.generate_mesh()  # Generar malla
 malla.interactiveGraph() # Mostrar gráfica
