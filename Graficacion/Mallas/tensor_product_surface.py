@@ -11,11 +11,29 @@ def factorial(x: int):
         return x * factorial(x - 1)
 
 def binomial(n: int, k: int): # (n | k)
+    """
+    Calcula el coeficiente binomial (n | k), que representa el número de formas de elegir k elementos de un conjunto de n elementos.
+
+    Parámetros:
+        n (int): El número total de elementos.
+        k (int): El número de elementos a elegir.
+
+    Retorna:
+        float: El valor del coeficiente binomial (n | k).
+    """
     return factorial(n) / (factorial(k) * factorial(n - k))
 
 #Clases
 class Point():
     def __init__(self, x: float, y: float, z: float = 0.0):
+        """
+        Inicializa un punto en el espacio 3D con coordenadas (x, y, z).
+
+        Parámetros:
+            x (float): Coordenada x del punto.
+            y (float): Coordenada y del punto.
+            z (float, opcional): Coordenada z del punto. Por defecto es 0.0.
+        """
         self.y = y
         self.x = x
         self.z = z
@@ -58,9 +76,12 @@ class Point():
 
 class TensorProductSurface():
     """
-    controlPoints: Matriz de puntos de control.
-    u: Parámetro u en el rango [0, 1].
-    v: Parámetro v en el rango [0, 1].
+    Inicializa una superficie de producto tensorial.
+
+    Parámetros:
+        controlPoints (np.ndarray, opcional): Matriz de puntos de control. Por defecto es None.
+        type (int, opcional): Tipo de función base a utilizar (0: Bernstein, 1: B-spline). Por defecto es 0.
+        subdivisions (int, opcional): Número de subdivisiones para generar la malla. Por defecto es 10.
     """
     def __init__(self, controlPoints: np.ndarray = None, type: int = 0, subdivisions: int = 10):
         self.mesh = []
@@ -85,6 +106,17 @@ class TensorProductSurface():
     def bernstein_basis_polynomial(self, v: int, n: int, x: int): # ( n | v) | Me
         return binomial(n,v)*x**v*(1-x)**(n-v)
     
+    def b_spline(self):
+        pass
+        #for i in range(resolution):
+        #t = 0 + 1 * i / resolution  # generar (resolution)-puntos en el rango 0-1
+        #pt = Point(0, 0)  
+        #term_x = ""
+        #term_y = ""
+        #for u in range(n + 1):
+        #    pt.x += cfs[u] * points[u].x * math.pow((1 - t), n - u) * math.pow(t, u)
+        #    pt.y += cfs[u] * points[u].y * math.pow((1 - t), n - u) * math.pow(t, u)
+
     def generateCoordinate( self, u: float, v:float, attr: str):
         coord = 0
         for i in range(self.m):
@@ -172,10 +204,10 @@ mesh2 = np.array([
 
 # Definir la malla 4x4 de puntos de control usando la clase Point
 control_points = np.array([
-    [Point(0, 0, 0), Point(1, 0, 1), Point(2, 0, 0), Point(3, 0, 1)],
-    [Point(0, 1, 1), Point(1, 1, 2), Point(2, 1, 1), Point(3, 1, 2)],
-    [Point(0, 2, 0), Point(1, 2, 1), Point(2, 2, 0), Point(3, 2, 1)],
-    [Point(0, 3, 1), Point(1, 3, 2), Point(2, 3, 1), Point(3, 3, 2)]
+    [Point(0, 0, 0), Point(1, 0, 1), Point(2, 0, 1), Point(3, 0, 0)],
+    [Point(0, 1, 1), Point(1, 1, 2), Point(2, 1, 2), Point(3, 1, 1)],
+    [Point(0, 2, 1), Point(1, 2, 2), Point(2, 2, 2), Point(3, 2, 1)],
+    [Point(0, 3, 0), Point(1, 3, 1), Point(2, 3, 1), Point(3, 3, 0)]
 ])
 
 malla = TensorProductSurface(controlPoints=control_points,type=0,subdivisions=20)

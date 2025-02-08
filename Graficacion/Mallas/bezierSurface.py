@@ -11,6 +11,16 @@ def factorial(x: int):
         return x * factorial(x - 1)
 
 def binomial(n: int, k: int): # (n | k)
+    """
+    Calcula el coeficiente binomial (n | k), que representa el número de formas de elegir k elementos de un conjunto de n elementos.
+
+    Parámetros:
+        n (int): El número total de elementos.
+        k (int): El número de elementos a elegir.
+
+    Retorna:
+        float: El valor del coeficiente binomial (n | k).
+    """
     return factorial(n) / (factorial(k) * factorial(n - k))
 
 #Clases
@@ -63,11 +73,6 @@ class Point():
 
 # lo
 class BezierSurface():
-    """
-    surfacePoints: Matriz 4x4 de puntos de control.
-    u: Parámetro u en el rango [0, 1].
-    v: Parámetro v en el rango [0, 1].
-    """
     def __init__(self, surfacePoints: np.ndarray = None, subdivisions: int = 10):
         self.mesh = []
         self.surfacePoints = surfacePoints
