@@ -56,7 +56,7 @@ class Point():
             # Default formatting
             return f"({self.x}, {self.y}, {self.z})"
 
-class BezierSurface():
+class TensorProductSurface():
     """
     controlPoints: Matriz de puntos de control.
     u: Parámetro u en el rango [0, 1].
@@ -178,6 +178,6 @@ control_points = np.array([
     [Point(0, 3, 1), Point(1, 3, 2), Point(2, 3, 1), Point(3, 3, 2)]
 ])
 
-malla = BezierSurface(controlPoints=control_points,type=0,subdivisions=20)
+malla = TensorProductSurface(controlPoints=control_points,type=0,subdivisions=20)
 malla.generate_mesh()  # Generar malla
 malla.interactiveGraph() # Mostrar gráfica
