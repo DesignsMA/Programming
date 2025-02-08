@@ -62,22 +62,35 @@ class BezierSurface():
     u: Parámetro u en el rango [0, 1].
     v: Parámetro v en el rango [0, 1].
     """
-    def __init__(self, controlPoints: np.ndarray = None, subdivisions: int = 10):
+    def __init__(self, controlPoints: np.ndarray = None, type: int = 0, subdivisions: int = 10):
         self.mesh = []
         self.controlPoints = controlPoints
+        self.type = 0
+        self.function = self._select_function()
         self.subdivisions = subdivisions
         self.m = controlPoints.shape[0]
         self.n = controlPoints.shape[1]
                 
+    def _select_function(self):
+        """
+        Selecciona la función base según el tipo.
+        """
+        if self.type == 0:
+            return self.bernstein_basis_polynomial
+        elif self.type == 1:
+            return self.b_spline_basis_polynomial
+        else:
+            raise ValueError("Tipo de función base no soportado.")
+        
     def bernstein_basis_polynomial(self, v: int, n: int, x: int): # ( n | v) | Me
         return binomial(n,v)*x**v*(1-x)**(n-v)
     
-    def generateCoordinate( self, func: function, u: float, v:float):
+    def generateCoordinate( self, u: float, v:float, attr: str):
         coord = 0
         for i in range(self.m):
             for j in range(self.n):
-                coord += self.controlPoints[i,j]*function(i, self.n-1, u)\
-                         *function(j, self.n-1, v)
+                coord += getattr(self.controlPoints[i,j], attr)*self.function(i, self.m-1, u)\
+                         *self.function(j, self.n-1, v)
         return coord
                 
     def generate_mesh(self):
@@ -86,13 +99,13 @@ class BezierSurface():
             return
         
         for u_index in range(self.subdivisions + 1):
-            u = u_index * (1.0 / self.subdivisions)  # Calculate u
+            u = u_index * (1.0 / self.subdivisions)  # Calcular en direccion u
             for v_index in range(self.subdivisions + 1):
-                v = v_index * (1.0 / self.subdivisions)  # Calculate v
+                v = v_index * (1.0 / self.subdivisions)  # Calcular en direccion v
                 x = self.generateCoordinate(u, v, 'x')
                 y = self.generateCoordinate(u, v, 'y')
                 z = self.generateCoordinate(u, v, 'z')
-                self.mesh.append(Point(x, y, z))  # Append as a Point object           
+                self.mesh.append(Point(x, y, z))  # Añadir como punto       
                      
     
     def interactiveGraph(self):
@@ -157,6 +170,14 @@ mesh2 = np.array([
             [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
             ])
 
-malla = BezierSurface(controlPoints=mesh2, subdivisions=20)
+# Definir la malla 4x4 de puntos de control usando la clase Point
+control_points = np.array([
+    [Point(0, 0, 0), Point(1, 0, 1), Point(2, 0, 0), Point(3, 0, 1)],
+    [Point(0, 1, 1), Point(1, 1, 2), Point(2, 1, 1), Point(3, 1, 2)],
+    [Point(0, 2, 0), Point(1, 2, 1), Point(2, 2, 0), Point(3, 2, 1)],
+    [Point(0, 3, 1), Point(1, 3, 2), Point(2, 3, 1), Point(3, 3, 2)]
+])
+
+malla = BezierSurface(controlPoints=control_points,type=0,subdivisions=20)
 malla.generate_mesh()  # Generar malla
 malla.interactiveGraph() # Mostrar gráfica
