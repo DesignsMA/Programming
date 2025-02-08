@@ -106,7 +106,28 @@ class TensorProductSurface():
     def bernstein_basis_polynomial(self, v: int, n: int, x: int): # ( n | v) | Me
         return binomial(n,v)*x**v*(1-x)**(n-v)
     
-    def b_spline(self):
+    def select_knot_vector(self, m: int, p: int=0):
+        print("""
+              
+              """)
+        type = type = int(input())
+
+        if type == 0:
+            return [u for u in range(m+1)] #  espaciado constante y cerrado
+        elif type == 1:
+            temp = [0,0.5]
+            return temp + [u for u in range(m+1)] #espaciado diferente
+        elif type == 2:
+            temp = [u for u in range(m+1)]
+            for i in range(p+1):
+                temp.insert(0, temp[0])
+                temp.append(temp[len(temp)])
+            return temp
+        else:
+            print("Opción desconocida, usando 0.")
+            return [u for u in range(m+1)] 
+    
+    def b_spline(self, i: int, p: int, x: int):
         pass
         #for i in range(resolution):
         #t = 0 + 1 * i / resolution  # generar (resolution)-puntos en el rango 0-1
