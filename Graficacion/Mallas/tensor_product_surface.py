@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pprint as pp
+import sys
 from mpl_toolkits.mplot3d import Axes3D  # Importar herramientas 3D
 
 #Funciones básicas
@@ -83,23 +84,34 @@ class TensorProductSurface():
         type (int, opcional): Tipo de función base a utilizar (0: Bernstein, 1: B-spline). Por defecto es 0.
         subdivisions (int, opcional): Número de subdivisiones para generar la malla. Por defecto es 10.
     """
-    def __init__(self, controlPoints: np.ndarray = None, type: int = 0, subdivisions: int = 10):
+    def __init__(self, controlPoints: np.ndarray = None, typeS: int = 0, subdivisions: int = 10, splineGrade: int = 2):
         self.mesh = []
         self.controlPoints = controlPoints
-        self.type = 0
+        self.typeS = typeS
         self.function = self._select_function()
         self.subdivisions = subdivisions
         self.m = controlPoints.shape[0]
         self.n = controlPoints.shape[1]
+        self.p = splineGrade
+        self.knots = None
+        self.knotType = 0
                 
     def _select_function(self):
         """
         Selecciona la función base según el tipo.
         """
-        if self.type == 0:
+        if self.typeS == 0:
             return self.bernstein_basis_polynomial
-        elif self.type == 1:
-            return self.b_spline_basis_polynomial
+        elif self.typeS == 1:
+            print("""
+            Opciones:
+            0: Knot vector uniforme y cerrado.
+            1: Knot vector no uniforme con espaciado diferente.
+            2: Knot vector abierto (open) con repetición de knots al inicio y al final.
+              """)
+            self.knotType = input("Introduce el tipo: ")
+            self.knotType = int(self.knotType)
+            return self.b_spline
         else:
             raise ValueError("Tipo de función base no soportado.")
         
@@ -107,43 +119,71 @@ class TensorProductSurface():
         return binomial(n,v)*x**v*(1-x)**(n-v)
     
     def select_knot_vector(self, m: int, p: int=0):
-        print("""
-              
-              """)
-        type = type = int(input())
-
-        if type == 0:
-            return [u for u in range(m+1)] #  espaciado constante y cerrado
-        elif type == 1:
+        if self.knotType == 0:
+            self.knots = [u for u in range(m+1)] #  espaciado constante y cerrado
+        elif self.knotType == 1:
             temp = [0,0.5]
-            return temp + [u for u in range(m+1)] #espaciado diferente
-        elif type == 2:
+            self.knots = temp + [u for u in range(m+1)] #espaciado diferente
+        elif self.knotType == 2:
             temp = [u for u in range(m+1)]
             for i in range(p+1):
                 temp.insert(0, temp[0])
                 temp.append(temp[len(temp)])
-            return temp
+            self.knots = temp
         else:
             print("Opción desconocida, usando 0.")
-            return [u for u in range(m+1)] 
+            self.knots = [u for u in range(m+1)] 
     
-    def b_spline(self, i: int, p: int, x: int):
-        pass
-        #for i in range(resolution):
-        #t = 0 + 1 * i / resolution  # generar (resolution)-puntos en el rango 0-1
-        #pt = Point(0, 0)  
-        #term_x = ""
-        #term_y = ""
-        #for u in range(n + 1):
-        #    pt.x += cfs[u] * points[u].x * math.pow((1 - t), n - u) * math.pow(t, u)
-        #    pt.y += cfs[u] * points[u].y * math.pow((1 - t), n - u) * math.pow(t, u)
+    def b_spline(self, i: int, p: int, x: float):
+        """
+        Calcula la función base B-spline N_{i,p}(x) utilizando el algoritmo recursivo de Cox-de Boor.
+
+        Parámetros:
+            i (int): Índice de la función base.
+            p (int): Grado de la B-spline.
+            x (float): Valor del parámetro en el que se evalúa la función base.
+
+        Retorna:
+            float: Valor de la función base B-spline N_{i,p}(x).
+        """
+        # Obtener el knot vector
+        m = self.n + p + 1
+        self.select_knot_vector(m,p)
+        knot_vector = self.knots
+        # Caso base: grado 0
+        if p == 0:
+            if knot_vector[i] <= x < knot_vector[i + 1]:
+                return 1
+            else:
+                return 0
+        # Caso recursivo: grado p > 0
+        else:
+            # Calcular los términos recursivos
+            term1 = 0.0
+            term2 = 0.0
+
+            # Evitar división por cero en el primer término
+            if knot_vector[i + p] != knot_vector[i]:
+                term1 = (x - knot_vector[i]) / (knot_vector[i + p] - knot_vector[i]) * self.b_spline(i, p - 1, x)
+
+            # Evitar división por cero en el segundo término
+            if knot_vector[i + p + 1] != knot_vector[i + 1]:
+                term2 = (knot_vector[i + p + 1] - x) / (knot_vector[i + p + 1] - knot_vector[i + 1]) * self.b_spline(i + 1, p - 1, x)
+
+            return term1 + term2
 
     def generateCoordinate( self, u: float, v:float, attr: str):
         coord = 0
+        if self.typeS == 0:
+            vArg = self.n-1
+            uArg = self.m-1
+        elif self.typeS == 1:
+            vArg = uArg = self.p
+            
         for i in range(self.m):
             for j in range(self.n):
-                coord += getattr(self.controlPoints[i,j], attr)*self.function(i, self.m-1, u)\
-                         *self.function(j, self.n-1, v)
+                coord += getattr(self.controlPoints[i,j], attr)*self.function(i, uArg, u)\
+                         *self.function(j, vArg, v)
         return coord
                 
     def generate_mesh(self):
@@ -231,6 +271,9 @@ control_points = np.array([
     [Point(0, 3, 0), Point(1, 3, 1), Point(2, 3, 1), Point(3, 3, 0)]
 ])
 
-malla = TensorProductSurface(controlPoints=control_points,type=0,subdivisions=20)
+malla = TensorProductSurface(controlPoints=control_points,typeS=0,subdivisions=20)
 malla.generate_mesh()  # Generar malla
-malla.interactiveGraph() # Mostrar gráfica
+
+malla2 = TensorProductSurface(controlPoints=control_points,typeS=1,subdivisions=20)
+malla2.generate_mesh()
+malla2.interactiveGraph()
