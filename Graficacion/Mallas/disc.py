@@ -6,7 +6,7 @@ import numpy as np
 from math import *
 class DiscMesh():
     def  __init__(self,radio:int=1,subdivisions: int=10, center: Point=Point(0,0,0)):
-        self.subdivisions = subdivisions
+        self.subdivisions = subdivisions+1
         self.radio = radio
         self.center = center
         self.mesh = []
