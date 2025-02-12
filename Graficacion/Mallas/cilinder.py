@@ -44,6 +44,6 @@ class CilinderMesh():
         plt.show()
         
 
-cilinder =  CilinderMesh(2, 30, height=30)
+cilinder =  CilinderMesh(2, 10, height=30)
 cilinder.generateMesh()
 cilinder.graph()
