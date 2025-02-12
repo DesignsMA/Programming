@@ -1,38 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # Importar herramientas 3D
-class Point():
-    def __init__(self, x:float, y:float, z:float=0.0):
-        self.y = y
-        self.x = x
-        self.z = z
-        pass
-    
-    def __str__(self):
-        return f"{self.x} {self.y} {self.z}"
-
-    def __add__(self, otro):
-        return Point(self.x + otro.x, self.y + otro.y, self.z +  otro.z)
-    
-    def __radd__(self, otro):
-        return self.__add__(otro)
-    
-    def __mul__(self, otro):
-        if isinstance(otro, (float, int)):  # Multiplicar por un escalar
-            return Point(self.x * otro, self.y * otro, self.z * otro)
-        else:
-            raise TypeError("Solo se puede multiplicar por un escalar (int o float)")
-
-    def __rmul__(self, otro):
-        # Manejar la multiplicación cuando el escalar está a la izquierda (por ejemplo, 2 * punto)
-        return self.__mul__(otro)
-
-    def __str__(self):
-        return f"Point({self.x}, {self.y}, {self.z})"
-
-    def __eq__(self, otro):
-        # Comparar dos puntos para ver si son iguales
-        return self.x == otro.x and self.y == otro.y and self.z == otro.z
+from mathObjects import *
 
 class MallaBilineal():
     
