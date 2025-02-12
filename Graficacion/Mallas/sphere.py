@@ -6,7 +6,7 @@ import numpy as np
 from math import *
 class SphereMesh():
     def  __init__(self,radio:float=1,subdivisions: int=15, center: Point=Point(0,0,0)):
-        self.subdivisions = subdivisions+1
+        self.subdivisions = subdivisions
         self.r = radio
         self.center = center
         self.mesh = []
@@ -50,7 +50,8 @@ class SphereMesh():
         ax.set_zlabel('Z')
         ax.set_title(title)
         plt.show()
-        
+    
+    
 
 Sphere = SphereMesh(radio=1,subdivisions=8)
 Sphere.generateMesh()

@@ -6,7 +6,7 @@ import numpy as np
 from math import *
 class TorusMesh():
     def  __init__(self,radio:float=6, conductRadio:float=3,subdivisions: int=15, center: Point=Point(0,0,0)):
-        self.subdivisions = subdivisions+1
+        self.subdivisions = subdivisions
         self.R = radio
         self.r = conductRadio
         self.center = center
