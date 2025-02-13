@@ -44,7 +44,7 @@ class BezierSurface():
                          *self.bernstein_basis_polynomial(j, self.n-1, v)
         return coord
                 
-    def generate_mesh(self):
+    def generateMesh(self):
         if self.surfacePoints is None:
             self.create_bezier_patch()
         
@@ -123,5 +123,5 @@ mesh2 = np.array([
             ])
 
 malla = BezierSurface(surfacePoints=mesh2, subdivisions=20)
-malla.generate_mesh()  # Generar malla
+malla.generateMesh()  # Generar malla
 malla.interactiveGraph() # Mostrar gráfica

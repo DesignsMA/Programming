@@ -6,6 +6,7 @@ import numpy as np
 from math import *
 from imageToBinary import imageToBinary
 from cilinder2 import *
+from bezierSurface import *
     
 def graph(mesh: list, m:int=128, n:int=128):
     ptx = np.array([point.x for point in mesh])
@@ -18,7 +19,7 @@ def graph(mesh: list, m:int=128, n:int=128):
     # Ajustar la relación de aspecto para que los ejes tengan la misma escala
     ax.set_box_aspect([1, 1, 1])  # Relación de aspecto igual en X, Y, Z
     
-    ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=True) #graficar puntos
+    ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=False) #graficar puntos
     # Configuraciones adicionales
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
@@ -26,9 +27,9 @@ def graph(mesh: list, m:int=128, n:int=128):
     plt.show()
         
 
-surface = CilinderMesh(radio=1,subdivisions=128, height= 128)
+surface = BezierSurface(subdivisions=127)
 surface.generateMesh()
-pixel_array = imageToBinary("tk.png")
+pixel_array = imageToBinary("no.webp")
 pixel_array = np.where(pixel_array > 128, 1, 0)
 print(pixel_array)
 
