@@ -29,19 +29,18 @@ def graph(mesh: list, m:int=128, n:int=128):
 
 surface = BezierSurface(subdivisions=127)
 surface.generateMesh()
-pixel_array = imageToBinary("no.webp")
+pixel_array = imageToBinary("grad.png")
 pixel_array = np.where(pixel_array > 128, 1, 0)
 print(pixel_array)
 
 imageMesh = []
-with open("bin.txt", 'r+') as f:
-        m, n = pixel_array.shape
-        mesh = np.array(surface.mesh).reshape(128,128)
-        # Iterar sobre cada elemento de la matriz
-        for i in range(m):  # Iterar sobre las filas
-            for j in range(n):  # Iterar sobre las columnas
-                if pixel_array[i,j] == 1:
-                    imageMesh.append(mesh[i,j])
+m, n = pixel_array.shape
+mesh = np.array(surface.mesh).reshape(128,128)
+# Iterar sobre cada elemento de la matriz
+for i in range(m):  # Iterar sobre las filas
+    for j in range(n):  # Iterar sobre las columnas
+        if pixel_array[i,j] == 1:
+            imageMesh.append(mesh[i,j])
            
 
 graph(imageMesh)
