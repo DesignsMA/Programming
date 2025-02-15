@@ -43,7 +43,7 @@ class CilinderMesh():
         ax.set_zlabel('Z')
         plt.show()
         
-
-cilinder =  CilinderMesh(2, 10, height=30)
-cilinder.generateMesh()
-cilinder.graph()
+    def __main__(self):
+        cilinder =  CilinderMesh(2, 10, height=30)
+        cilinder.generateMesh()
+        cilinder.graph()

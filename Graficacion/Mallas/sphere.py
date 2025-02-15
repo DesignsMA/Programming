@@ -51,8 +51,7 @@ class SphereMesh():
         ax.set_title(title)
         plt.show()
     
-    
-
-Sphere = SphereMesh(radio=1,subdivisions=8)
-Sphere.generateMesh()
-Sphere.graph("Sphere")
+    def __main__(self):
+        Sphere = SphereMesh(radio=1,subdivisions=8)
+        Sphere.generateMesh()
+        Sphere.graph("Sphere")

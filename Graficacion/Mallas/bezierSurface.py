@@ -113,15 +113,15 @@ class BezierSurface():
         # Mostrar el gráfico
         plt.show()
         
-        
-# MAIN
-# Definir los puntos de control para las curvas de Bézier
-mesh2 = np.array([
-            [Point(-1, 0, 0), Point(0, 0, 1), Point(1, 0, 0)],
-            [Point(-1, -1.5, 0), Point(0, -1.5, 1), Point(1, -1.5, 0)],
-            [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
-            ])
+    def __main__(self):
+        # MAIN
+        # Definir los puntos de control para las curvas de Bézier, genera una parábola 3d
+        mesh2 = np.array([
+                    [Point(-1, 0, 0), Point(0, 0, 1), Point(1, 0, 0)],
+                    [Point(-1, -1.5, 0), Point(0, -1.5, 1), Point(1, -1.5, 0)],
+                    [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
+                    ])
 
-malla = BezierSurface(surfacePoints=mesh2, subdivisions=20)
-malla.generateMesh()  # Generar malla
-malla.interactiveGraph() # Mostrar gráfica
+        malla = BezierSurface(surfacePoints=mesh2, subdivisions=20)
+        malla.generateMesh()  # Generar malla
+        malla.interactiveGraph() # Mostrar gráfica

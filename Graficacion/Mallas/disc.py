@@ -44,8 +44,9 @@ class DiscMesh():
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
         plt.show()
-        
+    
+    def __main__(self):
 
-disc =  DiscMesh(2, 15)
-disc.generateMesh()
-disc.graph()
+        disc =  DiscMesh(2, 15)
+        disc.generateMesh()
+        disc.graph()

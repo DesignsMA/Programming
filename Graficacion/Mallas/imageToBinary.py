@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 import sys
-def imageToBinary(file):
+def imageToBinary(file, umbral: int=128):
     # Cargar imagen en escala de grises para simplificar
     img = Image.open(file).convert("L")   #convierte a escala de grises
     img = img.resize((128,128))
@@ -20,7 +20,7 @@ def imageToBinary(file):
             # Iterar a través de todas las columnas de la imagen
             for j in range(pixel_array.shape[1]):
                 # Comparar el valor del píxel con el umbral de 128
-                if pixel_array[i, j] > 128:
+                if pixel_array[i, j] > umbral:
                     f.write('1')
                 else:
                     f.write('0')

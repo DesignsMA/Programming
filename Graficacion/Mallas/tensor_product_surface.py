@@ -272,26 +272,27 @@ class TensorProductSurface():
         plt.title("Superficie B-spline")
         plt.legend()
         plt.show()
-        
-# Definir los puntos de control para las curvas de Bézier
-control_points = np.array([
-    [Point(0, 0, 0), Point(1, 0, 1), Point(2, 0, 1), Point(3, 0, 0)],
-    [Point(0, 1, 1), Point(1, 1, 2), Point(2, 1, 2), Point(3, 1, 1)],
-    [Point(0, 2, 1), Point(1, 2, 2), Point(2, 2, 2), Point(3, 2, 1)],
-    [Point(0, 3, 0), Point(1, 3, 1), Point(2, 3, 1), Point(3, 3, 0)]
-])
 
-mesh = np.array([
-            [Point(-1, 0, 0), Point(0, 0, 1), Point(1, 0, 0)],
-            [Point(-1, -1.5, 0), Point(0, -1.5, 1), Point(1, -1.5, 0)],
-            [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
-            ])
+    def __main__(self):
+        # Definir los puntos de control para las curvas de Bézier
+        control_points = np.array([
+            [Point(0, 0, 0), Point(1, 0, 1), Point(2, 0, 1), Point(3, 0, 0)],
+            [Point(0, 1, 1), Point(1, 1, 2), Point(2, 1, 2), Point(3, 1, 1)],
+            [Point(0, 2, 1), Point(1, 2, 2), Point(2, 2, 2), Point(3, 2, 1)],
+            [Point(0, 3, 0), Point(1, 3, 1), Point(2, 3, 1), Point(3, 3, 0)]
+        ])
 
-#malla = TensorProductSurface(controlPoints=control_points)
-#malla.generate_mesh()
-#malla.interactiveGraph()
-# Crear y visualizar la superficie B-spline
-malla2 = TensorProductSurface(controlPoints=mesh, typeS=1, subdivisions=24, splineGrade=2)
-malla2.generate_mesh()
-malla2.controlPointsGraph(control_points=mesh)
-malla2.interactiveGraph()
+        mesh = np.array([
+                    [Point(-1, 0, 0), Point(0, 0, 1), Point(1, 0, 0)],
+                    [Point(-1, -1.5, 0), Point(0, -1.5, 1), Point(1, -1.5, 0)],
+                    [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
+                    ])
+
+        #malla = TensorProductSurface(controlPoints=control_points)
+        #malla.generate_mesh()
+        #malla.interactiveGraph()
+        # Crear y visualizar la superficie B-spline
+        malla2 = TensorProductSurface(controlPoints=mesh, typeS=1, subdivisions=24, splineGrade=2)
+        malla2.generate_mesh()
+        malla2.controlPointsGraph(control_points=mesh)
+        malla2.interactiveGraph()

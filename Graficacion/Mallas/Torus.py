@@ -59,13 +59,14 @@ class TorusMesh():
         ax.set_title(title)
         plt.show()
         
-
-torus = TorusMesh(subdivisions=25)
-torus.generateMesh()
-torus.graph("Ring Torus| Dona (R>r)")
-torus = TorusMesh(radio=3,conductRadio=3,subdivisions=25)
-torus.generateMesh()
-torus.graph("Horn Torus| (R==r)")
-torus = TorusMesh(radio=1.5,conductRadio=3,subdivisions=25)
-torus.generateMesh()
-torus.graph("Spindle Torus| (R<r)")
+    def __main__(self):
+        torus = TorusMesh(subdivisions=25)
+        torus.generateMesh()
+        torus.graph("Ring Torus| Dona (R>r)")
+        torus = TorusMesh(radio=3,conductRadio=3,subdivisions=25)
+        torus.generateMesh()
+        torus.graph("Horn Torus| (R==r)")
+        torus = TorusMesh(radio=1.5,conductRadio=3,subdivisions=25)
+        torus.generateMesh()
+        torus.graph("Spindle Torus| (R<r)")
+        

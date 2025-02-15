@@ -46,7 +46,8 @@ class CilinderMesh():
         ax.set_zlabel('Z')
         plt.show()
         
+    def __main__(self):
 
-disc =  CilinderMesh(2, 15, height=20)
-disc.generateMesh()
-disc.graph()
+        disc =  CilinderMesh(2, 15, height=20)
+        disc.generateMesh()
+        disc.graph()
