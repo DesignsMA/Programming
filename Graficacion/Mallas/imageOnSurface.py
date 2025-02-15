@@ -64,7 +64,7 @@ while True:
                     -1. Salir
                     """)
     
-    if opt == '1':
+    if opt == '1' or opt not in ['2','3','4','5','6','-1']:
         surface = MallaBilineal(subdivisions=127)
     elif opt == '2':
         surface = BezierSurface(paracaidas,subdivisions=127)
@@ -78,10 +78,12 @@ while True:
         surface = TorusMesh(subdivisions=128)
     elif opt == '-1':
         break
-
-    opt = input("Introduce el nombre de la imagen | Escribe main para ver el mallado: ")
-    if opt == "main":
-        surface.__main__()
-    else:
-        surface.generateMesh()
-        graph(imageOnSurface(opt, surface.mesh, umbral=128))
+    try:
+        opt = input("Introduce el nombre de la imagen | Escribe main para ver el mallado: ")
+        if opt == "main":
+            surface.__main__()
+        else:
+            surface.generateMesh()
+            graph(imageOnSurface(opt, surface.mesh, umbral=128))
+    except FileNotFoundError as e:
+        print(e)
