@@ -33,11 +33,11 @@ class DiscMesh():
         color_data = np.hypot(ptX, ptY)  # Distancia radial
         norm_color = (color_data - color_data.min()) / (color_data.max() - color_data.min())  # Normalizar
         # Aplicar gradiente de colores a la superficie
-        ax.plot_surface(ptX, ptY, ptZ, facecolors=cm.inferno(norm_color), rstride=1, cstride=1, alpha=0.5)       
+        ax.plot_surface(ptX, ptY, ptZ, facecolors=cm.plasma(norm_color), rstride=1, cstride=1, alpha=1)       
         # Trazar la malla de alambre
         ax.plot_wireframe(ptX, ptY, ptZ, color='black', linewidth=0.2)
         
-        ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=True) #graficar puntos
+        ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=False) #graficar puntos
 
         # Configuraciones adicionales
         ax.set_xlabel('X')

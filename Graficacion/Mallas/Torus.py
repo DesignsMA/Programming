@@ -50,7 +50,7 @@ class TorusMesh():
         # Trazar la malla de alambre
         ax.plot_wireframe(ptX, ptY, ptZ, color='black', linewidth=0.2)
         
-        ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=True) #graficar puntos
+        ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=False) #graficar puntos
 
         # Configuraciones adicionales
         ax.set_xlabel('X')

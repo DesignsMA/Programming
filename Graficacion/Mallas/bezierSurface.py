@@ -61,66 +61,39 @@ class BezierSurface():
                      
     
     def interactiveGraph(self):
-        for point in self.mesh:
-            print(f"{point}", end=' | ')
-        # Convertir a un array de numpy para facilitar la visualización
-        mesh_points = np.array([[point.x, point.y, point.z] for point in self.mesh])
-
-        pp.pp(mesh_points)
-        # Reorganizar los puntos en una cuadrícula para la visualización 3D
-        # mesh_points[:, 0] DE TODAS LAS FILAS, EXTRAE EL ELEMENTO CERO
-        # .reshape(subdivisions, subdivisions)  MODIFCA EL ARREGLO 1D A 2D,, es decir si el arreglo 1d tiene 3 elementos y realizas un reshape(1,3)
-        # obtienes un arreglo 2d con 3 filas donde sea [1,2,3] -> [ [1], [2], [3] ]
-        subdivisions = self.subdivisions + 1
-        X = mesh_points[:, 0].reshape(subdivisions, subdivisions)
-        Y = mesh_points[:, 1].reshape(subdivisions, subdivisions)
-        Z = mesh_points[:, 2].reshape(subdivisions, subdivisions)
+        ptx = np.array([point.x for point in self.mesh])
+        pty = np.array([point.y for point in self.mesh])
+        ptz = np.array([point.z for point in self.mesh])
         
-        pp.pp(X)
-        pp.pp(Y)
-        pp.pp(Z)
-        # Visualizar la malla en 3D
-        fig = plt.figure() #nueva ventana
-        #ax = fig.add_subplot(111, projection='3d'): Añade un subplot (gráfico) en la figura con proyección 3D. El argumento 111 indica que es el primer (y único) gráfico en una cuadrícula de 1x1.
-        ax = fig.add_subplot(111, projection='3d')  # Crear un gráfico 3D
+        fig = plt.figure() #generar figura
+        ax = fig.add_subplot(projection='3d') #añadir subplot
+        
+        ptX = ptx.reshape(self.subdivisions+1,self.subdivisions+1)
+        ptY = pty.reshape(self.subdivisions+1,self.subdivisions+1)
+        ptZ = ptz.reshape(self.subdivisions+1,self.subdivisions+1)
 
-        # Graficar la superficie | la  superficie compuesta por los puntos
-        ax.plot_surface(X, Y, Z, color='black', alpha=0.12)
+        # Aplicar gradiente de colores a la superficie basado en z
+        ax.plot_surface(ptX, ptY, ptZ, cmap='plasma',rstride=1, cstride=1, alpha=1)       
+        # Trazar la malla de alambre
+        ax.plot_wireframe(ptX, ptY, ptZ, color='black', linewidth=0.2)
+        
+        ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=False) #graficar puntos
 
-        # Graficar los puntos de la malla
-        ax.scatter(X, Y, Z, color='red')
-        #extrae todos los elementos de la primera fila x[i,j] i = filas, j = columnas
-        pp.pp(X[0,:])
-        pp.pp(Y[0,:])
-        pp.pp(Z[0,:])
-        #extrae todos los elementos de la primera columna x[i,j] i = filas, j = columnas
-        pp.pp(X[:,0])
-        pp.pp(Y[:,0])
-        pp.pp(Z[:,0])
-        # Conectar los puntos con líneas
-        for i in range(subdivisions):
-            ax.plot(X[i, :], Y[i, :], Z[i, :], color='black')  # Líneas en dirección u
-            ax.plot(X[:, i], Y[:, i], Z[:, i], color='black')  # Líneas en dirección v
-
-        # Etiquetar los ejes
+        # Configuraciones adicionales
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
-
-        # Agregar un título al gráfico
-        plt.title('Superficie de bézier')
-
-        # Mostrar el gráfico
+        ax.set_title("Superficie de bézier")
         plt.show()
         
     def __main__(self):
         # MAIN
         # Definir los puntos de control para las curvas de Bézier, genera una parábola 3d
-        mesh2 = np.array([
-                    [Point(-1, 0, 0), Point(0, 0, 1), Point(1, 0, 0)],
-                    [Point(-1, -1.5, 0), Point(0, -1.5, 1), Point(1, -1.5, 0)],
-                    [Point(-1, -3, 0), Point(0, -3, 1), Point(1, -3, 0)],
-                    ])
+        mesh2  = np.array([
+            [Point(0, 0, 0), Point(1, 0, 1), Point(2, 0, 0)],
+            [Point(0, 1, 1), Point(1, 1, 2), Point(2, 1, 1)],
+            [Point(0, 2, 0), Point(1, 2, 1), Point(2, 2, 0)]
+        ])
 
         malla = BezierSurface(surfacePoints=mesh2, subdivisions=20)
         malla.generateMesh()  # Generar malla

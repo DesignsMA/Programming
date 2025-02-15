@@ -38,7 +38,7 @@ class CilinderMesh():
         # Trazar la malla de alambre
         ax.plot_wireframe(ptX, ptY, ptZ, color='black', linewidth=0.5)
         
-        ax.scatter(ptx, pty, ptz, c='black', s=5, depthshade=True) #graficar puntos
+        ax.scatter(ptx, pty, ptz, c='black', s=5, depthshade=False) #graficar puntos
 
         # Configuraciones adicionales
         ax.set_xlabel('X')

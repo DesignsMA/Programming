@@ -42,7 +42,7 @@ class SphereMesh():
         # Trazar la malla de alambre
         ax.plot_wireframe(ptX, ptY, ptZ, color='black', linewidth=0.2)
         
-        ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=True) #graficar puntos
+        ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=False) #graficar puntos
 
         # Configuraciones adicionales
         ax.set_xlabel('X')
@@ -52,6 +52,6 @@ class SphereMesh():
         plt.show()
     
     def __main__(self):
-        Sphere = SphereMesh(radio=1,subdivisions=8)
+        Sphere = SphereMesh(radio=1,subdivisions=20)
         Sphere.generateMesh()
         Sphere.graph("Sphere")
