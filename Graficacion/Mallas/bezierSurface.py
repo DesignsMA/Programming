@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import pprint as pp
-from mpl_toolkits.mplot3d import Axes3D  # Importar herramientas 3D
 from mathObjects import *
 # surfacePoints es una matriz de 4X4 que describe una superficie bicubica para metrica
 # sin necesidad de guardar cada punto interpolado, una superficie de bezier es una
