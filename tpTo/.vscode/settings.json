@@ -1,9 +1,0 @@
-{
-    "java.jdt.ls.java.home": "C:\\JavaLegacy\\jdk-8",
-    "java.home": "C:\\JavaLegacy\\jdk-8",
-    "terminal.integrated.env.windows": {
-    "JAVA_HOME": "C:\\JavaLegacy\\jdk-8",
-    "PATH": "C:\\JavaLegacy\\jdk-8\\bin;${env:PATH}"
-  },
-  "java.configuration.updateBuildConfiguration": "automatic"
-}
