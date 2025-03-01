@@ -1,4 +1,4 @@
-from bezierSurface import *
+from bezierSurface import BezierSurface
 from bilineal import *
 from cilinder2 import *
 from disc import *
