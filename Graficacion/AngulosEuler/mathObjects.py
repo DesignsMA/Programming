@@ -1,4 +1,5 @@
 #Funciones básicas
+import numpy as np
 def factorial(x: int):
     if x == 1 or x == 0:
         return 1
@@ -75,3 +76,6 @@ class Point():
         else:
             # Default formatting
             return f"({self.x}, {self.y}, {self.z})"
+        
+    def arr(self):
+        return np.array( [ self.x, self.y, self.z ])
