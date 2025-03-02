@@ -1,6 +1,11 @@
 from bezierSurface import *
 import numpy as np
-class Cube:    
+from cilinder2 import CilinderMesh
+from disc import DiscMesh
+from math import *
+
+import matplotlib.patches as mpatches
+class FigureSpace:    
     def __init__(self, l: float, w: float, h: float, subdivisions: int):
         """
         Inicializa un cubo con dimensiones l (largo), w (ancho), h (altura).
@@ -14,6 +19,7 @@ class Cube:
         self.l = l
         self.w = w
         self.h = h
+        self.labels = []
         # Definir las caras del cubo como matrices de puntos
         self.faces = {
             'inferior': np.array([[Point(0, 0, 0), Point(l, 0, 0)],
@@ -38,9 +44,15 @@ class Cube:
         self.meshes = {}
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
-        self.normal = []
+        self.normalVector = []
+    
+    def showGraph(self):
+        plt.show()
+        
     def graphCube(self):
         self.meshes = {}
+        self.ax.set_box_aspect([1, 1, 0.3])  # Relación de aspecto igual en X, Y, Z
+
         for key, face in self.faces.items():
             mesh = BezierSurface(face, self.subdivisions)
             mesh.generateMesh()
@@ -60,32 +72,73 @@ class Cube:
             self.ax.plot_wireframe(ptX, ptY, ptZ, color='black', linewidth=0.2)
 
             self.ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=False) #graficar puntos
-
+    
         # Configurar los ejes
         self.ax.set_xlabel('X')
         self.ax.set_ylabel('Y')
         self.ax.set_zlabel('Z')
-
-        # Mostrar la gráfica
-        plt.show()# cara inferior
     
-    def normal(self, face: str = 'frontal'):
+    def addGraph(self, mesh, subdivisions):
+        ptx = np.array([point.x for point in mesh])
+        pty = np.array([point.y for point in mesh])
+        ptz = np.array([point.z for point in mesh])
+
+        ptX = ptx.reshape(subdivisions,subdivisions)
+        ptY = pty.reshape(subdivisions,subdivisions)
+        ptZ = ptz.reshape(subdivisions,subdivisions)
+        
+        self.ax.plot_surface(ptX, ptY, ptZ, color='red',rstride=1, cstride=1, alpha=0.5)       
+        # Trazar la malla de alambre
+        self.ax.plot_wireframe(ptX, ptY, ptZ, color='black', linewidth=0.2)
+        self.ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=False) #graficar puntos
+
+    
+    def normalVectorToFace(self, face: str = 'frontal'):
         cara = self.faces[face]
-        v1 = cara[0,1].arr() - cara[0, 0].arr()
-        v2 = cara[1,0].arr() - cara[0, 0].arr()
+        self.normalVector = self.normalToSurface(cara[0,0], cara[0,1], cara[1,0], txt="cubo")
+        print("Vector normal a la cara ",face, " : ", self.normalVector)
+    
+    def normalToSurface(self, p1:Point, p2:Point, p3:Point, color: str = 'blue', l: float = 1.5, lnw: float = 6, txt: str =None ):
+        v1 = p2.arr() - p1.arr()
+        v2 = p3.arr() - p1.arr()
         normal = np.cross(v1,v2) # producto cruz para  obtener la normal a una cara
         # Normalizar la normal para evitar problemas de escala
         normal = normal / np.linalg.norm(normal)
-        
-        self.normal = normal
-        #Graficar la cara del cubo (triángulo formado por P0, P1, P2)
-        # Graficar la normal en el origen
+        # Graficar la normal trasladada al origen
         self.ax.quiver(
             0, 0, 0,  # Punto de inicio (origen)
             normal[0], normal[1], normal[2],  # Componentes de la normal, componentes del vector flecha
-            color='blue', label='Normal', length=5, arrow_length_ratio=0.07 # Longitud del vector
+            color=color, label='Normal', length=l, arrow_length_ratio=0.12, # Longitud del vector
+            pivot='tail', linewidth=lnw
         )
+        if txt is not None:
+            color_patch = mpatches.Patch(color=color, label=f"Normal al {txt}")
+            self.labels.append(color_patch)
+            self.ax.legend(handles=self.labels, loc=(1,1))
 
-cube = Cube(20,20,1,10)
-cube.normal()
+        return normal
+
+
+cube = FigureSpace(20,20,1,10)
+cube.normalVectorToFace('superior')
+
+r = 10
+cilinder = CilinderMesh(r, height=1) # cilindro de 10x1
+cilinder.generateMesh()
+
+cube.addGraph(cilinder.mesh, 10)
 cube.graphCube()
+
+
+p1 = Point(10,0,0)
+p2 = Point(r*cos(120), r*sin(120), 0)
+p3 = Point(r*cos(240),  r*sin(240), 0)
+print(f"Vector normal al disco: { cube.normalToSurface( p1, p2, p3, 'green', 1.8, 2, "disco")}")
+
+# cambiando alturas del disco
+
+p1.z = 0
+p2.z = 1
+p3.z = 1
+cube.showGraph()
+
