@@ -1,5 +1,6 @@
 #Funciones básicas
 import numpy as np
+from math import cos, sin, radians, sqrt
 def factorial(x: int):
     if x == 1 or x == 0:
         return 1
@@ -43,14 +44,30 @@ class Point():
     def __radd__(self, otro):
         return self.__add__(otro)
     
+    def __sub__(self, otro):
+        return Point(self.x - otro.x, self.y - otro.y, self.z - otro.z)
+    
+    def __rsub__(self, otro):
+        return Point(otro.x - self.x, otro.y - self.y, otro.z - self.z)
+    
     def __mul__(self, otro):
         if isinstance(otro, (float, int)):  # Multiplicar por un escalar
             return Point(self.x * otro, self.y * otro, self.z * otro)
+        elif isinstance(otro, Point):  # Producto escalar entre dos puntos
+            return self.x * otro.x + self.y * otro.y + self.z * otro.z
         else:
-            raise TypeError("Solo se puede multiplicar por un escalar (int o float)")
+            raise TypeError("Solo se puede multiplicar por un escalar (int o float) o calcular el producto escalar con otro Point")
 
     def __rmul__(self, otro):
         return self.__mul__(otro)
+    
+    def __truediv__(self, otro):
+      if isinstance(otro, (float, int)):
+          if otro == 0:
+              raise ZeroDivisionError("No se puede dividir por cero")
+          return Point(self.x / otro, self.y / otro, self.z / otro)
+      else:
+          raise TypeError("Solo se puede dividir por un escalar (int o float)")
 
     def __eq__(self, otro):
         return self.x == otro.x and self.y == otro.y and self.z == otro.z
@@ -79,3 +96,81 @@ class Point():
         
     def arr(self):
         return np.array( [ self.x, self.y, self.z ])
+    
+    @staticmethod
+    def rotation_matrix_x(angle: float):
+        """
+        Retorna la matriz de rotación alrededor del eje x.
+
+        Parámetros:
+            angle (float): Ángulo de rotación en grados.
+        """
+        angle = radians(angle)  # Convertir a radianes
+        return np.array([
+            [1, 0, 0],
+            [0, cos(angle), -sin(angle)],
+            [0, sin(angle), cos(angle)]
+        ])
+        
+    def norm(self):
+        """
+        Calcula la norma (magnitud) del vector representado por el punto.
+        """
+        return sqrt(self.x**2 + self.y**2 + self.z**2)
+
+    @staticmethod
+    def rotation_matrix_y(angle: float):
+        """
+        Retorna la matriz de rotación alrededor del eje y.
+
+        Parámetros:
+            angle (float): Ángulo de rotación en grados.
+        """
+        angle = radians(angle)  # Convertir a radianes
+        return np.array([
+            [cos(angle), 0, sin(angle)],
+            [0, 1, 0],
+            [-sin(angle), 0, cos(angle)]
+        ])
+
+    @staticmethod
+    def rotation_matrix_z(angle: float):
+        """
+        Retorna la matriz de rotación alrededor del eje z.
+
+        Parámetros:
+            angle (float): Ángulo de rotación en grados.
+        """
+        angle = radians(angle)  # Convertir a radianes
+        return np.array([
+            [cos(angle), -sin(angle), 0],
+            [sin(angle), cos(angle), 0],
+            [0, 0, 1]
+        ])
+
+    def rotate(self, angle_x: float = 0, angle_y: float = 0, angle_z: float = 0):
+        """
+        Aplica una rotación al punto alrededor de los ejes x, y, y z.
+
+        Parámetros:
+            angle_x (float): Ángulo de rotación alrededor del eje x en grados.
+            angle_y (float): Ángulo de rotación alrededor del eje y en grados.
+            angle_z (float): Ángulo de rotación alrededor del eje z en grados.
+        """
+        # Convertir el punto a un array de NumPy
+        point_arr = self.arr()
+
+        # Aplicar las rotaciones en el orden z, y, x (común en gráficos 3D)
+        if angle_z != 0:
+            point_arr = np.dot(self.rotation_matrix_z(angle_z), point_arr)
+        if angle_y != 0:
+            point_arr = np.dot(self.rotation_matrix_y(angle_y), point_arr)
+        if angle_x != 0:
+            point_arr = np.dot(self.rotation_matrix_x(angle_x), point_arr)
+
+        # Actualizar las coordenadas del punto
+        self.x, self.y, self.z = point_arr
+
+    def rotateWithMatrix(self, rotation_matrix):
+        rotated_arr = np.dot(rotation_matrix, self.arr())  # Aplicar la rotación
+        self.x, self.y, self.z = rotated_arr
