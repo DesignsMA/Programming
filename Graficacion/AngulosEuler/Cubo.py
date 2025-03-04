@@ -52,6 +52,7 @@ class FigureSpace:
         
     def graphCube(self):
         self.meshes = {}
+        self.ax.set_box_aspect([1,1,0.5])
         for key, face in self.faces.items():
             mesh = BezierSurface(face, self.subdivisions)
             mesh.generateMesh()
@@ -167,7 +168,7 @@ cube.graphCube()
 p1 = Point(10,0,0)
 p2 = Point(r*cos(120), r*sin(120), 0)
 p3 = Point(r*cos(240),  r*sin(240), 0)
-normalDisco = cube.normalToSurface( p1, p2, p3, 'green', 1.8, 2, "disco", p1)
+normalDisco = cube.normalToSurface( p1, p2, p3, 'green', 2.2, 2, "disco")
 print(f"Vector normal al disco: {normalDisco}")
 cube.showGraph()
 # cambiando alturas del disco
@@ -176,12 +177,15 @@ input("Presione para modificar z en disco... ")
 p1.z = 0
 p2.z = 1
 p3.z = 1
-normalDiscoModificada = cube.normalToSurface( p1, p2, p3, '#3ffdff', 1.5, 2, "disco modificado", p1)
+normalDiscoModificada = cube.normalToSurface( p1, p2, p3, '#3ffdff', 3, 2, "disco modificado")
 print(f"Vector normal al disco modificado: {normalDiscoModificada}")
 
 input("Presione para mostrar disco y cilindro rotado...")
-alpha, beta, gamma = NormVector.direction_cosines(normalDiscoModificada) # obtener angulos
-
+alpha, beta, gamma = NormVector.direction_cosines(normalDiscoModificada) # obtener angulos en radianes
+alpha = degrees(alpha)
+beta = degrees(beta)
+gamma = degrees(gamma)
+print(f"Angulos de rotación: Alpha: {alpha} Beta: {beta} Gamma: {gamma}")
 for pt, pt2 in zip(cilinder.mesh,disc.mesh):
     if isinstance(pt, Point):
         pt.rotate(alpha, beta, gamma) # rotar cada punto
@@ -198,18 +202,31 @@ cube.createLabel("Figura rotada", '#3ffdff')
 cube.graphCube()
 
 input("Presione para deshacer rotaciones...")
-
+# Dadoe el nagulo entre los dos planos
+#  
+# Determinar los angulos de Euler: phi y theta
+#  
+# cos(phi)=z3^/|n^|
+#  
+# tan(theta)=yn^/xn^
+#  
+# cos(phi) = zn^/|n^|
+#  
+# Rz(phi)*Rx(theta) o Rz(phi)*Ry(theta)_
+ 
 # Deshacer rotaciones
 normalFirme = cube.normalVector
+anguloPlanos = degrees( acos( abs( normalDiscoModificada*normalFirme )/normalDiscoModificada.norm()*normalFirme.norm() ) )
 
+print(f"Angulo entre planos: {anguloPlanos}")
 # Calcular los ángulos theta_z y phi
-theta = degrees(acos( normalDiscoModificada*normalFirme/( normalDiscoModificada.norm()*normalFirme.norm() ) )) #obtener angulo entre el eje Z y el vector normal al disco nuevo
+theta = anguloPlanos
 gamma = degrees(atan2(normalDiscoModificada.y, normalDiscoModificada.x))
 
 # Matrices de rotación
-rotation_z = Point.rotation_matrix_z(-gamma)  # Rotar alrededor del eje z por -phi
-rotation_y = Point.rotation_matrix_y(-theta)  # Rotar alrededor del eje y por -theta_z
-rotation_total = np.dot(rotation_y, rotation_z)  # Combinar las rotaciones
+rotation_z = Point.rotation_matrix_z(-gamma)  
+rotation_y = Point.rotation_matrix_y(-theta)  
+rotation_total = np.dot(rotation_y, rotation_z)  # Combinar las rotaciones, obtener la matriz de rotaciones
 
 print(rotation_total)
 # Eliminar figuras anteriores (si es necesario)

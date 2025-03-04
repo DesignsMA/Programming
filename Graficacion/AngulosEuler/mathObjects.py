@@ -147,6 +147,18 @@ class Point():
             [sin(angle), cos(angle), 0],
             [0, 0, 1]
         ])
+    
+    @staticmethod
+    def centroid(p1, p2, p3):
+        """Calcula el centroide de tres puntos."""
+        if not all(isinstance(p, Point) for p in [p1, p2, p3]):
+            raise TypeError("Los argumentos deben ser instancias de Point.")
+
+        cx = (p1.x + p2.x + p3.x) / 3
+        cy = (p1.y + p2.y + p3.y) / 3
+        cz = (p1.z + p2.z + p3.z) / 3
+
+        return Point(cx, cy, cz)
 
     def rotate(self, angle_x: float = 0, angle_y: float = 0, angle_z: float = 0):
         """
