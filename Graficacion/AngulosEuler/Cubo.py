@@ -52,7 +52,6 @@ class FigureSpace:
         
     def graphCube(self):
         self.meshes = {}
-        self.ax.set_box_aspect([1,1,0.5])
         for key, face in self.faces.items():
             mesh = BezierSurface(face, self.subdivisions)
             mesh.generateMesh()
@@ -91,6 +90,7 @@ class FigureSpace:
         # Trazar la malla de alambre
         wireframe =self.ax.plot_wireframe(ptX, ptY, ptZ, color='black', linewidth=0.2)
         scatter = self.ax.scatter(ptx, pty, ptz, c='black', s=3, depthshade=False) #graficar puntos
+        self.ax.set_box_aspect([1,1,1])
         return surface, wireframe, scatter
     
     def normalVectorToFace(self, face: str = 'frontal'):
@@ -99,10 +99,9 @@ class FigureSpace:
         print("Vector normal a la cara ",face, " : ", self.normalVector)
     
     def normalToSurface(self, p1:Point, p2:Point, p3:Point, color: str = 'blue', l: float = 1, lnw: float = 1, txt: str =None, center: Point = Point(0,0,0) ):
-        v1 = p2.arr() - p1.arr()
-        v2 = p3.arr() - p1.arr()
-        normal = np.cross(v1,v2) # producto cruz para  obtener la normal a una cara
-        # Normalizar la normal para evitar problemas de escala, magnitud 1
+        v1 = np.array([p2.x - p1.x, p2.y - p1.y, p2.z - p1.z])
+        v2 = np.array([p3.x - p1.x, p3.y - p1.y, p3.z - p1.z])
+        normal = np.cross(v1, v2)        # Normalizar la normal para evitar problemas de escala, magnitud 1
         normal = normal / np.linalg.norm(normal)
         # Graficar la normal trasladada al origen
         
@@ -149,7 +148,7 @@ class NormVector:
         beta = degrees(acos(cos_beta))    # Ángulo con el eje y
         gamma = degrees(acos(cos_gamma))  # Ángulo con el eje z
         return alpha, beta, gamma
-
+    
 
 cube = FigureSpace(20,20,1,1)
 cube.normalVectorToFace('superior')
@@ -181,16 +180,18 @@ normalDiscoModificada = cube.normalToSurface( p1, p2, p3, '#3ffdff', 3, 2, "disc
 print(f"Vector normal al disco modificado: {normalDiscoModificada}")
 
 input("Presione para mostrar disco y cilindro rotado...")
-alpha, beta, gamma = NormVector.direction_cosines(normalDiscoModificada) # obtener angulos en radianes
-alpha = degrees(alpha)
-beta = degrees(beta)
-gamma = degrees(gamma)
-print(f"Angulos de rotación: Alpha: {alpha} Beta: {beta} Gamma: {gamma}")
-for pt, pt2 in zip(cilinder.mesh,disc.mesh):
+# Encontrar el eje y ángulo de rotación
+eje_rotacion = np.cross(normalDisco.arr(), normalDiscoModificada.arr())
+eje_rotacion /= np.linalg.norm(eje_rotacion)
+angulo_rotacion = np.arccos(np.clip(np.dot(normalDisco.arr(), normalDiscoModificada.arr()), -1.0, 1.0))
+# Rotar cada punto del disco y cilindro
+for pt, pt2 in zip(disc.mesh, cilinder.mesh):
     if isinstance(pt, Point):
-        pt.rotate(alpha, beta, gamma) # rotar cada punto
-        pt2.rotate(alpha, beta, gamma) # rotar cada punto
-
+        pt.rotate_point(pt, eje_rotacion, angulo_rotacion)
+        pt2.rotate_point(pt2, eje_rotacion, angulo_rotacion)
+        
+        
+                
 for fig, fig2 in zip(cilinderFig, discFig):
     fig.remove()
     fig2.remove()
@@ -202,48 +203,46 @@ cube.createLabel("Figura rotada", '#3ffdff')
 cube.graphCube()
 
 input("Presione para deshacer rotaciones...")
-# Dadoe el nagulo entre los dos planos
-#  
-# Determinar los angulos de Euler: phi y theta
-#  
-# cos(phi)=z3^/|n^|
-#  
-# tan(theta)=yn^/xn^
-#  
-# cos(phi) = zn^/|n^|
-#  
-# Rz(phi)*Rx(theta) o Rz(phi)*Ry(theta)_
- 
-# Deshacer rotaciones
+# Obtener la normal de referencia (estado original)
 normalFirme = cube.normalVector
-anguloPlanos = degrees( acos( abs( normalDiscoModificada*normalFirme )/normalDiscoModificada.norm()*normalFirme.norm() ) )
 
-print(f"Angulo entre planos: {anguloPlanos}")
-# Calcular los ángulos theta_z y phi
-theta = anguloPlanos
-gamma = degrees(atan2(normalDiscoModificada.y, normalDiscoModificada.x))
+# Calcular el ángulo entre los planos
+anguloPlanos = degrees(np.arccos(
+    abs(np.dot(normalDiscoModificada.arr(), normalFirme.arr())) /
+    (normalDiscoModificada.norm()*normalFirme.norm())
+))
 
-# Matrices de rotación
-rotation_z = Point.rotation_matrix_z(-gamma)  
-rotation_y = Point.rotation_matrix_y(-theta)  
-rotation_total = np.dot(rotation_y, rotation_z)  # Combinar las rotaciones, obtener la matriz de rotaciones
+print(f"Ángulo entre planos: {anguloPlanos}°")
 
-print(rotation_total)
-# Eliminar figuras anteriores (si es necesario)
+# Calcular los ángulos de Euler
+cos_phi = normalDiscoModificada.z / normalDiscoModificada.norm()
+phi = np.arccos(np.clip(cos_phi, -1.0, 1.0))  # Clip para evitar errores numéricos
+
+# Ángulo de rotación en el plano XY
+theta = np.arctan2(normalDiscoModificada.y, normalDiscoModificada.x)
+
+# Crear las matrices de rotación inversas
+R_y_inv = Point.rotation_matrix_y(-degrees(phi))  # Deshacer la inclinación
+R_z_inv = Point.rotation_matrix_z(-degrees(theta))  # Deshacer la rotación en XY
+
+# Multiplicar en el orden correcto
+R_total_inv = np.dot(R_y_inv, R_z_inv)
+
+print("Matriz de rotación inversa:")
+print(R_total_inv)
+
 for fig, fig2 in zip(cilinderFig2, discFig2):
     fig.remove()
     fig2.remove()
 
-# Rotar los puntos del cilindro y disco
+# Aplicar la rotación inversa a cada punto
 for pt, pt2 in zip(cilinder.mesh, disc.mesh):
     if isinstance(pt, Point) and isinstance(pt2, Point):
-        pt.rotateWithMatrix(rotation_total) # rotar cada punto
-        pt2.rotateWithMatrix(rotation_total) # rotar cada punto
-
+        pt.rotateWithMatrix(R_total_inv)  # Desrotar cada punto
+        pt2.rotateWithMatrix(R_total_inv)  # Desrotar cada punto
+        
 cilinderFig2 = [*cube.addGraph(cilinder.mesh, divisions, '#8bff7e')]
 discFig2 = [*cube.addGraph(disc.mesh, divisions, '#8bff7e')]
 cube.createLabel("Figura des-rotada", '#8bff7e')
-
-        
 
 input("Cerrar.")

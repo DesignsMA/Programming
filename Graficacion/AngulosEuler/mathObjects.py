@@ -41,6 +41,16 @@ class Point():
     def __add__(self, otro):
         return Point(self.x + otro.x, self.y + otro.y, self.z + otro.z)
     
+    def sumar(self, otro):
+        self.x += otro.x
+        self.y += otro.y
+        self.z += otro.z
+    
+    def restar(self, otro):
+        self.x -= otro.x
+        self.y -= otro.y
+        self.z -= otro.z
+    
     def __radd__(self, otro):
         return self.__add__(otro)
     
@@ -186,3 +196,18 @@ class Point():
     def rotateWithMatrix(self, rotation_matrix):
         rotated_arr = np.dot(rotation_matrix, self.arr())  # Aplicar la rotación
         self.x, self.y, self.z = rotated_arr
+    
+    def rotate_point(self,point, eje, theta):
+        """Rota un punto alrededor de un eje dado un ángulo theta (en radianes)."""
+        p = np.array([point.x, point.y, point.z])
+
+        K = np.array([
+            [0, -eje[2], eje[1]],
+            [eje[2], 0, -eje[0]],
+            [-eje[1], eje[0], 0]
+        ])
+
+        R = np.eye(3) + np.sin(theta) * K + (1 - np.cos(theta)) * np.dot(K, K)
+        p_rotado = np.dot(R, p)
+
+        self.x, self.y, self.z = p_rotado
