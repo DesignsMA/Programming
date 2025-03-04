@@ -45,13 +45,16 @@ class FigureSpace:
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
         self.normalVector = None
-    
     def showGraph(self):
         plt.show(block=False)
-        
+    
+    def setZlim(self, n):
+        self.ax.set_zlim((-n,n))
         
     def graphCube(self):
         self.meshes = {}
+        self.ax.set_zlim((-4,4))
+        self.ax.set_box_aspect([1,1,1])
         for key, face in self.faces.items():
             mesh = BezierSurface(face, self.subdivisions)
             mesh.generateMesh()
@@ -118,38 +121,7 @@ class FigureSpace:
             self.labels.append(color_patch)
             self.ax.legend(handles=self.labels, loc=(1,1))
 
-class NormVector:
-    @staticmethod
-    def direction_cosines(pt: Point):
-        """
-        Calcula los cosenos directores del vector representado por el punto.
-
-        Retorna:
-            tuple: Cosenos directores (cos_alpha, cos_beta, cos_gamma).
-        """
-        norm = pt.norm() # magnitud del vector
-        if norm == 0:
-            raise ValueError("El vector no puede ser un vector nulo.")
-        cos_alpha = pt.x / norm
-        cos_beta = pt.y / norm
-        cos_gamma = pt.z / norm
-        return cos_alpha, cos_beta, cos_gamma
-
-    @staticmethod
-    def direction_angles(pt: Point):
-        """
-        Calcula los ángulos que forma el vector con los ejes x, y, y z.
-
-        Retorna:
-            tuple: Ángulos en grados (alpha, beta, gamma).
-        """
-        cos_alpha, cos_beta, cos_gamma = NormVector.direction_cosines(pt)
-        alpha = degrees(acos(cos_alpha))  # Ángulo con el eje x
-        beta = degrees(acos(cos_beta))    # Ángulo con el eje y
-        gamma = degrees(acos(cos_gamma))  # Ángulo con el eje z
-        return alpha, beta, gamma
-    
-
+## Main
 cube = FigureSpace(20,20,1,1)
 cube.normalVectorToFace('superior')
 
@@ -162,7 +134,6 @@ disc.generateMesh()
 cilinderFig = [*cube.addGraph(cilinder.mesh, divisions)]
 discFig = [*cube.addGraph(disc.mesh, divisions)]
 cube.graphCube()
-
 
 p1 = Point(10,0,0)
 p2 = Point(r*cos(120), r*sin(120), 0)
@@ -190,12 +161,9 @@ for pt, pt2 in zip(disc.mesh, cilinder.mesh):
         pt.rotate_point(pt, eje_rotacion, angulo_rotacion)
         pt2.rotate_point(pt2, eje_rotacion, angulo_rotacion)
         
-        
-                
 for fig, fig2 in zip(cilinderFig, discFig):
     fig.remove()
     fig2.remove()
-
 
 cilinderFig2 = [*cube.addGraph(cilinder.mesh, divisions, '#3ffdff')]
 discFig2 = [*cube.addGraph(disc.mesh, divisions, '#3ffdff')]
