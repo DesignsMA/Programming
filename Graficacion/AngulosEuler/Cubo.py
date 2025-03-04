@@ -53,7 +53,7 @@ class FigureSpace:
         
     def graphCube(self):
         self.meshes = {}
-        self.ax.set_zlim((-4,4))
+        self.ax.set_zlim((-3,3))
         self.ax.set_box_aspect([1,1,1])
         for key, face in self.faces.items():
             mesh = BezierSurface(face, self.subdivisions)
