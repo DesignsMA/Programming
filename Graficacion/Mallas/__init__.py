@@ -1,4 +1,4 @@
-from bezierSurface import BezierSurface
+from Mallas.bezierSurface import *
 from bilineal import *
 from cilinder2 import *
 from Mallas.disc import *
