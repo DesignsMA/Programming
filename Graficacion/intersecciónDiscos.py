@@ -35,7 +35,7 @@ disc2.generateMesh()
 
 
 res = set(interseccionDisco(disc1,disc2))
-graph(ax, 'black', disc1.mesh+disc2.mesh, 0.5, alpha=0.2)
-graph(ax,'#ff5353', res, 7)
+graph(ax, 'black', disc1.mesh+disc2.mesh, 0.5, alpha=0.15)
+graph(ax,'#ff5353', res, 2)
 plt.show()
 
