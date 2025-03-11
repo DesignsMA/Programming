@@ -1,4 +1,5 @@
 #Funciones básicas
+import numpy as np
 def factorial(x: int):
     if x == 1 or x == 0:
         return 1
@@ -51,9 +52,18 @@ class Point():
     def __rmul__(self, otro):
         return self.__mul__(otro)
 
-    def __eq__(self, otro):
-        return self.x == otro.x and self.y == otro.y and self.z == otro.z
-    
+    def __eq__(self, other):
+        """ Compara dos puntos con tolerancia para evitar errores numéricos """
+        if not isinstance(other, Point):
+            return False
+        return (np.isclose(self.x, other.x, atol=1e-6) and 
+                np.isclose(self.y, other.y, atol=1e-6) and 
+                np.isclose(self.z, other.z, atol=1e-6))
+
+    def __hash__(self):
+        """ Genera un hash basado en valores redondeados para evitar errores numéricos """
+        return hash((round(self.x, 6), round(self.y, 6), round(self.z, 6)))
+        
     def __str__(self):
         return f"({self.x} {self.y} {self.z})"
     
