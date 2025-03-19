@@ -1,9 +1,9 @@
-from disc import *
-from mathObjects import *
+from Mallas.disc import *
+from Mallas.mathObjects import *
 
 def perteneceADisco(punto, xc, yc, zc, r):
     """Evalúa si un punto pertenece al disco en el plano z = zc"""
-    if not np.isclose(punto.z, zc, atol=1e-6):
+    if not punto.z == zc:
         print("El disco dos no está en el mismo plano que el disco uno")
         return False  # El punto no está en el plano del disco
         # ecuación del disco, si la distancia cuadra es menor o igual a cero, pertenece al disco

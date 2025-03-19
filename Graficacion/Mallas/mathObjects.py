@@ -68,3 +68,6 @@ class Point():
         else:
             # Default formatting
             return f"({self.x}, {self.y}, {self.z})"
+    
+    def tuple(self):
+        return (self.x, self.y, self.z)
