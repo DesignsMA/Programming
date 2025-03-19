@@ -1,5 +1,5 @@
-from Mallas.disc import *
-from Mallas.mathObjects import *
+from disc import *
+from mathObjects import *
 
 def perteneceADisco(punto, xc, yc, zc, r):
     """Evalúa si un punto pertenece al disco en el plano z = zc"""
@@ -19,6 +19,9 @@ def diferenciaDisco(d1: DiscMesh, d2: DiscMesh):
     diferencia = [p for p in d1.mesh if not perteneceADisco(p, d2.center.x, d2.center.y, d2.center.z, d2.radio)]
     return diferencia
 
+def unionDisco(d1: DiscMesh, d2: DiscMesh):
+    "Retorna la union de d1 con d2."
+    return diferenciaDisco(d1,d2)+diferenciaDisco(d2,d1)
 
 def graph(ax, color, mesh, size: int=1, alpha: float=1):
     ptx = np.array([point.x for point in mesh])
@@ -41,9 +44,9 @@ disc2 = DiscMesh(center=Point(5,0,0), subdivisions=100, radio=10)
 disc2.generateMesh()
 
 
-res = set(interseccionDisco(disc1,disc2))
-res_diff1 = set( diferenciaDisco(disc1,disc2)) # estan en d1 pero no en d2
-res_diff2 = set( diferenciaDisco(disc2,disc1)) # estan en d2 pero no en d1
+res = interseccionDisco(disc1,disc2)
+res_diff1 = diferenciaDisco(disc1,disc2) # estan en d1 pero no en d2
+res_diff2 = diferenciaDisco(disc2,disc1) # estan en d2 pero no en d1
 graph(ax, 'black', res_diff1, 1, alpha=1)
 graph(ax, 'black', res_diff2, 1, alpha=1)
 graph(ax,'#ff5353', res, 1)
