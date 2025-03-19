@@ -47,10 +47,8 @@ res2 = interseccionEsfera(sphere2,sphere1)
 res_diff1 = diferenciaEsfera(sphere1,sphere2) # estan en d1 pero no en d2
 res_diff2 = diferenciaEsfera(sphere2,sphere1) # estan en d2 pero no en d1
 res_union = unionEsfera(sphere1,sphere2)
-#graph(ax, 'purple', res_diff1, 1, alpha=0.2)
-#graph(ax, 'blue', res_diff2, 1, alpha=0.2)
-#graph(ax,'#ff5353', res1+res2, 1)
-graph(ax, "#ff5353",res_union, 1 )
+graph(ax, 'black', res_union, 1, alpha=0.2)
+graph(ax,'#ff5353', res1+res2, 1)
 
 plt.show()
 
