@@ -13,7 +13,7 @@ def implicitFunc(disc: DiscMesh, pointInDisc: Point):
     
     try:
         # Calcular z1 utilizando la fórmula del disco
-        z1_positive = z0 + np.sqrt(r1**2 - (x1 - x0)**2 - (y1 - y0)**2)
+        z1_positive =  (x1 - x0)**2 + (y1 - y0)**2 -r1**2
         return z1_positive
     except ValueError:
         # Si hay un error en la raíz cuadrada (cuando el punto está fuera del disco)
