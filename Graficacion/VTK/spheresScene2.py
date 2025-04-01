@@ -23,7 +23,7 @@ from mycube import Cube
 
 
 def main():
-    colors = vtkNamedColors()
+    
     cube = Cube(center=(0,0,0),size=2, color="#ffffff")
     paths = [
         r"D:\Users\sepma\Downloads\Data\C728\Git\C-C++-C#\C\git\Graficacion\VTK\PyVista\imgs\difraccion-1.jpg",  
@@ -50,9 +50,13 @@ def main():
     for i, vertex in enumerate(vertices[:6]):  # Just first 6 vertices
         sphere = Sphere(center=vertex, radius=0.3, texture_path=paths[i])
         spheres.append(sphere)
-    # The usual rendering stuff.
+    
+    renderer(Actors=spheres+[cube])
+
+def renderer(camPos: tuple = (1,1,1), Actors: list = [], width: int = 1280, height: int = 720):
+    colors = vtkNamedColors()
     camera = vtkCamera()
-    camera.SetPosition(1, 1, 1)
+    camera.SetPosition(*camPos)
     camera.SetFocalPoint(0, 0, 0)
 
     renderer = vtkRenderer()
@@ -61,20 +65,20 @@ def main():
 
     iren = vtkRenderWindowInteractor()
     iren.SetRenderWindow(renWin)
-
-    renderer.AddActor(cube.get_actor())
-    for sphere in spheres:
-        renderer.AddActor(sphere.get_actor())
+    for actor in Actors:
+        renderer.AddActor(actor.get_actor())
+        
     renderer.SetActiveCamera(camera)
     renderer.ResetCamera()
     renderer.SetBackground(colors.GetColor3d("Cornsilk"))
 
-    renWin.SetSize(600, 600)
-    renWin.SetWindowName("Figures")
+    renWin.SetSize(width, height)
+    renWin.SetWindowName("Render")
 
     # interact with data
     renWin.Render()
     iren.Start()
+
 
 
 if __name__ == "__main__":
