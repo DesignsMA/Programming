@@ -93,7 +93,7 @@ normal = normalToSurface(p1, p2, p3)
 p = pv.Plotter() # dividiendo en malla de 3 x 3
 # Top row
 p.subplot(0, 0)
-p.add_mesh(disc, color='#53ff53', show_edges=True, use_transparency=True, opacity=0.6) # añade mesh al subplot
+p.add_mesh(disc, color='#53ff53', show_edges=True, use_transparency=True, opacity=0.6, label="Disco inicial") # añade mesh al subplot
 p.add_mesh(box, color='ff5353', show_edges=True) # añade mesh al subplot
 
 # Mostrar la normal como una flecha
@@ -188,7 +188,7 @@ R_total_inv = np.dot(R_z_inv, R_y_inv)  # Orden inverso
 discDef = discRotated.copy()
 discDef.points = np.dot(discDef.points, R_total_inv.T)  # Desrotación
 
-p.add_mesh(discDef, color='red', show_edges=True, opacity=0.5, edge_color='purple') # añade mesh al subplot
+p.add_mesh(discDef, color='purple', show_edges=True, opacity=0.4, edge_color='purple', line_width=20, label="Disco desrotado") # añade mesh al subplot
 
 
 p.add_legend()
