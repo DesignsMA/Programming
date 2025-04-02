@@ -46,7 +46,7 @@ def iceCreamFunc():
     p.show()
 
 
-icecream = IceCream(resolution=10)
+icecream = IceCream(resolution=30)
 sphere = pv.Sphere(4,center=(0,0,0))
 p = pv.Plotter()
 result = icecream.boolean_intersection(sphere)
