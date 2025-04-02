@@ -32,25 +32,15 @@ class IceCream:
         return self.polydata.boolean_intersection(triangulatedMesh) # return mesh
 
 def iceCreamFunc():
-    cone = pv.Cone(height=10, radius=3.8, resolution=20, direction=(0,0,-1)).triangulate().subdivide(3)
-    sphere = pv.Sphere(radius=4,center=(0,0,fabs(10-4*0.75)), phi_resolution=20, theta_resolution=20).triangulate().subdivide(3)
-    cream = sphere.boolean_difference(cone) # restarle a la esfera el cono
-    cone = cone.boolean_difference(sphere)
-
+    head = pv.Sphere(radius=4,center=(0,0,0), phi_resolution=20, theta_resolution=20).triangulate().subdivide(3)
+    eyel = pv.Cylinder(radius=0.5, center = (2,4,2), direction=(0,1,0), height=5,resolution=20).triangulate().subdivide(3)
+    eyer = pv.Cylinder(radius=0.5, center = (-2,4,2), direction=(0,1,0), height=5,resolution=20).triangulate().subdivide(3)
+    helmet = head.boolean_difference(eyel+eyer)
     p = pv.Plotter()
-    p.add_mesh(cone, color='#ff5353', show_edges=False, label='Cono')
-    p.add_legend()
-    p.add_mesh(cream, color='pink', show_edges=False, label='Cream')
+    p.add_mesh(helmet, color='#ff5353', show_edges=False, label='Cono')
     p.add_legend()
     p.camera_position = 'xz'
     p.show()
 
 
-icecream = IceCream(resolution=10)
-sphere = pv.Sphere(4,center=(0,0,0))
-p = pv.Plotter()
-result = icecream.boolean_intersection(sphere)
-p.add_mesh(result, color='#ff5353', show_edges=False, label='Interseccion')
-p.add_legend()
-p.camera_position = 'xz'
-p.show()
+iceCreamFunc()
