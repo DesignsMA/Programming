@@ -1,154 +1,325 @@
-from pyvista import *
+import pyvista as pv
 import numpy as np
-from numpy.random import random
 from time import sleep
 from abc import ABC, abstractmethod
-    
-class SphereObject():
-    
-    def __init__(self, p: np.array, dp: np.array, r:float = 2.0,  res: int = 20, color: str = 'red'):
-        """
-          Inicializa una esfera con sus atributos para su uso en una simulación.
+from random import random
 
-          Args:
-              p (np.ndarray): Posición actual de la esfera en el espacio (centro).
-              dp (np.ndarray): Vector de desplazamiento que indica la dirección hacia donde se dirige la esfera.
-              r (float): Radio de la esfera. Por defecto es 2.0.
-              res (int, optional): Resolución de la malla (número de divisiones angulares). Por defecto es 20.
-              color (str): Color de la esfera. Por defecto es 'red'.
-        """
+class SphereObject():
+    def __init__(self, p: np.array, dp: np.array, r: float = 1.0, res: int = 20, color: str = 'red'):
         self.r = r
         self.color = color
-        self.mesh = Sphere(radius=r, center=p, direction=dp, theta_resolution=res, phi_resolution=res)
-        self.p = p
-        self.dp = dp
+        self.p = np.array(p, dtype=np.float64)
+        self.dp = np.array(dp, dtype=np.float64)
+        self.mesh = pv.Sphere(radius=r, center=self.p, theta_resolution=res, phi_resolution=res)
     
     def move(self):
-        """
-            Actualiza la posición de la esfera de acuerdo a su desplazamiento | No actualiza la vista.
-            
-        """
-        self.p += self.dp # actualizar posición
-        self.mesh.translate(self.dp, inplace=True)  # Actualiza la malla
+        self.p += self.dp
+        self.mesh.translate(self.dp, inplace=True)
 
-    # Tipos de colisión
-    
-    def bounce(self, normal: np.array):
-        """Invierte la dirección basado en la normal de la superficie colisionada."""
-        self.dp = -self.dp  # Simple, para paredes planas
-        
+    def bounce(self):
+        """Simple bounce by reversing direction"""
+        self.dp = -self.dp
+        self.p +=self.dp
+
 class Container(ABC):
     def __init__(self, mesh):
         self.mesh = mesh
+        self.center = np.array([0, 0, 0])
+        self.rotation_matrix = np.eye(3)  # Identity matrix initially
+    
+    def rotate(self, angle: float, axis: str):
+        """Rotate the container and update rotation matrix"""
+        if axis == 'x':
+            self.mesh.rotate_x(angle, inplace=True)
+            theta = np.radians(angle)
+            rot = np.array([
+                [1, 0, 0],
+                [0, np.cos(theta), -np.sin(theta)],
+                [0, np.sin(theta), np.cos(theta)]
+            ])
+        elif axis == 'y':
+            self.mesh.rotate_y(angle, inplace=True)
+            theta = np.radians(angle)
+            rot = np.array([
+                [np.cos(theta), 0, np.sin(theta)],
+                [0, 1, 0],
+                [-np.sin(theta), 0, np.cos(theta)]
+            ])
+        elif axis == 'z':
+            self.mesh.rotate_z(angle, inplace=True)
+            theta = np.radians(angle)
+            rot = np.array([
+                [np.cos(theta), -np.sin(theta), 0],
+                [np.sin(theta), np.cos(theta), 0],
+                [0, 0, 1]
+            ])
+        
+        self.rotation_matrix = rot @ self.rotation_matrix
     
     @abstractmethod
-    def check_collision(self, sphere: SphereObject) -> np.array:
-        """Retorna la normal de la superficie colisionada (o None si no hay colisión)."""
+    def check_collision(self, sphere: SphereObject) -> bool:
         pass
-    
+
 class BoxContainer(Container):
     def __init__(self, bound: float):
-        bounds = (-bound, bound, -bound, bound, -bound, bound) # limites
-        super().__init__(Box(bounds=bounds)) # inicializar malla
-        self.bound = bound # limite general
+        bounds = (-bound, bound, -bound, bound, -bound, bound)
+        super().__init__(pv.Box(bounds=bounds))
+        self.bound = bound
     
-    def check_collision(self, sphere: SphereObject) -> np.array:
-        normal = np.zeros(3)
-        collided = False
+    def check_collision(self, sphere: SphereObject) -> bool:
+        # Transform to local coordinates
+        local_pos = self.rotation_matrix.T @ (sphere.p - self.center)
         
-        # Verificar colisión con cada cara del cubo
-        for i in range(3):  # Ejes X, Y, Z
-            if sphere.p[i] - sphere.r <= -self.bound:
-                normal[i] = 1.0  # Normal hacia afuera de la cara negativa
-                collided = True
-            elif sphere.p[i] + sphere.r >= self.bound:
-                normal[i] = -1.0  # Normal hacia afuera de la cara positiva
-                collided = True
-        
-        return normal if collided else None
+        # Check against local bounds
+        for i in range(3):
+            if abs(local_pos[i]) + sphere.r > self.bound:
+                return True
+        return False
 
 class CylinderContainer(Container):
     def __init__(self, radius: float, height: float):
-        super().__init__(Cylinder(radius=radius, height=height))
+        # Orientar el cilindro en el eje X
+        super().__init__(pv.Cylinder(center=(0, 0, 0), direction=(1, 0, 0), radius=radius, height=height, resolution=20))
         self.radius = radius
-        self.height = height
-    
-    def check_collision(self, sphere: SphereObject) -> np.array:
-        normal = np.zeros(3)
-        collided = False
-        
-        # Colisión con la pared lateral (XZ)
-        dist_xz = np.sqrt(sphere.p[0]**2 + sphere.p[2]**2)
-        if dist_xz + sphere.r >= self.radius:
-            normal[0] = sphere.p[0] / dist_xz  # Normal radial en X
-            normal[2] = sphere.p[2] / dist_xz  # Normal radial en Z
-            collided = True
-        
-        # Colisión con las tapas (Y)
-        if sphere.p[1] - sphere.r <= -self.height/2:
-            normal[1] = 1.0  # Normal de la tapa inferior
-            collided = True
-        elif sphere.p[1] + sphere.r >= self.height/2:
-            normal[1] = -1.0  # Normal de la tapa superior
-            collided = True
-        
-        return normal if collided else None
+        self.height = height  # total length along X axis
 
+    def check_collision(self, sphere: SphereObject) -> bool:
+        # Transformar a coordenadas locales (considerando rotación)
+        local_pos = self.rotation_matrix.T @ (sphere.p - self.center)
+        x, y, z = local_pos
+        s = sphere.r
+
+        # Margen de seguridad
+        margin = 0.01 * s
+
+        # Colisión con paredes laterales (radio en eje Z)
+        dist_to_axis = np.sqrt(y**2 + z**2)
+        wall_collision = (dist_to_axis + s + margin) > self.radius
+
+        # Colisión con extremos en X
+        top_collision = (x + s + margin) > (self.height / 2)
+        bottom_collision = (x - s - margin) < (-self.height / 2)
+
+        return wall_collision or top_collision or bottom_collision
+    
 class TorusContainer(Container):
     def __init__(self, major_radius: float, minor_radius: float):
-        super().__init__(ParametricTorus(ringradius=major_radius, crosssectionradius=minor_radius))
+        torus = pv.ParametricTorus(ringradius=major_radius, crosssectionradius=minor_radius)
+        super().__init__(torus)
         self.major_r = major_radius
         self.minor_r = minor_radius
+        print(self.rotation_matrix)
     
-    def check_collision(self, sphere: SphereObject) -> np.array:
-        # Distancia al centro del anillo (plano XZ)
-        dist_xz = np.sqrt(sphere.p[0]**2 + sphere.p[2]**2)
-        closest_x = (self.major_r * sphere.p[0]) / dist_xz if dist_xz > 0 else 0
-        closest_z = (self.major_r * sphere.p[2]) / dist_xz if dist_xz > 0 else 0
+    def rotate(self, angle: float, axis: str):
+        """Rotate the container and update rotation matrix"""
+        if axis == 'x':
+            self.mesh.rotate_x(angle, inplace=True)
+            theta = np.radians(angle)
+            rot = np.array([
+                [1, 0, 0],
+                [0, np.cos(theta), -np.sin(theta)],
+                [0, np.sin(theta), np.cos(theta)]
+            ])
+        elif axis == 'y':
+            self.mesh.rotate_y(angle, inplace=True)
+            theta = np.radians(angle)
+            rot = np.array([
+                [np.cos(theta), 0, np.sin(theta)],
+                [0, 1, 0],
+                [-np.sin(theta), 0, np.cos(theta)]
+            ])
+        elif axis == 'z':
+            self.mesh.rotate_z(angle, inplace=True)
+            theta = np.radians(angle)
+            rot = np.array([
+                [np.cos(theta), -np.sin(theta), 0],
+                [np.sin(theta), np.cos(theta), 0],
+                [0, 0, 1]
+            ])
         
-        # Punto más cercano en el toro
-        closest_point = np.array([closest_x, sphere.p[1], closest_z])
+        self.rotation_matrix = self.rotation_matrix @ rot
+
+    def check_collision(self, sphere: SphereObject) -> bool:
+        # Transformar a coordenadas locales con rotación actual
+        local_pos = self.rotation_matrix.T @ (sphere.p - self.center)
+        x, y, z = local_pos
+    
+        R = self.major_r
+        r = self.minor_r
+        s = sphere.r
+    
+        # Distancia al eje central del toro
+        d = np.sqrt(x**2 + y**2)
+        distance_sq = (d - R)**2 + z**2
+    
+        # Margen de seguridad para evitar atascamientos
+        margin = 0.01 * s  # 5% del radio de la esfera
         
-        # Vector desde el punto más cercano a la esfera
-        collision_vector = sphere.p - closest_point
-        distance = np.linalg.norm(collision_vector)
-        
-        if distance <= sphere.r + self.minor_r:
-            normal = collision_vector / distance  # Normal unitaria
-            return normal
-        return None
+        # Condición de colisión mejorada
+        return ((r - s - margin)**2 <= distance_sq <= (r + s + margin)**2) and \
+               (R - r - s - margin < d < R + r + s + margin)
+               
 class PhysicsSimulator():
-    
-    def __init__(self, plotter: Plotter, container: str = ['cube', 'cilinder', 'torus']):
-        self.plot = plotter
-        self.containerType = container
-        self.initContainer()
+    def __init__(self, plotter: pv.Plotter, container: str = 'cube', nspheres: int = 2, rsphere: float = 0.8):
+        self.plotter = plotter
+        self.container = self._init_container(container)
         self.spheres = []
         self.running = False
+        self.current_rotations = np.array([0.0, 0.0, 0.0])  # Track rotations in X,Y,Z
+        
+        # Generate random spheres inside the container
+        for _ in range(nspheres):
+            # Get container dimensions
+            if isinstance(self.container, BoxContainer):
+                bound = self.container.bound
+                # Random position within bounds (accounting for sphere radius)
+                p = np.random.uniform(-bound + 2, bound - 2, 3)  # 2 = sphere radius
+            elif isinstance(self.container, CylinderContainer):
+                radius = self.container.radius - rsphere
+                half_length = self.container.height / 2 - rsphere
+
+                # Posición aleatoria dentro del cilindro (eje X, radio en Z-Y)
+                for _ in range(nspheres):
+                    theta = np.random.uniform(0, 2*np.pi)
+                    r = np.random.uniform(0, radius)
+                    x = np.random.uniform(-half_length, half_length)
+                    y = r * np.cos(theta)
+                    z = r * np.sin(theta)
+                    p = np.array([x, y, z])
+            
+            elif isinstance(self.container, TorusContainer):
+                major_r = self.container.major_r
+                minor_r = self.container.minor_r
+                
+                # Random position within torus volume (proper distribution)
+                for _ in range(nspheres):
+                    # Random angle around the torus (0 to 2pi)
+                    theta = np.random.uniform(0, 2*np.pi)
+                    
+                    # Random angle around the tube (0 to 2pi)
+                    phi = np.random.uniform(0, 2*np.pi)
+                    
+                    # Random radius within tube (avoiding edges)
+                    tube_r = np.random.uniform(0.2*minor_r, 0.8*minor_r)
+                    
+                    # Calculate position (torus lies in XY plane, tube in XZ)
+                    p = np.array([
+                        (major_r + tube_r * np.cos(phi)) * np.cos(theta),
+                        (major_r + tube_r * np.cos(phi)) * np.sin(theta),
+                        tube_r * np.sin(phi)
+                    ])
+                    
+            # Random direction vector (normalized)
+            dp = np.random.uniform(-1, 1, 3)
+            dp = dp / np.linalg.norm(dp) * 0.1  # Small initial velocity
+            
+            # Random color
+            color = np.random.choice(['red', 'green', 'blue', 'yellow', 'cyan', 'magenta'])
+            
+            self.spheres.append(SphereObject(p=p, dp=dp, r=rsphere, color=color))
+            
     
-    def initContainer(self):
-        self.container = Box(bounds=(-10,10,-10,10,-10,10))
-        pass
+    def _init_container(self, container_type: str) -> Container:
+        if container_type == "cube":
+            return BoxContainer(bound=20)
+        elif container_type == "cylinder":
+            return CylinderContainer(radius=20, height=40)
+        elif container_type == "torus":
+            return TorusContainer(major_radius=30, minor_radius=10)
+        raise ValueError(f"Invalid container type: {container_type}")
+    
+    def check_sphere_collision(self, sphere1: SphereObject, sphere2: SphereObject):
+        distance = np.linalg.norm(sphere1.p - sphere2.p)
+        if distance < sphere1.r + sphere2.r:
+            sphere1.bounce()
+            sphere2.bounce()
+    
+    def run_simulation(self):
+        self.running = True
+        rotation_sequence = [
+            (30, 'x'), (60, 'x'), (90, 'x'),
+            (30, 'y'), (60, 'y'), (90, 'y'),
+            (30, 'z'), (60, 'z'), (90, 'z')
+        ]
+        current_step = 0
+        pause_counter = 0
 
-    def checkContainerCollision(self, sphere: SphereObject):
-        pass
-        
-        
-    def checkSphereCollision(self, sphere1: SphereObject, sphere2: SphereObject):
-        pass
+        while self.running:
+            # Handle rotations
+            if pause_counter <= 0:
+                if current_step < len(rotation_sequence):  # Fixed: changed <= to <
+                    target_angle, axis = rotation_sequence[current_step]
+                    rotation_amount = 0.1  # Degrees per frame
 
-    def runSimulation(self):
-        while True:
+                    # Apply rotation
+                    self.container.rotate(rotation_amount, axis)
+
+                    # Update rotation tracker
+                    if axis == 'x':
+                        self.current_rotations[0] += rotation_amount
+                        current_angle = self.current_rotations[0]
+                    elif axis == 'y':
+                        self.current_rotations[1] += rotation_amount
+                        current_angle = self.current_rotations[1]
+                    else:  # 'z'
+                        self.current_rotations[2] += rotation_amount
+                        current_angle = self.current_rotations[2]
+
+                    # Check if target angle reached
+                    if current_angle >= target_angle:
+                        current_step += 1
+                        pause_counter = 30  # 1.5 second pause
+                else:
+                    current_step = 0
+                    self.current_rotations = np.array([0.0, 0.0, 0.0])
+            else:
+                pause_counter -= 1
+
+            # Physics update with collision handling
             for sphere in self.spheres:
+                # Store previous position
+                prev_pos = sphere.p.copy()
                 sphere.move()
-                self.checkContainerCollision(sphere)
-                self.checkSphereCollision(sphere, other_spheres)
-            plotter.update()
+
+                # Check collision and handle
+                if self.container.check_collision(sphere):
+                    # Move back to previous position
+                    sphere.p = prev_pos
+                    sphere.mesh.translate(prev_pos - sphere.p, inplace=True)
+
+                    # Apply simple bounce
+                    sphere.bounce()
+
+                    # Position correction in the opposite direction of velocity
+                    correction = 0.1 * -sphere.dp/np.linalg.norm(sphere.dp)
+                    sphere.p += correction
+                    sphere.mesh.translate(correction, inplace=True)
+
+                # Sphere-sphere collisions
+                for other in self.spheres:
+                    if other != sphere:
+                        distance = np.linalg.norm(sphere.p - other.p)
+                        if distance < sphere.r + other.r:
+                            # Simple bounce for both spheres
+                            sphere.bounce()
+                            other.bounce()
+
+            self.plotter.update()
             sleep(0.05)
-    
-set_plot_theme('dark')
-plotter = Plotter()
+                    
+# Setup and run simulation
+pv.set_plot_theme('dark')
+plotter = pv.Plotter()
+spheres =input("Especifique el numero de esferas\n: ")
+container = input("Especifique el contenedor\ntorus | cube | cylinder\n: ")
+simulator = PhysicsSimulator(plotter, container=container, nspheres=int(spheres))
 
-simulator = PhysicsSimulator(plotter=plotter, container='cube')
+plotter.add_mesh(simulator.container.mesh, opacity=0.2)
+for sphere in simulator.spheres:
+    plotter.add_mesh(sphere.mesh, color=sphere.color)
 
-plotter.add_key_event(" ", lambda: simulator.runSimulation)
+plotter.add_key_event("1", lambda: simulator.run_simulation())
+plotter.add_key_event("x", lambda: exit())
+plotter.show_axes()
+plotter.show()
+
