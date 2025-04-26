@@ -19,7 +19,7 @@ class SphereObject():
     def bounce(self):
         """Simple bounce by reversing direction"""
         self.dp = -self.dp
-        self.p +=self.dp
+        self.p +=self.dp*3
 
 class Container(ABC):
     def __init__(self, mesh):
@@ -71,8 +71,9 @@ class BoxContainer(Container):
         local_pos = self.rotation_matrix.T @ (sphere.p - self.center)
         
         # Check against local bounds
+        umbral = 0.01
         for i in range(3):
-            if abs(local_pos[i]) + sphere.r > self.bound:
+            if abs(local_pos[i]) + sphere.r + sphere.r*umbral  >= self.bound:
                 return True
         return False
 
@@ -167,12 +168,9 @@ class PhysicsSimulator():
         self.running = False
         self.current_rotations = np.array([0.0, 0.0, 0.0])  # Track rotations in X,Y,Z
         
-        # Generate random spheres inside the container
         for _ in range(nspheres):
-            # Get container dimensions
             if isinstance(self.container, BoxContainer):
                 bound = self.container.bound
-                # Random position within bounds (accounting for sphere radius)
                 p = np.random.uniform(-bound + 2, bound - 2, 3)  # 2 = sphere radius
             elif isinstance(self.container, CylinderContainer):
                 radius = self.container.radius - rsphere
@@ -191,32 +189,26 @@ class PhysicsSimulator():
                 major_r = self.container.major_r
                 minor_r = self.container.minor_r
                 
-                # Random position within torus volume (proper distribution)
                 for _ in range(nspheres):
-                    # Random angle around the torus (0 to 2pi)
                     theta = np.random.uniform(0, 2*np.pi)
                     
-                    # Random angle around the tube (0 to 2pi)
                     phi = np.random.uniform(0, 2*np.pi)
                     
-                    # Random radius within tube (avoiding edges)
                     tube_r = np.random.uniform(0.2*minor_r, 0.8*minor_r)
                     
-                    # Calculate position (torus lies in XY plane, tube in XZ)
                     p = np.array([
                         (major_r + tube_r * np.cos(phi)) * np.cos(theta),
                         (major_r + tube_r * np.cos(phi)) * np.sin(theta),
                         tube_r * np.sin(phi)
                     ])
                     
-            # Random direction vector (normalized)
             dp = np.random.uniform(-1, 1, 3)
-            dp = dp / np.linalg.norm(dp) * 0.1  # Small initial velocity
+            dp = dp / np.linalg.norm(dp) * 0.3  # Small initial velocity
             
             # Random color
             color = np.random.choice(['red', 'green', 'blue', 'yellow', 'cyan', 'magenta'])
             
-            self.spheres.append(SphereObject(p=p, dp=dp, r=rsphere, color=color))
+            self.spheres.append(SphereObject(p=p, dp=dp, r=rsphere, color=color, res=10))
             
     
     def _init_container(self, container_type: str) -> Container:
