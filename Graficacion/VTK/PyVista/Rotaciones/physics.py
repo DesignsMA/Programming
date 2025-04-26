@@ -19,7 +19,7 @@ class SphereObject():
     def bounce(self):
         """Simple bounce by reversing direction"""
         self.dp = -self.dp
-        self.p +=self.dp*3
+
 
 class Container(ABC):
     def __init__(self, mesh):
@@ -154,7 +154,7 @@ class TorusContainer(Container):
         distance_sq = (d - R)**2 + z**2
     
         # Margen de seguridad para evitar atascamientos
-        margin = 0.01 * s  # 5% del radio de la esfera
+        margin = 0.16 * s  # 5% del radio de la esfera
         
         # Condición de colisión mejorada
         return ((r - s - margin)**2 <= distance_sq <= (r + s + margin)**2) and \
@@ -203,7 +203,7 @@ class PhysicsSimulator():
                     ])
                     
             dp = np.random.uniform(-1, 1, 3)
-            dp = dp / np.linalg.norm(dp) * 0.3  # Small initial velocity
+            dp = dp / np.linalg.norm(dp) * 0.08  # Small initial velocity
             
             # Random color
             color = np.random.choice(['red', 'green', 'blue', 'yellow', 'cyan', 'magenta'])
@@ -217,14 +217,8 @@ class PhysicsSimulator():
         elif container_type == "cylinder":
             return CylinderContainer(radius=20, height=40)
         elif container_type == "torus":
-            return TorusContainer(major_radius=30, minor_radius=10)
+            return TorusContainer(major_radius=30, minor_radius=20)
         raise ValueError(f"Invalid container type: {container_type}")
-    
-    def check_sphere_collision(self, sphere1: SphereObject, sphere2: SphereObject):
-        distance = np.linalg.norm(sphere1.p - sphere2.p)
-        if distance < sphere1.r + sphere2.r:
-            sphere1.bounce()
-            sphere2.bounce()
     
     def run_simulation(self):
         self.running = True
@@ -241,7 +235,7 @@ class PhysicsSimulator():
             if pause_counter <= 0:
                 if current_step < len(rotation_sequence):  # Fixed: changed <= to <
                     target_angle, axis = rotation_sequence[current_step]
-                    rotation_amount = 0.1  # Degrees per frame
+                    rotation_amount = 0.010  # Degrees per frame
 
                     # Apply rotation
                     self.container.rotate(rotation_amount, axis)
@@ -269,35 +263,30 @@ class PhysicsSimulator():
 
             # Physics update with collision handling
             for sphere in self.spheres:
-                # Store previous position
-                prev_pos = sphere.p.copy()
-                sphere.move()
+                
 
                 # Check collision and handle
                 if self.container.check_collision(sphere):
-                    # Move back to previous position
-                    sphere.p = prev_pos
-                    sphere.mesh.translate(prev_pos - sphere.p, inplace=True)
-
-                    # Apply simple bounce
                     sphere.bounce()
+                    sphere.move()
 
-                    # Position correction in the opposite direction of velocity
-                    correction = 0.1 * -sphere.dp/np.linalg.norm(sphere.dp)
-                    sphere.p += correction
-                    sphere.mesh.translate(correction, inplace=True)
+
+                sphere.move()
+                    
 
                 # Sphere-sphere collisions
                 for other in self.spheres:
                     if other != sphere:
+                        umbral = 0.015
                         distance = np.linalg.norm(sphere.p - other.p)
-                        if distance < sphere.r + other.r:
+                        if distance < sphere.r + other.r + sphere.r*umbral:
                             # Simple bounce for both spheres
                             sphere.bounce()
                             other.bounce()
-
+                            sphere.move()
+                            other.move()
             self.plotter.update()
-            sleep(0.05)
+            sleep(0.001)
                     
 # Setup and run simulation
 pv.set_plot_theme('dark')
