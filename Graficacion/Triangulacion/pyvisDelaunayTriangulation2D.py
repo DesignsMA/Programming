@@ -3,37 +3,61 @@ import numpy as np
 import random
 # clases de utilidad
 class Edge():
-    def __init__(self, a: int = 0, b: int = 0):
-        """Representación de un lado entre índices de puntos."""
-        self.a = a
-        self.b = b
-    def __repr__(self):
-        return f"Edge({self.a}, {self.b})"
-    def tuple(self):
-        return (self.a, self.b)
+  def __init__(self, a: float = 0, b: float = 0):
+      """
+      Representación de un lado.
+      
+      :params:
+      a (float): Miembro 'a' del lado.
+      
+      b (float): Miembro 'b' del lado.
+      """
+      self.a = a
+      self.b = b
+  
+  def __repr__(self):
+     return f"Edge({self.a}, {self.b})"
+  
+  def tuple(self):
+      "Returns the tuple equivalent of the class."
+      return (self.a,self.b) # tuple
+  
+  def arr(self):
+      "Returns the numpy array equivalent of the class."
+      return np.array([self.a,self.b], dtype=np.float64) # retornar arreglo de tipo float64
 
 class Point2D():
-    """Punto en 2D con utilidades básicas."""
-    def __init__(self, x: float = 0, y: float = 0):
-        self.x = x
-        self.y = y
-    def __repr__(self):
-        return f"Point2D({self.x}, {self.y})"
-    def distance_to(self, other):
-        return np.hypot(self.x - other.x, self.y - other.y)
-    def arr(self):
-        return np.array([self.x, self.y], dtype=np.float64)
-    def __lt__(self, other):
-        return (self.x, self.y) < (other.x, other.y)
+  """
+    Point2D | Representación de un punto en dos dimensiones.
+  """
+    
+  def __init__(self, x: float = 0, y: float = 0):
+      """      
+      :params:
+        x (float): Coordenada en el eje X.
+        
+        y (float): Coordenada en el eje Y.
+      """
+      self.x = x
+      self.y = y
+    
+  def __repr__(self):
+      return f"Point2D({self.x}, {self.y})"
+  
+  def __lt__(self, other):
+      """ Define el orden de los puntos (orden por x, luego por y) """
+      if self.x == other.x:
+          return self.y < other.y
+      return self.x < other.x
 
-class Triangle():
-    """Triángulo definido por tres índices de vértices."""
-    def __init__(self, a, b, c):
-        self.a, self.b, self.c = a, b, c
-    def vertices(self):
-        return (self.a, self.b, self.c)
-    def contains_vertex(self, idx):
-        return idx in (self.a, self.b, self.c)      
+  def distance_to(self, other):
+      """Calcula la distancia entre dos puntos"""
+      return np.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
+  
+  def arr(self):
+      "Returns the numpy array equivalent of the class."
+      return np.array([self.x,self.y], dtype=np.float64) # retornar arreglo de tipo float64
+      
 
 # clase que maneja la lógica de la triangulación
 class DelaunayTriangulation():
@@ -43,7 +67,7 @@ class DelaunayTriangulation():
       self.sorted = points.copy()
       self.edges = []
       self.hull = []
-      self.circumcenters = []
+      self.circuncenters = []
 
   def insideCircle(self, A: Point2D, B: Point2D, C: Point2D, P: Point2D):
     ax = A.x - P.x
@@ -58,20 +82,6 @@ class DelaunayTriangulation():
   
   def crossProduct(self, A: Point2D, B: Point2D):
     return A.x * B.y - A.y * B.x
-
-  def _circumcenter(self, A: Point2D, B: Point2D, C: Point2D):
-        """Calcula circuncentro y radio del triángulo ABC."""
-        ax, ay =  A.x, A.y
-        bx, by = B.x, B.y
-        cx, cy = C.x, C.y
-        d = 2 * (ax*(by - cy) + bx*(cy - ay) + cx*(ay - by))
-        if abs(d) < 1e-12:
-            return None, None
-        ux = ((ax*ax + ay*ay)*(by - cy) + (bx*bx + by*by)*(cy - ay) + (cx*cx + cy*cy)*(ay - by)) / d
-        uy = ((ax*ax + ay*ay)*(cx - bx) + (bx*bx + by*by)*(ax - cx) + (cx*cx + cy*cy)*(bx - ax)) / d
-        center = Point2D(ux, uy)
-        radius = center.distance_to(A)
-        return center, radius
 
   def triangulate(self):
       n = len(self.points)
@@ -120,56 +130,7 @@ class DelaunayTriangulation():
       self.hull = self.edges.copy() # almacenar envolvente
       
       # triangular
-      # --- DELAUNAY TRIANGULATION (Bowyer-Watson) ---
-      # Preparamos triángulo super
-      min_x = min(p.x for p in self.sorted)
-      max_x = max(p.x for p in self.sorted)
-      min_y = min(p.y for p in self.sorted)
-      max_y = max(p.y for p in self.sorted)
-      dmax = max(max_x-min_x, max_y-min_y) * 10
-      mid_x, mid_y = (min_x+max_x)/2, (min_y+max_y)/2
-      super_pts = [Point2D(mid_x-dmax, mid_y-dmax), Point2D(mid_x, mid_y+dmax), Point2D(mid_x+dmax, mid_y-dmax)]
-      base_index = len(self.sorted)
-      self.sorted.extend(super_pts)
-      # Triángulo inicial
-      triangles = [Triangle(base_index, base_index+1, base_index+2)]
-      # Para cada punto original
-      for i in range(n):
-          bad = []
-          p = self.sorted[i]
-          for t in triangles:
-              A, B, C = self.sorted[t.a], self.sorted[t.b], self.sorted[t.c]
-              if self.insideCircle(A, B, C, p):
-                  bad.append(t)
-          # recolectar bordes del hueco
-          poly = []
-          for t in bad:
-              for ea, eb in [(t.a,t.b), (t.b,t.c), (t.c,t.a)]:
-                  edge = Edge(min(ea,eb), max(ea,eb))
-                  poly.append(edge)
-          # eliminar triángulos inválidos
-          triangles = [t for t in triangles if t not in bad]
-          # bordes únicos
-          unique = [e for e in poly if poly.count(e) == 1]
-          # re-triangular hueco
-          for e in unique:
-              triangles.append(Triangle(e.a, e.b, i))
-      # eliminar triángulos con vértices del supertriángulo
-      triangles = [t for t in triangles if not any(v>=base_index for v in t.vertices())]
-      # vaciar lista de edges y circuncentros
-      self.edges.clear()
-      self.circumcenters.clear()
-      edge_set = set()
-      for t in triangles:
-          A, B, C = (self.sorted[j] for j in t.vertices())
-          center, radius = self._circumcenter(A, B, C)
-          if center is not None:
-              self.circumcenters.append((center, radius))
-          for ea, eb in [(t.a,t.b),(t.b,t.c),(t.c,t.a)]:
-              edge_set.add((min(ea,eb), max(ea,eb)))
-      self.edges = [Edge(a,b) for a,b in edge_set]
-      # fin de triangulación
-      return
+      ...
       
   # Implementación de quick sort para puntos
   
@@ -198,4 +159,3 @@ class DelaunayTriangulation():
       self.sortByX(points, start, pivot - 1) # volver a particionar pero para el lado izquierdo
       self.sortByX(points, pivot+1, end) # volver a particionar pero para el lado derecho
       return points
-    
