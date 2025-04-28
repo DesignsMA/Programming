@@ -1,53 +1,85 @@
 from pyvis.network import Network
 import random
-from pyvisDelaunayTriangulation2D import DelaunayTriangulation, Point2D
+import math
+from pyvisDelaunayTriangulation2D import DelaunayTriangulation, Triangle, Point2D
 
-# Configuración
-bounds = [60, 60]
-nodes = 16
-canvas_size = 600
+# Crear puntos aleatorios
+random_points = [Point2D(random.random()*100, random.random()*100) for _ in range(16)]
 
-# factor para escalar de coordenadas [0..bounds] → píxeles
-scale = (canvas_size / max(bounds)) * 2  
-# desplazamiento para llevar el centro de bounds a (0,0)
-off_x = bounds[0] / 2
-off_y = bounds[1] / 2
+# Triangulación
+dt = DelaunayTriangulation(random_points)
+dt.bowyer_watson()
 
-# Creamos la red PyVis sin physics
-net = Network(f"{canvas_size}px", f"{canvas_size}px", bgcolor="#161616", notebook=False)
+# Visualización (usando pyvis)
+net = Network(height="750px", width="100%", notebook=False, bgcolor="#161616")
+# circuncentros
+for i, triangle in enumerate(dt.triangles):
+    if isinstance(triangle, Triangle) and not triangle.is_degenerate:
+        circuncenter, radius = triangle.get_circumcircle()
+        
+        # Punto pequeño para el circuncentro
+        net.add_node(n_id=f"c{i}", 
+                   x=circuncenter.x*10, 
+                   y=circuncenter.y*10, 
+                   size=3, 
+                   color="#00ff99",
+                   font={'size': 0},
+                   physics=False)
+        
+        # Círculo circunscrito (usando múltiples nodos para simular círculo)
+        circle_nodes = 64  # Número de puntos para aproximar el círculo
+        for j in range(circle_nodes):
+            angle = 2 * math.pi * j / circle_nodes
+            x = circuncenter.x*10 + radius*10 * math.cos(angle)
+            y = circuncenter.y*10 + radius*10 * math.sin(angle)
+            
+            net.add_node(n_id=f"circ_{i}_{j}",
+                       x=x, 
+                       y=y, 
+                       size=1, 
+                       color="#00ff99",
+                       font={'size': 0},
+                       opacity=0,
+                       physics=False)
+            
+            # Conectar puntos del círculo
+            if j > 0:
+                net.add_edge(f"circ_{i}_{j-1}", f"circ_{i}_{j}", 
+                           width=0.5, 
+                           font={'size': 0},
+                           opacity=0.2,
+                           color="#00ff99",
+                           physics=False)
+        # Cerrar el círculo
+        net.add_edge(f"circ_{i}_{circle_nodes-1}", f"circ_{i}_0", 
+                   width=0.5, 
+                   font={'size': 0},
+                   opacity=0.2,
+                   color="#00ff99",
+                   physics=False)
+
+# Añadir puntos
+for i, point in enumerate(dt.points):
+    net.add_node(i, x=point.x*10, y=point.y*10, size=6, color="#ff5353", borderWidth=1, physics=False)
+
+# Añadir aristas
+edge_set = set()
+for triangle in dt.triangles:
+    for edge in triangle.edges:
+        edge_set.add(edge)
+
+for edge in edge_set:
+    p1, p2 = edge
+    id1 = dt.points.index(p1)
+    id2 = dt.points.index(p2)
+    net.add_edge(id1, id2, physics=False, width=2, color="#ff5050")
+
+
+        
 net.set_options('''
 {
   "physics": { "enabled": false },
-  "interaction": { "dragNodes": true, "zoomView": true, "dragView": true },
-  "nodes": { "font": { "size": 14, "color": "#ffffff" } }
+  "interaction": { "dragNodes": true, "zoomView": true, "dragView": true }
 }
 ''')
-
-# Generar puntos aleatorios y triangular
-pts = [Point2D(random.randint(10, bounds[0]-10),
-               random.randint(10, bounds[1]-10))
-       for _ in range(nodes)]
-tri = DelaunayTriangulation(pts)
-tri.triangulate()
-
-# Añadir sólo los nodos originales, centrados y con Y invertida
-for i, p in enumerate(tri.sorted[:nodes]):
-    x_px = (p.x - off_x) * scale
-    y_px = -(p.y - off_y) * scale   # <- OJO: invertimos Y para PyVis
-    net.add_node(i, label=str(i), shape="dot", color="#ff5353",
-                 x=x_px, y=y_px, size=10, physics=False)
-
-# Detectar aristas del hull
-hull = {(min(e.a, e.b), max(e.a, e.b)) for e in tri.hull}
-
-# Añadir todas las aristas Delaunay
-for e in tri.edges:
-    a, b = e.a, e.b
-    key = (min(a, b), max(a, b))
-    if key in hull:
-        net.add_edge(a, b, color="#4287f5", width=3, title=f"Hull {a}-{b}")
-    else:
-        net.add_edge(a, b, color="#ffffff", width=1, title=f"Edge {a}-{b}")
-
-net.title = f"Delaunay Triangulation ({nodes} nodes)"
-net.write_html('triangulation_output.html')
+net.write_html("delaunay.html", notebook=False)

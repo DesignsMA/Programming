@@ -2,30 +2,6 @@ from pyvis.network import Network
 import numpy as np
 import random
 # clases de utilidad
-class Edge():
-  def __init__(self, a: float = 0, b: float = 0):
-      """
-      Representación de un lado.
-      
-      :params:
-      a (float): Miembro 'a' del lado.
-      
-      b (float): Miembro 'b' del lado.
-      """
-      self.a = a
-      self.b = b
-  
-  def __repr__(self):
-     return f"Edge({self.a}, {self.b})"
-  
-  def tuple(self):
-      "Returns the tuple equivalent of the class."
-      return (self.a,self.b) # tuple
-  
-  def arr(self):
-      "Returns the numpy array equivalent of the class."
-      return np.array([self.a,self.b], dtype=np.float64) # retornar arreglo de tipo float64
-
 class Point2D():
   """
     Point2D | Representación de un punto en dos dimensiones.
@@ -55,84 +31,162 @@ class Point2D():
       return np.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
   
   def arr(self):
-      "Returns the numpy array equivalent of the class."
+      "Retorna el equivalente en numpy array."
       return np.array([self.x,self.y], dtype=np.float64) # retornar arreglo de tipo float64
-      
-
+  
+  def __eq__(self, other):
+      return self.x == other.x and self.y == other.y
+  
+  def __hash__(self):
+      return hash((self.x, self.y))
+class Triangle():
+    
+    def __init__(self, A: Point2D, B: Point2D, C: Point2D):
+        """Inicializa un triángulo con tres puntos 2D.
+        
+        Args:
+            A: Primer vértice del triángulo
+            B: Segundo vértice del triángulo
+            C: Tercer vértice del triángulo
+        """
+        self.A = A
+        self.B = B
+        self.C = C
+        self.circumcenter = None  # Centro del circuncírculo
+        self.radius = None          # Radio del circuncírculo
+        self._circumcircle_valid = False             # Bandera de validación
+        self.edges = frozenset({frozenset({self.A, self.B}), 
+                               frozenset({self.B, self.C}), 
+                               frozenset({self.C, self.A})})
+    def _calculate_circumcircle(self):
+        a = self.B.distance_to(self.C)
+        b = self.A.distance_to(self.C)
+        c = self.A.distance_to(self.B)
+        
+        if self.is_degenerate:
+            self._circumcircle_valid = False
+            return False
+            
+        a2, b2, c2 = a*a, b*b, c*c
+        sum_weights = a2*(b2 + c2 - a2) + b2*(a2 + c2 - b2) + c2*(a2 + b2 - c2)
+        
+        if abs(sum_weights) < 1e-10:
+            self._circumcircle_valid = False
+            return False
+            
+        wx = a2*(b2 + c2 - a2)*self.A.x + b2*(a2 + c2 - b2)*self.B.x + c2*(a2 + b2 - c2)*self.C.x
+        wy = a2*(b2 + c2 - a2)*self.A.y + b2*(a2 + c2 - b2)*self.B.y + c2*(a2 + b2 - c2)*self.C.y
+        
+        self.circumcenter = Point2D(wx / sum_weights, wy / sum_weights)
+        self.radius = self.circumcenter.distance_to(self.A)
+        self._circumcircle_valid = True
+        return True
+    
+    def get_circumcircle(self):
+        if not self._circumcircle_valid:
+            self._calculate_circumcircle()
+        return self.circumcenter, self.radius
+    
+    def point_in_circumcircle(self, point: Point2D):
+        if not self._circumcircle_valid:
+            if not self._calculate_circumcircle():
+                return False
+        
+        if self.circumcenter is None or self.radius is None:
+            return False
+            
+        distance_sq = (point.x - self.circumcenter.x)**2 + (point.y - self.circumcenter.y)**2
+        return distance_sq <= (self.radius**2 + 1e-10)
+        
+    @property
+    def is_degenerate(self) -> bool:
+        area = 0.5 * abs((self.B.x - self.A.x)*(self.C.y - self.A.y) - 
+                         (self.B.y - self.A.y)*(self.C.x - self.A.x))
+        return area < 1e-10
+        
+    def __eq__(self, other):
+        if not isinstance(other, Triangle):
+            return False
+        return {self.A, self.B, self.C} == {other.A, other.B, other.C}
+    
+    def __hash__(self):
+        return hash((frozenset({self.A, self.B, self.C})))
 # clase que maneja la lógica de la triangulación
 class DelaunayTriangulation():
   
   def __init__(self, points: list):
       self.points = points
       self.sorted = points.copy()
-      self.edges = []
       self.hull = []
-      self.circuncenters = []
-
-  def insideCircle(self, A: Point2D, B: Point2D, C: Point2D, P: Point2D):
-    ax = A.x - P.x
-    ay = A.y - P.y
-    bx = B.x - P.x
-    by = B.y - P.y
-    cx = C.x - P.x
-    cy = C.y - P.y
-    
-    # Esto calcula el determinante (debe ser > 0 para estar dentro del círculo)
-    return (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)) > 0
+      self.triangles = []  # Almacenará triángulos
+      self.super_triangle = None  # Triángulo inicial que contiene todos los puntos
   
-  def crossProduct(self, A: Point2D, B: Point2D):
-    return A.x * B.y - A.y * B.x
-
-  def triangulate(self):
-      n = len(self.points)
-      self.sorted = self.sortByX(self.sorted,0,n-1) # ordenar puntos en funcion de x (menor a mayor)
-      
-      # crear envolvente convexa
-      # parte inferior
-      
-      for i in range(n):
-        while len(self.edges) >=2:
-            j = len(self.edges) - 2
-            k = len(self.edges) - 1
-            A = self.sorted[self.edges[j].a] # obtener (*a*,b)
-            B = self.sorted[self.edges[j].b] 
-            C = self.sorted[self.edges[k].b] 
+  def bowyer_watson(self):
+        self.triangles = []
+        self.super_triangle = self.superTriangle()
+        self.triangles.append(self.super_triangle)
+        
+        for point in self.points:
+            bad_triangles = []
             
-            if self.crossProduct( Point2D(B.x - A.x, B.y - A.y), Point2D(C.x - B.x, C.y - B.y) ) > 0:
-                break # romper ciclo
+            # Encontrar todos los triángulos cuyo circuncírculo contiene el punto
+            for triangle in self.triangles:
+                if triangle.point_in_circumcircle(point):
+                    bad_triangles.append(triangle)
             
-            self.edges.pop()# remover el ultimo elemento
-
-        self.edges.append( Edge( len(self.edges), i ) )
-      
-      lower = len(self.edges)
-      
-      i = n -2
-      t = lower + 1
-      # parte superior
-      while i >= 0:
-          while len(self.edges) >= t:
-              j = len(self.edges) -2
-              k = len(self.edges) -1
-              A = self.sorted[self.edges[j].a] # obtener (*a*,b)
-              B = self.sorted[self.edges[j].b] 
-              C = self.sorted[self.edges[k].b]
-              if np.cross( Point2D(B.x - A.x, B.y - A.y).arr(), Point2D(C.x - B.x, C.y - B.y).arr() ) > 0:
-                break # romper ciclo
+            # Encontrar el polígono formado por las aristas únicas
+            polygon_edges = []
+            for triangle in bad_triangles:
+                for edge in triangle.edges:
+                    # Si la arista es compartida con otro triángulo malo, no es parte del polígono
+                    shared = False
+                    for other in bad_triangles:
+                        if triangle == other:
+                            continue
+                        if edge in other.edges:
+                            shared = True
+                            break
+                    if not shared:
+                        polygon_edges.append(edge)
             
-              self.edges.pop() # remover el ultimo elemento
-
-          self.edges.append( Edge( i,  len(self.edges)) )
-
-          i-=1
-          
-      self.edges.pop() # remover duplicados 
-      self.hull = self.edges.copy() # almacenar envolvente
+            # Eliminar los triángulos malos
+            for triangle in bad_triangles:
+                if triangle in self.triangles:
+                    self.triangles.remove(triangle)
+            
+            #  Crear nuevos triángulos desde el punto a cada arista del polígono
+            for edge in polygon_edges:
+                edge_points = list(edge)
+                new_triangle = Triangle(edge_points[0], edge_points[1], point)
+                self.triangles.append(new_triangle)
+        
+        # Eliminar triángulos que comparten vértices con el supertriángulo
+        super_vertices = {self.super_triangle.A, self.super_triangle.B, self.super_triangle.C}
+        self.triangles = [
+            t for t in self.triangles 
+            if not ({t.A, t.B, t.C} & super_vertices)
+        ]
       
-      # triangular
-      ...
-      
-  # Implementación de quick sort para puntos
+  def superTriangle(self):      
+    xMin = yMin =  float('inf')  # Inicializar con infinito
+    xMax = yMax = float('-inf')
+    for p in self.points:
+        if p.x < xMin:
+            xMin = p.x
+        if p.y < yMin:
+            yMin = p.y
+            
+        if p.x > xMax:
+            xMax = p.x
+        if p.y > yMax:
+            yMax = p.y
+    
+    margen = 10*max(xMax -xMin, yMax -yMin)
+    v1 = Point2D( xMin - margen, yMin-margen)
+    v2 = Point2D( xMax + margen, yMin -margen)
+    v3 = Point2D( (xMin + xMax)/2, yMax + margen )
+    return Triangle(v1,v2,v3)
+
   
   def sortByX(self, points: list, start: int, end: int):
       # particion de puntos por quick sort
