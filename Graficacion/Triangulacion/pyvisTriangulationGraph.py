@@ -3,11 +3,17 @@ import random
 import math
 import numpy as np
 from pyvisDelaunayTriangulation2D import DelaunayTriangulation, Triangle, Point2D
+import pyvista as pv
+
 
 while input('X para salir: ').lower() != 'x':
+    plotter = pv.Plotter()
+    plotter.add_key_event("x", plotter.close)
+    is3D = False
     # Crear puntos aleatorios
     tipo = input("¿Que quieres generar?\nPuntos de una esfera (esfera) | Random (rand)\n: ")
     if tipo.lower() == 'esfera':
+        is3D = input('¿Visualizar en 3D?\nSí | No\n:  ').lower() != 'no'
         thetaV = float( input("Grados en theta: ") )
         phyV = float( input("Grados en phy: ") )
         res = int( input("Subdivisiones: ") )
@@ -16,7 +22,8 @@ while input('X para salir: ').lower() != 'x':
             for phy in np.linspace(0, phyV*math.pi/180, res): #de 0-2Pi calcular theta
                 x = 10*math.sin(theta)*math.cos(phy)
                 y = 10*math.sin(theta)*math.sin(phy)
-                genPoints.append(Point2D(x*100,y*200)) # por cien para escalar
+                z = 10*math.cos(theta)
+                genPoints.append(Point2D(x*100,y*100,z*100)) # por cien para escalar
 
     else:
         points = int( input("Cuantos puntos quieres generar: ") )
@@ -30,6 +37,7 @@ while input('X para salir: ').lower() != 'x':
 
     # Visualización (usando pyvis)
     net = Network(height="900px", width="100%", notebook=False, bgcolor="#161616")
+
     if drawCenter.lower() != 'no':
         # circuncentros
         for i, triangle in enumerate(dt.triangles):
@@ -76,24 +84,30 @@ while input('X para salir: ').lower() != 'x':
                            opacity=0.2,
                            color="#00ff99",
                            physics=False)
-
+                
     # Añadir puntos
     for i, point in enumerate(dt.points):
         net.add_node(i, x=point.x*10, y=point.y*10, size=6, color="#ff5353", borderWidth=1, physics=False)
-
+        
+        if is3D:
+            sphere = pv.Sphere(center=point.arr3D(), theta_resolution=10, phi_resolution=10, radius=4)
+            plotter.add_mesh(sphere, color='#ff5353')
     # Añadir aristas
     edge_set = set()
     for triangle in dt.triangles:
         for edge in triangle.edges:
             edge_set.add(edge)
-
+            
     for edge in edge_set:
-        p1, p2 = edge
-        id1 = dt.points.index(p1)
-        id2 = dt.points.index(p2)
-        net.add_edge(id1, id2, physics=False, width=2, color="#ff5050")
-
-
+        if len(edge) == 2:
+            p1, p2 = edge
+            id1 = dt.points.index(p1)
+            id2 = dt.points.index(p2)
+            net.add_edge(id1, id2, physics=False, width=2, color="#ff5050")
+            if is3D:
+                line = pv.Line(p1.arr3D(),p2.arr3D())
+                plotter.add_mesh(line, color='#ff5353')
+        
 
     net.set_options('''
     {
@@ -102,3 +116,9 @@ while input('X para salir: ').lower() != 'x':
     }
     ''')
     net.write_html("delaunay.html", notebook=False)
+    
+    if is3D:
+        plotter.show('Triangulación de una esfera.')
+        
+
+plotter.close()

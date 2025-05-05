@@ -7,7 +7,7 @@ class Point2D():
     Point2D | Representación de un punto en dos dimensiones.
   """
     
-  def __init__(self, x: float = 0, y: float = 0):
+  def __init__(self, x: float = 0, y: float = 0, z: float = 0):
       """      
       :params:
         x (float): Coordenada en el eje X.
@@ -16,6 +16,7 @@ class Point2D():
       """
       self.x = x
       self.y = y
+      self.z = z
     
   def __repr__(self):
       return f"Point2D({self.x}, {self.y})"
@@ -33,6 +34,9 @@ class Point2D():
   def arr(self):
       "Retorna el equivalente en numpy array."
       return np.array([self.x,self.y], dtype=np.float64) # retornar arreglo de tipo float64
+  
+  def arr3D(self):
+      return np.array([self.x, self.y, self.z], dtype=np.float64)
   
   def __eq__(self, other):
       return self.x == other.x and self.y == other.y
